@@ -6,5 +6,10 @@ namespace HousingRegisterApi.V1.Boundary.Response
         //TODO: add the fields that this API will return here
         //TODO: add xml comments containing information that will be included in the auto generated swagger docs
         //Guidance on XML comments and response objects here (https://github.com/LBHackney-IT/lbh-base-api/wiki/Controllers-and-Response-Objects)
+
+        public int Id { get; set; }
+
+        /// <example>2021-04-12</example>
+        public string CreatedAt { get; set; }
     }
 }

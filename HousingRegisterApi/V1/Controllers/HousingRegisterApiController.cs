@@ -21,28 +21,38 @@ namespace HousingRegisterApi.V1.Controllers
 
         //TODO: add xml comments containing information that will be included in the auto generated swagger docs (https://github.com/LBHackney-IT/lbh-base-api/wiki/Controllers-and-Response-Objects)
         /// <summary>
-        /// ...
+        /// List the records available
         /// </summary>
-        /// <response code="200">...</response>
+        /// <response code="200">Success</response>
         /// <response code="400">Invalid Query Parameter.</response>
+        /// <response code="500">Something went wrong</response>
         [ProducesResponseType(typeof(ResponseObjectList), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
-        public IActionResult ListContacts()
+        public IActionResult ListRecords()
         {
             return Ok(_getAllUseCase.Execute());
         }
 
         /// <summary>
-        /// ...
+        /// Retrives the record corresponding to the supplied id
         /// </summary>
-        /// <response code="200">...</response>
-        /// <response code="404">No ? found for the specified ID</response>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid id value supplied</response>
+        /// <response code="404">No record found for the specified ID</response>
+        /// <response code="500">Something went wrong</response>
         [ProducesResponseType(typeof(ResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         [Route("{id}")]
         public IActionResult ViewRecord(int id)
         {
-            return Ok(_getByIdUseCase.Execute(id));
+            var entity = _getByIdUseCase.Execute(id);
+            if (null == entity) return NotFound(id);
+
+            return Ok(entity);
         }
     }
 }
