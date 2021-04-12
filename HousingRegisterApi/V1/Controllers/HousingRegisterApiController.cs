@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace HousingRegisterApi.V1.Controllers
 {
     [ApiController]
-    //TODO: Rename to match the APIs endpoint
-    [Route("api/v1/residents")]
+    [Route("api/v1/housing")]
     [Produces("application/json")]
     [ApiVersion("1.0")]
-    //TODO: rename class to match the API name
     public class HousingRegisterApiController : BaseController
     {
         private readonly IGetAllUseCase _getAllUseCase;
@@ -41,11 +39,10 @@ namespace HousingRegisterApi.V1.Controllers
         /// <response code="404">No ? found for the specified ID</response>
         [ProducesResponseType(typeof(ResponseObject), StatusCodes.Status200OK)]
         [HttpGet]
-        //TODO: rename to match the identifier that will be used
-        [Route("{yourId}")]
-        public IActionResult ViewRecord(int yourId)
+        [Route("{id}")]
+        public IActionResult ViewRecord(int id)
         {
-            return Ok(_getByIdUseCase.Execute(yourId));
+            return Ok(_getByIdUseCase.Execute(id));
         }
     }
 }
