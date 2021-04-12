@@ -8,7 +8,7 @@ namespace HousingRegisterApi.V1.UseCase
     //TODO: Rename class name and interface name to reflect the entity they are representing eg. GetClaimantByIdUseCase
     public class GetByIdUseCase : IGetByIdUseCase
     {
-        private IExampleGateway _gateway;
+        private readonly IExampleGateway _gateway;
         public GetByIdUseCase(IExampleGateway gateway)
         {
             _gateway = gateway;

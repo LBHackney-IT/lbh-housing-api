@@ -1,3 +1,4 @@
+using FluentAssertions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using NUnit.Framework;
@@ -13,7 +14,10 @@ namespace HousingRegisterApi.Tests.V1.Factories
         {
             var domain = new Entity();
             var response = domain.ToResponse();
+
             //TODO: check here that all of the fields have been mapped correctly. i.e. response.fieldOne.Should().Be("one")
+            response.Id.Should().Be(domain.Id);
+            response.CreatedAt.Should().Be(domain.CreatedAt.FormatDate());
         }
     }
 }

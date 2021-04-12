@@ -16,7 +16,8 @@ shell:
 
 .PHONY: test
 test:
-	docker-compose up dynamodb-database & docker-compose build housing-register-api-test && docker-compose up housing-register-api-test
+	docker-compose up -d dynamodb-database
+	docker-compose build housing-register-api-test && docker-compose up housing-register-api-test
 
 .PHONY: lint
 lint:
@@ -25,8 +26,5 @@ lint:
 	dotnet format
 
 .PHONY: restart-db
-restart-db:
-	docker stop $$(docker ps -q --filter ancestor=test-database -a)
-	-docker rm $$(docker ps -q --filter ancestor=test-database -a)
-	docker rmi test-database
-	docker-compose up -d test-database
+restart-db:	
+	docker-compose up -d dynamodb-database
