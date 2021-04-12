@@ -1,6 +1,5 @@
 using Amazon.DynamoDBv2.DataModel;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
@@ -15,15 +14,12 @@ namespace HousingRegisterApi.V1.Infrastructure
     // * The table name must match that specified in the terraform step that provisions the DynamoDb resource
     // * The name of the hash key property must match that specified in the terraform step that provisions the DynamoDb resource
 
-    [Table("example_table")]
     [DynamoDBTable("example_table", LowerCamelCaseProperties = true)]
     public class DatabaseEntity
     {
-        [Column("id")]
         [DynamoDBHashKey]
         public int Id { get; set; }
 
-        [Column("created_at")]
         [DynamoDBProperty]
         public DateTime CreatedAt { get; set; }
     }

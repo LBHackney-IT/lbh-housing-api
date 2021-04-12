@@ -4,19 +4,19 @@ setup:
 
 .PHONY: build
 build:
-	docker-compose build base-api
+	docker-compose build housing-register-api
 
 .PHONY: serve
 serve:
-	docker-compose build base-api && docker-compose up base-api
+	docker-compose build housing-register-api && docker-compose up housing-register-api
 
 .PHONY: shell
 shell:
-	docker-compose run base-api bash
+	docker-compose run housing-register-api bash
 
 .PHONY: test
 test:
-	docker-compose up test-database & docker-compose build base-api-test && docker-compose up base-api-test
+	docker-compose up dynamodb-database & docker-compose build housing-register-api-test && docker-compose up housing-register-api-test
 
 .PHONY: lint
 lint:
