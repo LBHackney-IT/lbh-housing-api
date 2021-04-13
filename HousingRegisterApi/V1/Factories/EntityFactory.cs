@@ -13,6 +13,7 @@ namespace HousingRegisterApi.V1.Factories
             return new Entity
             {
                 Id = databaseEntity.Id,
+                Name = databaseEntity.Name,
                 CreatedAt = databaseEntity.CreatedAt
             };
         }
@@ -24,6 +25,7 @@ namespace HousingRegisterApi.V1.Factories
             return new DatabaseEntity
             {
                 Id = entity.Id,
+                Name = entity.Name,
                 CreatedAt = entity.CreatedAt
             };
         }

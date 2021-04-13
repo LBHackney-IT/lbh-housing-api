@@ -16,6 +16,7 @@ namespace HousingRegisterApi.V1.Factories
             return new ResponseObject
             {
                 Id = domain.Id,
+                Name = domain.Name,
                 CreatedAt = domain.CreatedAt.FormatDate()
             };
         }

@@ -20,7 +20,8 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBHashKey]
         public int Id { get; set; }
 
-        [DynamoDBProperty]
+        public string Name { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 }

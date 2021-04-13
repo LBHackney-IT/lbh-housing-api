@@ -18,6 +18,7 @@ namespace HousingRegisterApi.Tests.V1.Helper
             return new DatabaseEntity
             {
                 Id = entity.Id,
+                Name = entity.Name,
                 CreatedAt = entity.CreatedAt,
             };
         }

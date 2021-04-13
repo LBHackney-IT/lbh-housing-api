@@ -63,3 +63,4 @@ tmp/
 
 .fake
 .ionide
+database/shared-local-instance.db

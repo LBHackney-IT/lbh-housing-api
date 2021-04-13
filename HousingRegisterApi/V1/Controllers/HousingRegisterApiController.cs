@@ -19,7 +19,6 @@ namespace HousingRegisterApi.V1.Controllers
             _getByIdUseCase = getByIdUseCase;
         }
 
-        //TODO: add xml comments containing information that will be included in the auto generated swagger docs (https://github.com/LBHackney-IT/lbh-base-api/wiki/Controllers-and-Response-Objects)
         /// <summary>
         /// List the records available
         /// </summary>

@@ -95,6 +95,8 @@ $ make test
 
 To run database tests locally (e.g. via Visual Studio), then a local instance of DynamoDB will need to be running. 
 
+The required tables and data will be initialised as part of the test.
+
 ### Agreed Testing Approach
 - Use nUnit, FluentAssertions and Moq
 - Always follow a TDD approach
@@ -124,6 +126,4 @@ To run database tests locally (e.g. via Visual Studio), then a local instance of
 - **Rashmi Shetty**, Product Owner at London Borough of Hackney (rashmi.shetty@hackney.gov.uk)
 
 [docker-download]: https://www.docker.com/products/docker-desktop
-[universal-housing-simulator]: https://github.com/LBHackney-IT/lbh-universal-housing-simulator
-[made-tech]: https://madetech.com/
 [AWS-CLI]: https://aws.amazon.com/cli/

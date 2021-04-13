@@ -17,6 +17,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
 
             //TODO: check here that all of the fields have been mapped correctly. i.e. response.fieldOne.Should().Be("one")
             response.Id.Should().Be(domain.Id);
+            response.Name.Should().Be(domain.Name);
             response.CreatedAt.Should().Be(domain.CreatedAt.FormatDate());
         }
     }

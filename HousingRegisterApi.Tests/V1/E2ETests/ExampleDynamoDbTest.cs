@@ -70,6 +70,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var apiEntity = JsonConvert.DeserializeObject<ResponseObject>(responseContent);
 
             apiEntity.Should().BeEquivalentTo(entity, (x) => x.Excluding(y => y.CreatedAt));
+            apiEntity.Name.Should().Be(entity.Name);
             apiEntity.CreatedAt.Should().Be(entity.CreatedAt.FormatDate());
         }
     }

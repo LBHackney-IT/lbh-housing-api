@@ -9,6 +9,8 @@ namespace HousingRegisterApi.V1.Boundary.Response
 
         public int Id { get; set; }
 
+        /// <example>Thomas</example>
+        public string Name { get; set; }
         /// <example>2021-04-12</example>
         public string CreatedAt { get; set; }
     }

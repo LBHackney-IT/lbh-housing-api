@@ -7,6 +7,6 @@ namespace HousingRegisterApi.V1.Gateways
     {
         Entity GetEntityById(int id);
 
-        List<Entity> GetAll();
+        IEnumerable<Entity> GetAll();
     }
 }

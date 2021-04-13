@@ -49,6 +49,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             _dynamoDb.Verify(x => x.LoadAsync<DatabaseEntity>(entity.Id, default), Times.Once);
 
             entity.Id.Should().Be(response.Id);
+            entity.Name.Should().Be(response.Name);
             entity.CreatedAt.Should().BeSameDateAs(response.CreatedAt);
         }
     }

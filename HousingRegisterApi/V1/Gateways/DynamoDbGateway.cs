@@ -3,6 +3,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -15,9 +16,11 @@ namespace HousingRegisterApi.V1.Gateways
             _dynamoDbContext = dynamoDbContext;
         }
 
-        public List<Entity> GetAll()
+        public IEnumerable<Entity> GetAll()
         {
-            return new List<Entity>();
+            var conditions = new List<ScanCondition>();
+            var search = _dynamoDbContext.ScanAsync<DatabaseEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            return search.Select(x => x.ToDomain());
         }
 
         public Entity GetEntityById(int id)

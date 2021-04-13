@@ -21,6 +21,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             var entity = databaseEntity.ToDomain();
 
             databaseEntity.Id.Should().Be(entity.Id);
+            databaseEntity.Name.Should().Be(entity.Name);
             databaseEntity.CreatedAt.Should().BeSameDateAs(entity.CreatedAt);
         }
 
@@ -33,6 +34,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             var databaseEntity = entity.ToDatabase();
 
             entity.Id.Should().Be(databaseEntity.Id);
+            entity.Name.Should().Be(databaseEntity.Name);
             entity.CreatedAt.Should().BeSameDateAs(databaseEntity.CreatedAt);
         }
     }
