@@ -1,6 +1,6 @@
-# LBH Base API
+# Hackney: Housing register API
 
-Base API is a boilerplate code for being reused for new APIs for LBH
+An API to submit and review applications to the housing register. Using the Base API as boilerplate code.
 
 ## Stack
 
@@ -9,7 +9,7 @@ Base API is a boilerplate code for being reused for new APIs for LBH
 
 ## Dependencies
 
-- Universal Housing Simulator
+- TBC
 
 ## Contributing
 
@@ -21,51 +21,21 @@ Base API is a boilerplate code for being reused for new APIs for LBH
 4. Rename the initial template.
 5. Open it in your IDE.
 
-### Renaming
-
-The renaming of `base-api` into `SomethingElseApi` can be done by running a Renamer powershell script. To do so:
-1. Open the powershell and navigate to this directory's root.
-2. Run the script using the following command:
-```
-.\Renamer.ps1 -apiName My_Api
-```
-
-If your ***script execution policy*** prevents you from running the script, you can temporarily ***bypass*** that with:
-```
-powershell -noprofile -ExecutionPolicy Bypass -file .\Renamer.ps1 -apiName My_Api
-```
-
-Or you can change your execution policy, prior to running the script, permanently with _(this disables security so, be cautious)_:
-```
-Set-ExecutionPolicy Unrestricted
-```
-
-After the renaming is done, the ***script will ask you if you want to delete it as well***, as it's useless now - It's your choice.
-
-#### On OSX
-
-Use Docker to run this script on Macs:
-```
-docker run -it -v `pwd`:/app mcr.microsoft.com/powershell
-```
-
 ### Development
 
 To serve the application, run it using your IDE of choice, we use Visual Studio CE and JetBrains Rider on Mac.
 
 **Note**
-When running locally the appropriate database conneciton details are still needed.
-##### Postgres
-For Postgres an approprate `CONNECTION_STRING` environment variable is needed,
-and if you want to use a local Postgres instance then that will of course need to be installed and running.
+When running locally the appropriate database connection details are still needed.
+
 ##### DynamoDb
-To use a local instance of DynamoDb, this will need to be installed. This is most easily done using [Docker](https://www.docker.com/products/docker-desktop).
+To use a local instance of DynamoDb, this will need to be installed. This can be setup using [Docker](https://www.docker.com/products/docker-desktop).
 Run the following command, specifying the local path where you want the container's shared volume to be stored.
 ```
 docker run --name dynamodb-local -p 8000:8000 -v <PUT YOUR LOCAL PATH HERE>:/data/ amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /data
 ```
 
-If you would like to see what is in your local DynamoDb instance using a simple gui, then [this admin tool](https://github.com/aaronshaf/dynamodb-admin) can do that.
+If you would like to see what is in your local DynamoDb instance using a GUI, then [this admin tool](https://github.com/aaronshaf/dynamodb-admin) can do that.
 
 The application can also be served locally using docker:
 1.  Add you security credentials to AWS CLI.
@@ -123,13 +93,7 @@ Documentation on how to do this can be found [here](https://docs.microsoft.com/e
 $ make test
 ```
 
-To run database tests locally (e.g. via Visual Studio) and you are using Postgres the `CONNECTION_STRING` environment variable will need to be populated with:
-
-`Host=localhost;Database=testdb;Username=postgres;Password=mypassword"`
-
-Note: The Host name needs to be the name of the stub database docker-compose service, in order to run tests via Docker.
-
-If changes to the database schema are made then the docker image for the database will have to be removed and recreated. The restart-db make command will do this for you.
+To run database tests locally (e.g. via Visual Studio), then a local instance of DynamoDB will need to be running. 
 
 ### Agreed Testing Approach
 - Use nUnit, FluentAssertions and Moq
@@ -141,16 +105,7 @@ If changes to the database schema are made then the docker image for the databas
 - Optimise when test run speed starts to hinder development
 - Unit tests and E2E tests should run in CI
 - Test database schemas should match up with production database schema
-- Have integration tests which test from the PostgreSQL database to API Gateway
-
-## Data Migrations
-### A good data migration
-- Record failure logs
-- Automated
-- Reliable
-- As close to real time as possible
-- Observable monitoring in place
-- Should not affect any existing databases
+- Have integration tests which test from the DynamoDB database to API Gateway
 
 ## Contacts
 
@@ -159,6 +114,10 @@ If changes to the database schema are made then the docker image for the databas
 - **Selwyn Preston**, Lead Developer at London Borough of Hackney (selwyn.preston@hackney.gov.uk)
 - **Mirela Georgieva**, Lead Developer at London Borough of Hackney (mirela.georgieva@hackney.gov.uk)
 - **Matt Keyworth**, Lead Developer at London Borough of Hackney (matthew.keyworth@hackney.gov.uk)
+
+### Contributors
+
+- **Thomas Morris**, Senior Developer at Manifesto (thomas.morris@hackney.gov.uk)
 
 ### Other Contacts
 
