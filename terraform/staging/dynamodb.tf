@@ -19,8 +19,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 }
 
 resource "aws_iam_policy" "housingregisterapi_dynamodb_table_policy" {
-    name                  = "lambda-dynamodb-housingregister-api"
-    description           = "A policy allowing read/write operations on housingregister dynamoDB for the Housing Register API"
+    name                  = "lambda-dynamodb-housing-register-api"
+    description           = "A policy allowing read/write operations on housing register dynamoDB for the Housing Register API"
     path                  = "/housing-register-api/"
 
     policy                = <<EOF
