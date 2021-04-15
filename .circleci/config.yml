@@ -189,50 +189,51 @@ workflows:
       - build-and-test:
           filters:
             branches:
-              only: master
+              only: release
       - assume-role-staging:
-          context: api-assume-role-staging-context
+          context: api-assume-role-housing-staging-context
           requires:
               - build-and-test
           filters:
              branches:
-               only: master
+               only: release
       - terraform-init-and-apply-to-staging:
           requires:
             - assume-role-staging
           filters:
             branches:
-              only: master
+              only: release
       - deploy-to-staging:
           requires:
             - terraform-init-and-apply-to-staging
           filters:
             branches:
-              only: master
+              only: release
       - permit-production-terraform-release:
           type: approval
           requires:
             - deploy-to-staging
       - assume-role-production:
-          context: api-assume-role-production-context
+          context: api-assume-role-housing-production-context
           requires:
               - permit-production-terraform-release
           filters:
              branches:
-               only: master
+               only: release
       - terraform-init-and-apply-to-production:
           requires:
             - assume-role-production
           filters:
             branches:
-              only: master
+              only: release
       - permit-production-release:
           type: approval
           requires:
             - deploy-to-staging
+            - terraform-init-and-apply-to-production
           filters:
             branches:
-              only: master
+              only: release
       - deploy-to-production:
           context: api-assume-role-housing-production-context
           requires:
@@ -240,4 +241,4 @@ workflows:
             - terraform-init-and-apply-to-production
           filters:
             branches:
-              only: master
+              only: release
