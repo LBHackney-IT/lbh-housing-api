@@ -59,8 +59,6 @@ bin/
 .idea/
 tmp/
 .vs/
-/base-api.Tests/Properties/launchSettings.json
-
 .fake
 .ionide
 database/shared-local-instance.db
