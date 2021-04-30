@@ -4,7 +4,7 @@ using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 
 namespace HousingRegisterApi.V1.UseCase
-{    
+{
     public class GetAllApplicationsUseCase : IGetAllApplicationsUseCase
     {
         private readonly IApplicationApiGateway _gateway;

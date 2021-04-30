@@ -5,7 +5,7 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
 
 namespace HousingRegisterApi.V1.UseCase
-{    
+{
     public class GetApplicationByIdUseCase : IGetApplicationByIdUseCase
     {
         private readonly IApplicationApiGateway _gateway;
@@ -13,7 +13,7 @@ namespace HousingRegisterApi.V1.UseCase
         {
             _gateway = gateway;
         }
-        
+
         public ApplicationResponse Execute(Guid id)
         {
             return _gateway.GetApplicationById(id).ToResponse();

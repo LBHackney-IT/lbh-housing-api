@@ -6,7 +6,7 @@ using HousingRegisterApi.V1.Domain;
 namespace HousingRegisterApi.V1.Factories
 {
     public static class ResponseFactory
-    {        
+    {
         public static ApplicationResponse ToResponse(this Application domain)
         {
             if (null == domain) return null;

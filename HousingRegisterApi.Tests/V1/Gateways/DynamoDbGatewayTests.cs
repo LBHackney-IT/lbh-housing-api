@@ -10,7 +10,7 @@ using NUnit.Framework;
 using System;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
-{        
+{
     [TestFixture]
     public class DynamoDbGatewayTests
     {

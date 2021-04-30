@@ -22,7 +22,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockGateway = new Mock<IApplicationApiGateway>();
             _classUnderTest = new GetApplicationByIdUseCase(_mockGateway.Object);
             _fixture = new Fixture();
-        }        
+        }
 
         [Test]
         public void GetApplicationByIdNullReturnsNull()
