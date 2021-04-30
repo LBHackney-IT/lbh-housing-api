@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using HousingRegisterApi.V1.Controllers;
-using HousingRegisterApi.V1.Infrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

@@ -11,28 +11,31 @@ using NUnit.Framework;
 
 namespace HousingRegisterApi.Tests.V1.UseCase
 {
-    public class GetAllUseCaseTests
+    public class GetAllApplicationsUseCaseTests
     {
-        private Mock<IExampleGateway> _mockGateway;
-        private GetAllUseCase _classUnderTest;
+        private Mock<IApplicationApiGateway> _mockGateway;
+        private GetAllApplicationsUseCase _classUnderTest;
         private Fixture _fixture;
 
         [SetUp]
         public void SetUp()
         {
-            _mockGateway = new Mock<IExampleGateway>();
-            _classUnderTest = new GetAllUseCase(_mockGateway.Object);
+            _mockGateway = new Mock<IApplicationApiGateway>();
+            _classUnderTest = new GetAllApplicationsUseCase(_mockGateway.Object);
             _fixture = new Fixture();
         }
 
         [Test]
-        public void GetsAllFromTheGateway()
+        public void GetsAllApplicationsFromTheGateway()
         {
-            var stubbedEntities = _fixture.CreateMany<Entity>().ToList();
+            // Arrange
+            var stubbedEntities = _fixture.CreateMany<Application>().ToList();
             _mockGateway.Setup(x => x.GetAll()).Returns(stubbedEntities);
 
-            var expectedResponse = new ResponseObjectList { ResponseObjects = stubbedEntities.ToResponse() };
+            // Act
+            var expectedResponse = new ApplicationList { Results = stubbedEntities.ToResponse() };
 
+            // Assert
             _classUnderTest.Execute().Should().BeEquivalentTo(expectedResponse);
         }
 

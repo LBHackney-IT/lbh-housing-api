@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using HousingRegisterApi.V1.Controllers;
-using HousingRegisterApi.V1.Infrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;

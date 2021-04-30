@@ -7,12 +7,10 @@ using HousingRegisterApi.V1.Infrastructure;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using System;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
-{
-    //TODO: Remove this file if DynamoDb gateway not being used
-    //TODO: Rename Tests to match gateway name
-    //For instruction on how to run tests please see the wiki: https://github.com/LBHackney-IT/lbh-base-api/wiki/Running-the-test-suite.
+{        
     [TestFixture]
     public class DynamoDbGatewayTests
     {
@@ -30,27 +28,30 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         [Test]
         public void GetEntityByIdReturnsNullIfEntityDoesntExist()
         {
-            var response = _classUnderTest.GetEntityById(123);
+            // Act
+            var guid = Guid.NewGuid();
+            var response = _classUnderTest.GetApplicationById(guid);
 
+            // Assert
             response.Should().BeNull();
         }
 
         [Test]
         public void GetEntityByIdReturnsTheEntityIfItExists()
         {
-            var entity = _fixture.Create<Entity>();
+            // Arrange
+            var entity = _fixture.Create<Application>();
             var dbEntity = DatabaseEntityHelper.CreateDatabaseEntityFrom(entity);
 
-            _dynamoDb.Setup(x => x.LoadAsync<DatabaseEntity>(entity.Id, default))
+            _dynamoDb.Setup(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default))
                      .ReturnsAsync(dbEntity);
 
-            var response = _classUnderTest.GetEntityById(entity.Id);
+            // Act
+            var response = _classUnderTest.GetApplicationById(entity.Id);
 
-            _dynamoDb.Verify(x => x.LoadAsync<DatabaseEntity>(entity.Id, default), Times.Once);
-
-            entity.Id.Should().Be(response.Id);
-            entity.Name.Should().Be(response.Name);
-            entity.CreatedAt.Should().BeSameDateAs(response.CreatedAt);
+            // Assert
+            _dynamoDb.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default), Times.Once);
+            entity.Should().BeEquivalentTo(response);
         }
     }
 }
