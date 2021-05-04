@@ -1,9 +1,10 @@
 using HousingRegisterApi.V1.Boundary.Response;
+using System;
 
 namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
-    public interface IGetAllUseCase
+    public interface IGetApplicationByIdUseCase
     {
-        ResponseObjectList Execute();
+        ApplicationResponse Execute(Guid id);
     }
 }

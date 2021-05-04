@@ -1,32 +1,32 @@
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Infrastructure;
+using System.Linq;
 
 namespace HousingRegisterApi.V1.Factories
 {
     public static class EntityFactory
     {
-        public static Entity ToDomain(this DatabaseEntity databaseEntity)
+        public static Application ToDomain(this ApplicationDbEntity databaseEntity)
         {
-            //TODO: Map the rest of the fields in the domain object.
-            // More information on this can be found here https://github.com/LBHackney-IT/lbh-base-api/wiki/Factory-object-mappings
-
-            return new Entity
+            return new Application
             {
                 Id = databaseEntity.Id,
-                Name = databaseEntity.Name,
-                CreatedAt = databaseEntity.CreatedAt
+                Status = databaseEntity.Status,
+                CreatedAt = databaseEntity.CreatedAt,
+                Applicant = databaseEntity.Applicant,
+                OtherMembers = databaseEntity.OtherMembers
             };
         }
 
-        public static DatabaseEntity ToDatabase(this Entity entity)
+        public static ApplicationDbEntity ToDatabase(this Application entity)
         {
-            //TODO: Map the rest of the fields in the database object.
-
-            return new DatabaseEntity
+            return new ApplicationDbEntity
             {
                 Id = entity.Id,
-                Name = entity.Name,
-                CreatedAt = entity.CreatedAt
+                Status = entity.Status,
+                CreatedAt = entity.CreatedAt,
+                Applicant = entity.Applicant,
+                OtherMembers = entity.OtherMembers.ToList()
             };
         }
     }

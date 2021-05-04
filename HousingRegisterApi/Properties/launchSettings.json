@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "base_api": {
+    "housingregister_api": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/v1/healthcheck/ping",

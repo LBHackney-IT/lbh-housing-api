@@ -2,12 +2,13 @@ using Amazon.DynamoDBv2.DataModel;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HousingRegisterApi.V1.Gateways
 {
-    public class DynamoDbGateway : IExampleGateway
+    public class DynamoDbGateway : IApplicationApiGateway
     {
         private readonly IDynamoDBContext _dynamoDbContext;
 
@@ -16,16 +17,16 @@ namespace HousingRegisterApi.V1.Gateways
             _dynamoDbContext = dynamoDbContext;
         }
 
-        public IEnumerable<Entity> GetAll()
+        public IEnumerable<Application> GetAll()
         {
             var conditions = new List<ScanCondition>();
-            var search = _dynamoDbContext.ScanAsync<DatabaseEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
             return search.Select(x => x.ToDomain());
         }
 
-        public Entity GetEntityById(int id)
+        public Application GetApplicationById(Guid id)
         {
-            var result = _dynamoDbContext.LoadAsync<DatabaseEntity>(id).GetAwaiter().GetResult();
+            var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
             return result?.ToDomain();
         }
     }

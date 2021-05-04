@@ -1,6 +1,4 @@
 using AutoFixture;
-using HousingRegisterApi;
-using HousingRegisterApi.Tests;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
@@ -14,10 +12,9 @@ using HousingRegisterApi.V1.Boundary.Response;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
-    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests
-    //Example integration tests using DynamoDb
+    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
 
-    public class ExampleDynamoDbTest : DynamoDbIntegrationTests<Startup>
+    public class GetApplicationByIdTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly Fixture _fixture = new Fixture();
 
@@ -26,9 +23,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private Entity ConstructTestEntity()
+        private Application ConstructTestEntity()
         {
-            var entity = _fixture.Create<Entity>();
+            var entity = _fixture.Create<Application>();
             entity.CreatedAt = DateTime.UtcNow;
             return entity;
         }
@@ -39,19 +36,20 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private async Task SetupTestData(Entity entity)
+        private async Task SetupTestData(Application entity)
         {
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
-            CleanupActions.Add(async () => await DynamoDbContext.DeleteAsync<DatabaseEntity>(entity.Id).ConfigureAwait(false));
+            CleanupActions.Add(async () => await DynamoDbContext.DeleteAsync<ApplicationDbEntity>(entity.Id).ConfigureAwait(false));
         }
 
         [Test]
         public async Task GetEntityByIdNotFoundReturns404()
         {
-            int id = 123456789;
-            var uri = new Uri($"api/v1/housing/{id}", UriKind.Relative);
+            var id = Guid.NewGuid();
+            var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
             var response = await Client.GetAsync(uri).ConfigureAwait(false);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
@@ -61,17 +59,16 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var entity = ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
-            var uri = new Uri($"api/v1/housing/{entity.Id}", UriKind.Relative);
+            var uri = new Uri($"api/v1/applications/{entity.Id}", UriKind.Relative);
             var response = await Client.GetAsync(uri).ConfigureAwait(false);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var apiEntity = JsonConvert.DeserializeObject<ResponseObject>(responseContent);
+            var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 
-            apiEntity.Should().BeEquivalentTo(entity, (x) => x.Excluding(y => y.CreatedAt));
-            apiEntity.Name.Should().Be(entity.Name);
-            apiEntity.CreatedAt.Should().Be(entity.CreatedAt.FormatDate());
+            // Assert
+            apiEntity.Should().BeEquivalentTo(entity.ToResponse());
         }
     }
 }
