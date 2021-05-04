@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 
 namespace HousingRegisterApi.V1.Gateways
 {
     public interface IApplicationApiGateway
     {
+        IEnumerable<Application> GetAll();
+
         Application GetApplicationById(Guid id);
 
-        IEnumerable<Application> GetAll();
+        Application CreateNewApplication(CreateApplicationRequest request);
     }
 }
