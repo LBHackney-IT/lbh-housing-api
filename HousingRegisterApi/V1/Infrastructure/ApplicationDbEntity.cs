@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
-    [DynamoDBTable("Applications", LowerCamelCaseProperties = true)]
+    [DynamoDBTable("HousingRegister", LowerCamelCaseProperties = true)]
     public class ApplicationDbEntity
     {
         [DynamoDBHashKey]
