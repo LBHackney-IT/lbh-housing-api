@@ -34,7 +34,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         /// <param name="entity"></param>        
         private async Task SetupTestData(Application entity)
         {
-            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);            
+            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
         [Test]
