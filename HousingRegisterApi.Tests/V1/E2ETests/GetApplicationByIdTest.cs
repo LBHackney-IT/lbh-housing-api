@@ -1,7 +1,6 @@
 using AutoFixture;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
-using HousingRegisterApi.V1.Infrastructure;
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -35,8 +34,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         /// <param name="entity"></param>        
         private async Task SetupTestData(Application entity)
         {
-            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
-            CleanupActions.Add(async () => await DynamoDbContext.DeleteAsync<ApplicationDbEntity>(entity.Id).ConfigureAwait(false));
+            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);            
         }
 
         [Test]
