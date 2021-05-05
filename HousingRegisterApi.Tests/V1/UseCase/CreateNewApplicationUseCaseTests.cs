@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -42,6 +43,20 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.Should().BeEquivalentTo(application.ToResponse());
         }
 
-        //TODO: Add extra tests here for extra functionality added to the use case
+        [Test]
+        public void CreateNewApplicationExceptionIsThrown()
+        {
+            // Arrange
+            var exception = new ApplicationException("Test exception");
+            _mockGateway
+                .Setup(x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()))
+                .Throws(exception);
+
+            // Act
+            Func<ApplicationResponse> func = () => _classUnderTest.Execute(new CreateApplicationRequest());
+
+            // Assert
+            func.Should().Throw<ApplicationException>().WithMessage(exception.Message);
+        }
     }
 }

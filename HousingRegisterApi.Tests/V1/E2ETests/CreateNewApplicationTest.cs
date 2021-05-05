@@ -27,6 +27,13 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             return entity;
         }
 
+        private async Task<HttpResponseMessage> PostTestRequestAsync(string input)
+        {
+            using var data = new StringContent(input, Encoding.UTF8, "application/json");
+            var uri = new Uri($"api/v1/applications/", UriKind.Relative);
+            return await Client.PostAsync(uri, data).ConfigureAwait(false);
+        }
+
         [Test]
         public async Task CreateNewApplicationReturnsResponse()
         {
@@ -34,22 +41,30 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = ConstructTestRequest();
             var json = JsonConvert.SerializeObject(request);
 
-            // Act
-            using var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var uri = new Uri($"api/v1/applications/", UriKind.Relative);
-            var response = await Client.PostAsync(uri, data).ConfigureAwait(false);
-
+            // Act            
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
+
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 
-            // Assert
+            // Assert            
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 1000);
             apiEntity.Applicant.Should().BeEquivalentTo(request.Applicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+        }
+
+        [Test]
+        public async Task CreateNewApplicationReturnsBadRequest()
+        {
+            // Act
+            var response = await PostTestRequestAsync("test").ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
     }
 }
