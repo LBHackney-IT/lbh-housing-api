@@ -30,13 +30,16 @@ resource "aws_iam_policy" "housingregisterapi_dynamodb_table_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                        "dynamodb:BatchGetItem",
-                        "dynamodb:GetItem",
-                        "dynamodb:Query",
-                        "dynamodb:Scan",
-                        "dynamodb:BatchWriteItem",
-                        "dynamodb:PutItem",
-                        "dynamodb:UpdateItem"
+                        "dynamodb:BatchGet*", 
+                        "dynamodb:BatchWrite*", 
+                        "dynamodb:DeleteItem", 
+                        "dynamodb:DescribeStream", 
+                        "dynamodb:DescribeTable", 
+                        "dynamodb:Get*", 
+                        "dynamodb:PutItem", 
+                        "dynamodb:Query", 
+                        "dynamodb:Scan", 
+                        "dynamodb:UpdateItem" 
                      ],
             "Resource": "${aws_dynamodb_table.housingregisterapi_dynamodb_table.arn}"
         }
