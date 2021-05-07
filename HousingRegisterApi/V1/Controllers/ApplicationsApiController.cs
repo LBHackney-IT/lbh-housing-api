@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -14,10 +15,16 @@ namespace HousingRegisterApi.V1.Controllers
     {
         private readonly IGetAllApplicationsUseCase _getAllUseCase;
         private readonly IGetApplicationByIdUseCase _getByIdUseCase;
-        public ApplicationsApiController(IGetAllApplicationsUseCase getAllUseCase, IGetApplicationByIdUseCase getByIdUseCase)
+        private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
+
+        public ApplicationsApiController(
+            IGetAllApplicationsUseCase getAllUseCase,
+            IGetApplicationByIdUseCase getByIdUseCase,
+            ICreateNewApplicationUseCase createNewApplicationUseCase)
         {
             _getAllUseCase = getAllUseCase;
             _getByIdUseCase = getByIdUseCase;
+            _createNewApplicationUseCase = createNewApplicationUseCase;
         }
 
         /// <summary>
@@ -54,6 +61,22 @@ namespace HousingRegisterApi.V1.Controllers
             if (null == entity) return NotFound(id);
 
             return Ok(entity);
+        }
+
+        /// <summary>
+        /// Creates a new application
+        /// </summary>
+        /// <response code="201">Returns the application created with its ID</response>
+        /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        public IActionResult CreateNewApplication([FromBody] CreateApplicationRequest applicationRequest)
+        {
+            var newApplication = _createNewApplicationUseCase.Execute(applicationRequest);
+            return Created(new Uri($"api/v1/applications/{newApplication.Id}", UriKind.Relative), newApplication);
         }
     }
 }

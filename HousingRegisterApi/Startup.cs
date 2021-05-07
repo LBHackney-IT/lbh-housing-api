@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using HousingRegisterApi.V1.Controllers;
+using Amazon;
+using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
@@ -29,7 +31,6 @@ namespace HousingRegisterApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
             AWSSDKHandler.RegisterXRayForAllServices();
         }
 
@@ -110,9 +111,10 @@ namespace HousingRegisterApi
             });
 
             ConfigureLogging(services, Configuration);
+            AWSXRayRecorder.InitializeInstance(Configuration);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
 
             services.ConfigureDynamoDB();
-
             RegisterGateways(services);
             RegisterUseCases(services);
         }
@@ -146,6 +148,7 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
+            services.AddScoped<ICreateNewApplicationUseCase, CreateNewApplicationUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
