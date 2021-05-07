@@ -16,7 +16,7 @@ namespace HousingRegisterApi.Tests
         {
             new TableDef
             {
-                Name = "Applications",
+                Name = "HousingRegister",
                 KeyName = "id",
                 KeyType = ScalarAttributeType.S
             }
