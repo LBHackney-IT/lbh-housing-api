@@ -17,30 +17,3 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         project_name      = var.project_name
     }
 }
-
-resource "aws_iam_policy" "housingregisterapi_dynamodb_table_policy" {
-    name                  = "lambda-dynamodb-housing-register-api"
-    description           = "A policy allowing read/write operations on housing register dynamoDB for the Housing Register API"
-    path                  = "/housing-register-api/"
-
-    policy                = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                        "dynamodb:BatchGetItem",
-                        "dynamodb:GetItem",
-                        "dynamodb:Query",
-                        "dynamodb:Scan",
-                        "dynamodb:BatchWriteItem",
-                        "dynamodb:PutItem",
-                        "dynamodb:UpdateItem"
-                     ],
-            "Resource": "${aws_dynamodb_table.housingregisterapi_dynamodb_table.arn}"
-        }
-    ]
-}
-EOF
-}
