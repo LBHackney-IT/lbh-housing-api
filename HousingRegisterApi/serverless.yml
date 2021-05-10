@@ -26,6 +26,7 @@ functions:
   HousingRegisterApi:
     name: ${self:service}-${self:provider.stage}
     handler: HousingRegisterApi::HousingRegisterApi.LambdaEntryPoint::FunctionHandlerAsync
+    role: lambdaExecutionRole
     events:
       - http:
           path: /{proxy+}
