@@ -149,6 +149,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
             services.AddScoped<ICreateNewApplicationUseCase, CreateNewApplicationUseCase>();
+            services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

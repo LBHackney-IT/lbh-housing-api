@@ -45,5 +45,21 @@ namespace HousingRegisterApi.V1.Gateways
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
         }
+
+        public Application UpdateApplication(Guid id, UpdateApplicationRequest request)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null)
+            {
+                return null;
+            }
+
+            entity.Status = request.Status;
+            entity.Applicant = request.Applicant;
+            entity.OtherMembers = request.OtherMembers.ToList();            
+            
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+            return entity.ToDomain();
+        }
     }
 }
