@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (!string.IsNullOrEmpty(request.Status))
                 entity.Status = request.Status;
-            
+
             if (request.Applicant != null)
                 entity.Applicant = request.Applicant;
 

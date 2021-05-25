@@ -23,8 +23,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public UpdateApplicationTest()
         {
             _applicationFixture = new ApplicationFixture();
-        }        
-     
+        }
+
         private async Task SetupTestData(Application entity)
         {
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
@@ -36,7 +36,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
             return await Client.PatchAsync(uri, data).ConfigureAwait(false);
         }
-       
+
         [Test]
         public async Task UpdateApplicationFullReturnsValidResponse()
         {

@@ -18,17 +18,17 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         private readonly ApplicationFixture _applicationFixture;
 
         public GetApplicationByIdTest()
-        {            
-            _applicationFixture = new ApplicationFixture();            
+        {
+            _applicationFixture = new ApplicationFixture();
         }
-     
+
         private async Task SetupTestData(Application entity)
         {
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
         private async Task<HttpResponseMessage> GetTestRequestAsync(Guid id)
-        {            
+        {
             var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
             return await Client.GetAsync(uri).ConfigureAwait(false);
         }
@@ -36,7 +36,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         [Test]
         public async Task GetEntityByIdNotFoundReturns404()
         {
-            var id = Guid.NewGuid();            
+            var id = Guid.NewGuid();
             var response = await GetTestRequestAsync(id).ConfigureAwait(false);
 
             // Assert
