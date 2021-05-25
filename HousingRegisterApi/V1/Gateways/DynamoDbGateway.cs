@@ -54,10 +54,15 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
-            entity.Status = request.Status;
-            entity.Applicant = request.Applicant;
-            entity.OtherMembers = request.OtherMembers.ToList();            
+            if (!string.IsNullOrEmpty(request.Status))
+                entity.Status = request.Status;
             
+            if (request.Applicant != null)
+                entity.Applicant = request.Applicant;
+
+            if (request.OtherMembers != null)
+                entity.OtherMembers = request.OtherMembers.ToList();
+
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
         }

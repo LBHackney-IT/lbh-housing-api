@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -56,16 +57,16 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
             return await Client.PatchAsync(uri, data).ConfigureAwait(false);
         }
-
+       
         [Test]
-        public async Task UpdateApplicationReturnsResponse()
+        public async Task UpdateApplicationFullReturnsValidResponse()
         {
             // Arrange  
             var entity = ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
-            var request = ConstructTestRequest();            
-            var json = JsonConvert.SerializeObject(request);            
+            var request = ConstructTestRequest();
+            var json = JsonConvert.SerializeObject(request);
 
             // Act
             var response = await PatchTestRequestAsync(entity.Id, json).ConfigureAwait(false);
@@ -80,6 +81,36 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
             apiEntity.Applicant.Should().BeEquivalentTo(request.Applicant);
+            apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+        }
+
+        [Test]
+        public async Task UpdateApplicationPartialReturnsValidResponse()
+        {
+            // Arrange  
+            var entity = ConstructTestEntity();
+            await SetupTestData(entity).ConfigureAwait(false);
+
+            var request = new UpdateApplicationRequest()
+            {
+                Status = "Pending",
+                OtherMembers = new List<Person>()
+            };
+            var json = JsonConvert.SerializeObject(request);
+
+            // Act
+            var response = await PatchTestRequestAsync(entity.Id, json).ConfigureAwait(false);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
+
+            // Assert            
+            apiEntity.Should().NotBeNull();
+            apiEntity.Id.Should().NotBeEmpty();
+            apiEntity.Status.Should().Be(request.Status);
+            apiEntity.CreatedAt.Should().Be(entity.CreatedAt);
+            apiEntity.Applicant.Should().BeEquivalentTo(entity.Applicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
         }
 
