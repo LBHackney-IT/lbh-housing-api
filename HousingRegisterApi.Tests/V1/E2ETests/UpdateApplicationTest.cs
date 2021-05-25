@@ -4,8 +4,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using AutoFixture;
 using FluentAssertions;
+using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
@@ -18,34 +18,13 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
     public class UpdateApplicationTest : DynamoDbIntegrationTests<Startup>
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly ApplicationFixture _applicationFixture;
 
-        /// <summary>
-        /// Method to construct a test entity that can be used in a test
-        /// </summary>        
-        /// <returns></returns>
-        private Application ConstructTestEntity()
+        public UpdateApplicationTest()
         {
-            var entity = _fixture.Create<Application>();
-            entity.CreatedAt = DateTime.UtcNow;
-            return entity;
-        }
-
-        /// <summary>
-        /// Method to construct a test request that can be used in a test
-        /// </summary>        
-        /// <returns></returns>
-        private UpdateApplicationRequest ConstructTestRequest()
-        {
-            var entity = _fixture.Create<UpdateApplicationRequest>();
-            return entity;
-        }
-
-        /// <summary>
-        /// Method to add an entity instance to the database so that it can be used in a test.
-        /// Also adds the corresponding action to remove the upserted data from the database when the test is done.
-        /// </summary>
-        /// <param name="entity"></param>        
+            _applicationFixture = new ApplicationFixture();
+        }        
+     
         private async Task SetupTestData(Application entity)
         {
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
@@ -62,10 +41,10 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task UpdateApplicationFullReturnsValidResponse()
         {
             // Arrange  
-            var entity = ConstructTestEntity();
+            var entity = _applicationFixture.ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
-            var request = ConstructTestRequest();
+            var request = _applicationFixture.ConstructUpdateApplicationRequest();
             var json = JsonConvert.SerializeObject(request);
 
             // Act
@@ -88,7 +67,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task UpdateApplicationPartialReturnsValidResponse()
         {
             // Arrange  
-            var entity = ConstructTestEntity();
+            var entity = _applicationFixture.ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
             var request = new UpdateApplicationRequest()
@@ -119,7 +98,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         {
             // Arrange  
             var id = Guid.NewGuid();
-            var request = ConstructTestRequest();
+            var request = _applicationFixture.ConstructUpdateApplicationRequest();
             var json = JsonConvert.SerializeObject(request);
 
             // Act            

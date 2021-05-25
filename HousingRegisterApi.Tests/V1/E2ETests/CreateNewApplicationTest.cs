@@ -3,9 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using AutoFixture;
 using FluentAssertions;
-using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
 using HousingRegisterApi.V1.Boundary.Response;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -15,16 +14,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
     public class CreateNewApplicationTest : DynamoDbIntegrationTests<Startup>
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly ApplicationFixture _applicationFixture;
 
-        /// <summary>
-        /// Method to construct a test request that can be used in a test
-        /// </summary>        
-        /// <returns></returns>
-        private CreateApplicationRequest ConstructTestRequest()
+        public CreateNewApplicationTest()
         {
-            var entity = _fixture.Create<CreateApplicationRequest>();
-            return entity;
+            _applicationFixture = new ApplicationFixture();
         }
 
         private async Task<HttpResponseMessage> PostTestRequestAsync(string input)
@@ -38,7 +32,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task CreateNewApplicationReturnsResponse()
         {
             // Arrange
-            var request = ConstructTestRequest();
+            var request = _applicationFixture.ConstructCreateApplicationRequest();
             var json = JsonConvert.SerializeObject(request);
 
             // Act            
