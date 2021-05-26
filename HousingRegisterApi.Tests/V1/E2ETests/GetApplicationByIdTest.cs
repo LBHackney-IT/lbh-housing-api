@@ -1,48 +1,43 @@
-using AutoFixture;
-using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
-using FluentAssertions;
-using Newtonsoft.Json;
-using NUnit.Framework;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
+using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Factories;
+using Newtonsoft.Json;
+using NUnit.Framework;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
     public class GetApplicationByIdTest : DynamoDbIntegrationTests<Startup>
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly ApplicationFixture _applicationFixture;
 
-        /// <summary>
-        /// Method to construct a test entity that can be used in a test
-        /// </summary>        
-        /// <returns></returns>
-        private Application ConstructTestEntity()
+        public GetApplicationByIdTest()
         {
-            var entity = _fixture.Create<Application>();
-            entity.CreatedAt = DateTime.UtcNow;
-            return entity;
+            _applicationFixture = new ApplicationFixture();
         }
 
-        /// <summary>
-        /// Method to add an entity instance to the database so that it can be used in a test.
-        /// Also adds the corresponding action to remove the upserted data from the database when the test is done.
-        /// </summary>
-        /// <param name="entity"></param>        
         private async Task SetupTestData(Application entity)
         {
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
+        }
+
+        private async Task<HttpResponseMessage> GetTestRequestAsync(Guid id)
+        {
+            var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
+            return await Client.GetAsync(uri).ConfigureAwait(false);
         }
 
         [Test]
         public async Task GetEntityByIdNotFoundReturns404()
         {
             var id = Guid.NewGuid();
-            var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
-            var response = await Client.GetAsync(uri).ConfigureAwait(false);
+            var response = await GetTestRequestAsync(id).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -52,14 +47,13 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task GetEntityByIdFoundReturnsResponse()
         {
             // Arrange
-            var entity = ConstructTestEntity();
+            var entity = _applicationFixture.ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
-            // Act
-            var uri = new Uri($"api/v1/applications/{entity.Id}", UriKind.Relative);
-            var response = await Client.GetAsync(uri).ConfigureAwait(false);
-
+            // Act            
+            var response = await GetTestRequestAsync(entity.Id).ConfigureAwait(false);
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 

@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace HousingRegisterApi.V1.Controllers
 {
@@ -16,15 +17,18 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IGetAllApplicationsUseCase _getAllUseCase;
         private readonly IGetApplicationByIdUseCase _getByIdUseCase;
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
+        private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getAllUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
-            ICreateNewApplicationUseCase createNewApplicationUseCase)
+            ICreateNewApplicationUseCase createNewApplicationUseCase,
+            IUpdateApplicationUseCase updateApplicationUseCase)
         {
             _getAllUseCase = getAllUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
+            _updateApplicationUseCase = updateApplicationUseCase;
         }
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace HousingRegisterApi.V1.Controllers
         public IActionResult ViewApplication(Guid id)
         {
             var entity = _getByIdUseCase.Execute(id);
-            if (null == entity) return NotFound(id);
+            if (entity == null) return NotFound(id);
 
             return Ok(entity);
         }
@@ -77,6 +81,25 @@ namespace HousingRegisterApi.V1.Controllers
         {
             var newApplication = _createNewApplicationUseCase.Execute(applicationRequest);
             return Created(new Uri($"api/v1/applications/{newApplication.Id}", UriKind.Relative), newApplication);
+        }
+
+        /// <summary>
+        /// Updates an existing application
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPatch]
+        [Route("{id}")]
+        public IActionResult UpdateApplication([FromRoute][Required] Guid id, [FromBody] UpdateApplicationRequest applicationRequest)
+        {
+            var result = _updateApplicationUseCase.Execute(id, applicationRequest);
+            if (result == null) return NotFound(id);
+
+            return Ok(result);
         }
     }
 }
