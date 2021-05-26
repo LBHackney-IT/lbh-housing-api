@@ -38,7 +38,7 @@ namespace HousingRegisterApi.V1.Gateways
                 Id = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 Status = request.Status,
-                Applicant = request.Applicant,
+                MainApplicant = request.MainApplicant,
                 OtherMembers = request.OtherMembers.ToList()
             };
 
@@ -57,8 +57,8 @@ namespace HousingRegisterApi.V1.Gateways
             if (!string.IsNullOrEmpty(request.Status))
                 entity.Status = request.Status;
 
-            if (request.Applicant != null)
-                entity.Applicant = request.Applicant;
+            if (request.MainApplicant != null)
+                entity.MainApplicant = request.MainApplicant;
 
             if (request.OtherMembers != null)
                 entity.OtherMembers = request.OtherMembers.ToList();

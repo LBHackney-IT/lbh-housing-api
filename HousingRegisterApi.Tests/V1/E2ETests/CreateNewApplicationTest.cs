@@ -47,7 +47,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
-            apiEntity.Applicant.Should().BeEquivalentTo(request.Applicant);
+            apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
         }
 

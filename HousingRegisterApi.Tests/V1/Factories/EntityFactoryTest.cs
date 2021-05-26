@@ -21,7 +21,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             databaseEntity.Id.Should().Be(entity.Id);
             databaseEntity.Status.Should().Be(entity.Status);
             databaseEntity.CreatedAt.Should().BeSameDateAs(entity.CreatedAt);
-            databaseEntity.Applicant.Should().BeEquivalentTo(entity.Applicant);
+            databaseEntity.MainApplicant.Should().BeEquivalentTo(entity.MainApplicant);
             databaseEntity.OtherMembers.Should().BeEquivalentTo(entity.OtherMembers);
         }
 
@@ -34,7 +34,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             entity.Id.Should().Be(databaseEntity.Id);
             entity.Status.Should().Be(databaseEntity.Status);
             entity.CreatedAt.Should().BeSameDateAs(databaseEntity.CreatedAt);
-            entity.Applicant.Should().BeEquivalentTo(databaseEntity.Applicant);
+            entity.MainApplicant.Should().BeEquivalentTo(databaseEntity.MainApplicant);
             entity.OtherMembers.Should().BeEquivalentTo(databaseEntity.OtherMembers);
         }
     }
