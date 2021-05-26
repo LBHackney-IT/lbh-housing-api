@@ -2,6 +2,7 @@ using System;
 
 namespace HousingRegisterApi.V1.Domain
 {
+    // TODO: integrate with the Person API
     public class Person
     {
         public Guid Id { get; set; }
