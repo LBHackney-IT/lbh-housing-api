@@ -14,7 +14,5 @@ namespace HousingRegisterApi.V1.Domain
         public string PlaceOfBirth { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; }
-        public Address Address { get; set; }
-        public ContactInformation ContactInformation { get; set; }
     }
 }
