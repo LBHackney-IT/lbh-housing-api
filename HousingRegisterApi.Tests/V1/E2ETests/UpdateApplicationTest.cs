@@ -59,7 +59,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
-            apiEntity.Applicant.Should().BeEquivalentTo(request.Applicant);
+            apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
         }
 
@@ -73,7 +73,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = new UpdateApplicationRequest()
             {
                 Status = "Pending",
-                OtherMembers = new List<Person>()
+                OtherMembers = new List<Applicant>()
             };
             var json = JsonConvert.SerializeObject(request);
 
@@ -89,7 +89,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.CreatedAt.Should().Be(entity.CreatedAt);
-            apiEntity.Applicant.Should().BeEquivalentTo(entity.Applicant);
+            apiEntity.MainApplicant.Should().BeEquivalentTo(entity.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
         }
 

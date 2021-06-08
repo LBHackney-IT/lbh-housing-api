@@ -16,10 +16,10 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime CreatedAt { get; set; }
 
-        [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Person>))]
-        public Person Applicant { get; set; }
+        [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Applicant>))]
+        public Applicant MainApplicant { get; set; }
 
-        [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<Person>))]
-        public List<Person> OtherMembers { get; set; } = new List<Person>();
+        [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<Applicant>))]
+        public List<Applicant> OtherMembers { get; set; } = new List<Applicant>();
     }
 }

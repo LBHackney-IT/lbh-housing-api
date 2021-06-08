@@ -6,7 +6,7 @@ namespace HousingRegisterApi.V1.Boundary.Request
     public class CreateApplicationRequest
     {
         public string Status { get; set; }
-        public Person Applicant { get; set; }
-        public IEnumerable<Person> OtherMembers { get; set; }
+        public Applicant MainApplicant { get; set; }
+        public IEnumerable<Applicant> OtherMembers { get; set; }
     }
 }

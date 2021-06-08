@@ -15,7 +15,7 @@ namespace HousingRegisterApi.V1.Factories
                 Id = domain.Id,
                 Status = domain.Status,
                 CreatedAt = domain.CreatedAt,
-                Applicant = domain.Applicant,
+                MainApplicant = domain.MainApplicant,
                 OtherMembers = domain.OtherMembers
             };
         }

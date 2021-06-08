@@ -12,7 +12,7 @@ namespace HousingRegisterApi.V1.Boundary.Response
         public string Status { get; set; }
         /// <example>2021-04-12</example>
         public DateTime CreatedAt { get; set; }
-        public Person Applicant { get; set; }
-        public IEnumerable<Person> OtherMembers { get; set; }
+        public Applicant MainApplicant { get; set; }
+        public IEnumerable<Applicant> OtherMembers { get; set; }
     }
 }

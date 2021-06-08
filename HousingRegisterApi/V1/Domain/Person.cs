@@ -2,6 +2,7 @@ using System;
 
 namespace HousingRegisterApi.V1.Domain
 {
+    // TODO: integrate with the Person API
     public class Person
     {
         public Guid Id { get; set; }
@@ -14,7 +15,5 @@ namespace HousingRegisterApi.V1.Domain
         public string PlaceOfBirth { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; }
-        public Address Address { get; set; }
-        public ContactInformation ContactInformation { get; set; }
     }
 }

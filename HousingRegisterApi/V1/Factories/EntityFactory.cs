@@ -13,7 +13,7 @@ namespace HousingRegisterApi.V1.Factories
                 Id = databaseEntity.Id,
                 Status = databaseEntity.Status,
                 CreatedAt = databaseEntity.CreatedAt,
-                Applicant = databaseEntity.Applicant,
+                MainApplicant = databaseEntity.MainApplicant,
                 OtherMembers = databaseEntity.OtherMembers
             };
         }
@@ -25,7 +25,7 @@ namespace HousingRegisterApi.V1.Factories
                 Id = entity.Id,
                 Status = entity.Status,
                 CreatedAt = entity.CreatedAt,
-                Applicant = entity.Applicant,
+                MainApplicant = entity.MainApplicant,
                 OtherMembers = entity.OtherMembers.ToList()
             };
         }
