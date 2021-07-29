@@ -37,7 +37,7 @@ namespace HousingRegisterApi.V1.Gateways
             {
                 Id = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
-                Status = request.Status,
+                Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
                 MainApplicant = request.MainApplicant,
                 OtherMembers = request.OtherMembers.ToList()
             };
