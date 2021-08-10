@@ -11,6 +11,7 @@ namespace HousingRegisterApi.V1.Factories
             return new Application
             {
                 Id = databaseEntity.Id,
+                Reference = databaseEntity.Reference,
                 Status = databaseEntity.Status,
                 CreatedAt = databaseEntity.CreatedAt,
                 MainApplicant = databaseEntity.MainApplicant,
@@ -23,6 +24,7 @@ namespace HousingRegisterApi.V1.Factories
             return new ApplicationDbEntity
             {
                 Id = entity.Id,
+                Reference = entity.Reference,
                 Status = entity.Status,
                 CreatedAt = entity.CreatedAt,
                 MainApplicant = entity.MainApplicant,

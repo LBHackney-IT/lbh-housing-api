@@ -16,13 +16,15 @@ namespace HousingRegisterApi.Tests.V1.Gateways
     {
         private readonly Fixture _fixture = new Fixture();
         private Mock<IDynamoDBContext> _dynamoDb;
+        private Mock<ISHA256Helper> _hashHelper;
         private DynamoDbGateway _classUnderTest;
 
         [SetUp]
         public void Setup()
         {
             _dynamoDb = new Mock<IDynamoDBContext>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object);
+            _hashHelper = new Mock<ISHA256Helper>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object);
         }
 
         [Test]

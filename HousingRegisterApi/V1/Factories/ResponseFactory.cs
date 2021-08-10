@@ -13,6 +13,7 @@ namespace HousingRegisterApi.V1.Factories
             return new ApplicationResponse
             {
                 Id = domain.Id,
+                Reference = domain.Reference,
                 Status = domain.Status,
                 CreatedAt = domain.CreatedAt,
                 MainApplicant = domain.MainApplicant,

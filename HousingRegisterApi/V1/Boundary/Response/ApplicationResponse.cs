@@ -9,9 +9,14 @@ namespace HousingRegisterApi.V1.Boundary.Response
     {
         public Guid Id { get; set; }
         /// <example>Pending</example>
+
+        public string Reference { get; set; }
+
         public string Status { get; set; }
+
         /// <example>2021-04-12</example>
         public DateTime CreatedAt { get; set; }
+
         public Applicant MainApplicant { get; set; }
         public IEnumerable<Applicant> OtherMembers { get; set; }
     }
