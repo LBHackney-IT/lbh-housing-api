@@ -15,7 +15,7 @@ using NUnit.Framework;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
-    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
+    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests
     public class UpdateApplicationTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
@@ -40,7 +40,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         [Test]
         public async Task UpdateApplicationFullReturnsValidResponse()
         {
-            // Arrange  
+            // Arrange
             var entity = _applicationFixture.ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
@@ -54,7 +54,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 
-            // Assert            
+            // Assert
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
@@ -66,7 +66,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         [Test]
         public async Task UpdateApplicationPartialReturnsValidResponse()
         {
-            // Arrange  
+            // Arrange
             var entity = _applicationFixture.ConstructTestEntity();
             await SetupTestData(entity).ConfigureAwait(false);
 
@@ -84,7 +84,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 
-            // Assert            
+            // Assert
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
@@ -96,12 +96,12 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         [Test]
         public async Task UpdateApplicationReturnsNotFound()
         {
-            // Arrange  
+            // Arrange
             var id = Guid.NewGuid();
             var request = _applicationFixture.ConstructUpdateApplicationRequest();
             var json = JsonConvert.SerializeObject(request);
 
-            // Act            
+            // Act
             var response = await PatchTestRequestAsync(id, json).ConfigureAwait(false);
 
             // Assert

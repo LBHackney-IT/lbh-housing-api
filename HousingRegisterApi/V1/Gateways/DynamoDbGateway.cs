@@ -12,10 +12,12 @@ namespace HousingRegisterApi.V1.Gateways
     public class DynamoDbGateway : IApplicationApiGateway
     {
         private readonly IDynamoDBContext _dynamoDbContext;
+        private readonly ISHA256Helper _hashHelper;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext)
+        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ISHA256Helper hashHelper)
         {
             _dynamoDbContext = dynamoDbContext;
+            _hashHelper = hashHelper;
         }
 
         public IEnumerable<Application> GetAll()
@@ -36,6 +38,7 @@ namespace HousingRegisterApi.V1.Gateways
             var entity = new ApplicationDbEntity
             {
                 Id = Guid.NewGuid(),
+                Reference = _hashHelper.Generate(request.MainApplicant.ContactInformation.EmailAddress).Substring(0, 10),
                 CreatedAt = DateTime.UtcNow,
                 Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
                 MainApplicant = request.MainApplicant,

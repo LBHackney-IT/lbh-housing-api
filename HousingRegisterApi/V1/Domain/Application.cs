@@ -10,6 +10,11 @@ namespace HousingRegisterApi.V1.Domain
     {
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// A unique refrence for the application
+        /// </summary>
+        public string Reference { get; set; }
+
         // TODO: should this be a type?
         /// <summary>
         /// The current status of the application.
