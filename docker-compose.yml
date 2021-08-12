@@ -8,7 +8,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 3000:3000
-    environment:      
+    environment:
       - DynamoDb_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
       - AWS_REGION=eu-west-2
@@ -35,3 +35,13 @@ services:
     image: amazon/dynamodb-local
     ports:
       - 8000:8000
+
+  # uncomment the below to persist data locally
+  # dynamodb-database:
+  #   image: amazon/dynamodb-local
+  #   command: "-jar DynamoDBLocal.jar -sharedDb -optimizeDbBeforeStartup -dbPath ./data"
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - "./database:/home/dynamodblocal/data"
+  #   working_dir: /home/dynamodblocal
