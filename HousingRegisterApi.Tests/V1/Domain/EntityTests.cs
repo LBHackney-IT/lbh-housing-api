@@ -26,5 +26,23 @@ namespace HousingRegisterApi.Tests.V1.Domain
 
             entity.CreatedAt.Should().BeSameDateAs(date);
         }
+
+        [Test]
+        public void EntitesHaveANullSubmittedAt()
+        {
+            var entity = new Application();
+
+            entity.SubmittedAt.Should().Be(null);
+        }
+
+        [Test]
+        public void EntitiesHaveASubmittedAt()
+        {
+            var entity = new Application();
+            var date = new DateTime(2019, 02, 21);
+            entity.SubmittedAt = date;
+
+            entity.SubmittedAt.Should().BeSameDateAs(date);
+        }
     }
 }
