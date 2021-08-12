@@ -146,11 +146,12 @@ namespace HousingRegisterApi
 
         private static void RegisterUseCases(IServiceCollection services)
         {
+            services.AddScoped<ICompleteApplicationUseCase, CompleteApplicationUseCase>();
+            services.AddScoped<ICreateNewApplicationUseCase, CreateNewApplicationUseCase>();
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
-            services.AddScoped<ICreateNewApplicationUseCase, CreateNewApplicationUseCase>();
-            services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
             services.AddScoped<ISHA256Helper, SHA256Helper>();
+            services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
