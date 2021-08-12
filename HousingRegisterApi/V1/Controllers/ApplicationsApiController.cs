@@ -18,17 +18,20 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IGetApplicationByIdUseCase _getByIdUseCase;
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
+        private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getAllUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
-            IUpdateApplicationUseCase updateApplicationUseCase)
+            IUpdateApplicationUseCase updateApplicationUseCase,
+            ICompleteApplicationUseCase completeApplicationUseCase)
         {
             _getAllUseCase = getAllUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
+            _completeApplicationUseCase = completeApplicationUseCase;
         }
 
         /// <summary>
@@ -97,6 +100,25 @@ namespace HousingRegisterApi.V1.Controllers
         public IActionResult UpdateApplication([FromRoute][Required] Guid id, [FromBody] UpdateApplicationRequest applicationRequest)
         {
             var result = _updateApplicationUseCase.Execute(id, applicationRequest);
+            if (result == null) return NotFound(id);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Updates an existing application
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPatch]
+        [Route("{id}/complete")]
+        public IActionResult CompleteApplication([FromRoute][Required] Guid id)
+        {
+            var result = _completeApplicationUseCase.Execute(id);
             if (result == null) return NotFound(id);
 
             return Ok(result);
