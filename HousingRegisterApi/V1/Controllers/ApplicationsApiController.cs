@@ -106,7 +106,7 @@ namespace HousingRegisterApi.V1.Controllers
         }
 
         /// <summary>
-        /// Updates an existing application
+        /// Completes an existing application
         /// </summary>
         /// <response code="200">Success</response>
         /// <response code="400">Invalid fields in the post parameter.</response>

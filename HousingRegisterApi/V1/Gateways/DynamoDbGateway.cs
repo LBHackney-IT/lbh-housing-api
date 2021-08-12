@@ -81,6 +81,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             entity.SubmittedAt = DateTime.UtcNow;
+            entity.Status = "Submitted";
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 

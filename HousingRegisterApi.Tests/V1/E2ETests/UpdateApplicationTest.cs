@@ -73,7 +73,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = new UpdateApplicationRequest()
             {
                 Status = "Pending",
-                SubmittedAt = DateTime.MaxValue,
                 OtherMembers = new List<Applicant>()
             };
             var json = JsonConvert.SerializeObject(request);
