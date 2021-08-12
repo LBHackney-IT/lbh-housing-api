@@ -6,6 +6,7 @@ An API to submit and review applications to the housing register. Using the Base
 
 - .NET Core as a web framework.
 - nUnit as a test framework.
+- DynamoDB for a data store.
 
 ## Dependencies
 
@@ -18,8 +19,7 @@ An API to submit and review applications to the housing register. Using the Base
 1. Install [Docker][docker-download].
 2. Install [AWS CLI][AWS-CLI].
 3. Clone this repository.
-4. Rename the initial template.
-5. Open it in your IDE.
+4. Open it in your IDE.
 
 ### Development
 
@@ -29,24 +29,25 @@ To serve the application, run it using your IDE of choice, we use Visual Studio 
 When running locally the appropriate database connection details are still needed.
 
 ##### DynamoDb
-To use a local instance of DynamoDb, this will need to be installed. This can be setup using [Docker](https://www.docker.com/products/docker-desktop).
-Run the following command, specifying the local path where you want the container's shared volume to be stored.
+To use a local instance of DynamoDb, this can be [installed](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html) or run via [Docker](https://www.docker.com/products/docker-desktop).
+
+The following command will start up a new Docker container with DynamoDb.
 ```
-docker run --name dynamodb-local -p 8000:8000 -v <PUT YOUR LOCAL PATH HERE>:/data/ amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /data
+docker-compose up -d dynamodb-database
 ```
 
-If you would like to see what is in your local DynamoDb instance using a GUI, then [this admin tool](https://github.com/aaronshaf/dynamodb-admin) can do that.
+To check that a local DynamoDb instance is up and has valid data, you can use the AWS CLI:
+```
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+```
 
-The application can also be served locally using docker:
-1.  Add you security credentials to AWS CLI.
-```sh
-$ aws configure
-```
-2. Log into AWS ECR.
-```sh
-$ aws ecr get-login --no-include-email
-```
-3. Build and serve the application. It will be available in the port 3000.
+If you would like to see what is in your local DynamoDb instance using a GUI, then [this admin tool](https://github.com/aaronshaf/dynamodb-admin) or [NoSQL workbench](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.settingup.html) are good tools for this.
+
+#### Docker
+
+The application can also be served locally using docker.
+
+Build and serve the application. It will be available in the port 3000.
 ```sh
 $ make build && make serve
 ```
@@ -93,7 +94,7 @@ Documentation on how to do this can be found [here](https://docs.microsoft.com/e
 $ make test
 ```
 
-To run database tests locally (e.g. via Visual Studio), then a local instance of DynamoDB will need to be running. 
+To run database tests locally (e.g. via Visual Studio), then a local instance of DynamoDB will need to be running.
 
 The required tables and data will be initialised as part of the test.
 
@@ -120,6 +121,7 @@ The required tables and data will be initialised as part of the test.
 ### Contributors
 
 - **Thomas Morris**, Senior Developer at Manifesto (thomas.morris@hackney.gov.uk)
+- **Tony Gledhill**, Senior Developer at Manifesto (anthony.gledhill@hackney.gov.uk)
 
 ### Other Contacts
 
