@@ -14,5 +14,7 @@ namespace HousingRegisterApi.V1.Gateways
         Application CreateNewApplication(CreateApplicationRequest request);
 
         Application UpdateApplication(Guid id, UpdateApplicationRequest request);
+
+        Application CompleteApplication(Guid id);
     }
 }

@@ -27,6 +27,11 @@ namespace HousingRegisterApi.V1.Domain
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
+        /// The date the application was submitted.
+        /// </summary>
+        public DateTime? SubmittedAt { get; set; }
+
+        /// <summary>
         /// The main applicant associated with the application.
         /// </summary>
         public Applicant MainApplicant { get; set; }

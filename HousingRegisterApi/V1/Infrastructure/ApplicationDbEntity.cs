@@ -18,6 +18,9 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime CreatedAt { get; set; }
 
+        [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
+        public DateTime? SubmittedAt { get; set; }
+
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Applicant>))]
         public Applicant MainApplicant { get; set; }
 

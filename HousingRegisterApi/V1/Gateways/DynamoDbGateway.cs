@@ -40,6 +40,7 @@ namespace HousingRegisterApi.V1.Gateways
                 Id = Guid.NewGuid(),
                 Reference = _hashHelper.Generate(request.MainApplicant.ContactInformation.EmailAddress).Substring(0, 10),
                 CreatedAt = DateTime.UtcNow,
+                SubmittedAt = null,
                 Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
                 MainApplicant = request.MainApplicant,
                 OtherMembers = request.OtherMembers.ToList()
@@ -67,6 +68,28 @@ namespace HousingRegisterApi.V1.Gateways
                 entity.OtherMembers = request.OtherMembers.ToList();
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
+            return entity.ToDomain();
+        }
+
+        public Application CompleteApplication(Guid id)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null)
+            {
+                return null;
+            }
+
+            if (entity.MainApplicant != null)
+            {
+                return null;
+            }
+
+            entity.SubmittedAt = DateTime.UtcNow;
+            entity.Status = "Submitted";
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
             return entity.ToDomain();
         }
     }

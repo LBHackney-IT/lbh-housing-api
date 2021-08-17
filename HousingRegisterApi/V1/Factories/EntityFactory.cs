@@ -14,6 +14,7 @@ namespace HousingRegisterApi.V1.Factories
                 Reference = databaseEntity.Reference,
                 Status = databaseEntity.Status,
                 CreatedAt = databaseEntity.CreatedAt,
+                SubmittedAt = databaseEntity.SubmittedAt,
                 MainApplicant = databaseEntity.MainApplicant,
                 OtherMembers = databaseEntity.OtherMembers
             };
@@ -27,6 +28,7 @@ namespace HousingRegisterApi.V1.Factories
                 Reference = entity.Reference,
                 Status = entity.Status,
                 CreatedAt = entity.CreatedAt,
+                SubmittedAt = entity.SubmittedAt,
                 MainApplicant = entity.MainApplicant,
                 OtherMembers = entity.OtherMembers.ToList()
             };
