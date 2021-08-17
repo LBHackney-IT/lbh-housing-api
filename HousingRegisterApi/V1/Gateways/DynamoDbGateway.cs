@@ -80,6 +80,11 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
+            if (entity.MainApplicant != null)
+            {
+                return null;
+            }
+
             entity.SubmittedAt = DateTime.UtcNow;
             entity.Status = "Submitted";
 
