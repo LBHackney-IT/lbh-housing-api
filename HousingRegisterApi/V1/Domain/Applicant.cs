@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using Amazon.DynamoDBv2.DataModel;
 
 namespace HousingRegisterApi.V1.Domain
 {
     public class Applicant
     {
+        [DynamoDBProperty("Person")]
         public Person Person { get; set; }
+
         public Address Address { get; set; }
         public ContactInformation ContactInformation { get; set; }
         public IEnumerable<Question> Eligibility { get; set; }

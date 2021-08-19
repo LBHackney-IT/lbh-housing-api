@@ -7,6 +7,7 @@ using HousingRegisterApi.V1.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -14,11 +15,13 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
+        private readonly IDynamoDBSearchHelper _dynamoDBSearchHelper;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ISHA256Helper hashHelper)
+        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
+            _dynamoDBSearchHelper = dynamoDBSearchHelper;
         }
 
         public IEnumerable<Application> GetAll()
@@ -30,12 +33,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
         {
-            var conditions = new List<ScanCondition>
-            {
-                //new ScanCondition("id", ScanOperator.Contains, searchTerm),
-                //new ScanCondition("reference", ScanOperator.Contains, searchTerm),
-            };
-
+            var conditions = _dynamoDBSearchHelper.Execute(searchTerm);
             var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
             return search.Select(x => x.ToDomain());
         }

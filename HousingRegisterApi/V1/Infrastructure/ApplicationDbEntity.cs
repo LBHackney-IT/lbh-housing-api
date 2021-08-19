@@ -9,10 +9,10 @@ namespace HousingRegisterApi.V1.Infrastructure
     public class ApplicationDbEntity
     {
         [DynamoDBHashKey]
-        [DynamoDBProperty(AttributeName = "id")]
+        [DynamoDBProperty("id")]
         public Guid Id { get; set; }
 
-        [DynamoDBProperty(AttributeName = "reference")]
+        [DynamoDBProperty("reference")]
         public string Reference { get; set; }
 
         public string Status { get; set; }
@@ -23,7 +23,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime? SubmittedAt { get; set; }
 
-        [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Applicant>))]
+        [DynamoDBProperty("MainApplicant", Converter = typeof(DynamoDbObjectConverter<Applicant>))]
         public Applicant MainApplicant { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<Applicant>))]
