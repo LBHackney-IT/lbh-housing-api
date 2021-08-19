@@ -9,8 +9,10 @@ namespace HousingRegisterApi.V1.Infrastructure
     public class ApplicationDbEntity
     {
         [DynamoDBHashKey]
+        [DynamoDBProperty(AttributeName = "id")]
         public Guid Id { get; set; }
 
+        [DynamoDBProperty(AttributeName = "reference")]
         public string Reference { get; set; }
 
         public string Status { get; set; }

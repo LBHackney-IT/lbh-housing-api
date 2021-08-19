@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
@@ -23,6 +24,18 @@ namespace HousingRegisterApi.V1.Gateways
         public IEnumerable<Application> GetAll()
         {
             var conditions = new List<ScanCondition>();
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            return search.Select(x => x.ToDomain());
+        }
+
+        public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
+        {
+            var conditions = new List<ScanCondition>
+            {
+                //new ScanCondition("id", ScanOperator.Contains, searchTerm),
+                //new ScanCondition("reference", ScanOperator.Contains, searchTerm),
+            };
+
             var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
             return search.Select(x => x.ToDomain());
         }

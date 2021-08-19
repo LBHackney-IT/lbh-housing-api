@@ -9,6 +9,8 @@ namespace HousingRegisterApi.V1.Gateways
     {
         IEnumerable<Application> GetAll();
 
+        IEnumerable<Application> GetAllBySearchTerm(string searchTerm);
+
         Application GetApplicationById(Guid id);
 
         Application CreateNewApplication(CreateApplicationRequest request);

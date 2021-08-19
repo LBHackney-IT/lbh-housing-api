@@ -19,19 +19,22 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
+        private readonly IGetApplicationBySearchTermUseCase _getApplicationBySearchTermUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getAllUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
-            ICompleteApplicationUseCase completeApplicationUseCase)
+            ICompleteApplicationUseCase completeApplicationUseCase,
+            IGetApplicationBySearchTermUseCase getApplicationBySearchTermUseCase)
         {
             _getAllUseCase = getAllUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
             _completeApplicationUseCase = completeApplicationUseCase;
+            _getApplicationBySearchTermUseCase = getApplicationBySearchTermUseCase;
         }
 
         /// <summary>
@@ -120,6 +123,19 @@ namespace HousingRegisterApi.V1.Controllers
         {
             var result = _completeApplicationUseCase.Execute(id);
             if (result == null) return NotFound(id);
+
+            return Ok(result);
+        }
+
+        [ProducesResponseType(typeof(ApplicationList), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("search/{searchTerm}")]
+        public IActionResult Seach([FromRoute][Required] string searchTerm)
+        {
+            var result = _getApplicationBySearchTermUseCase.Execute(searchTerm);
+            if (result == null) return NotFound(searchTerm);
 
             return Ok(result);
         }
