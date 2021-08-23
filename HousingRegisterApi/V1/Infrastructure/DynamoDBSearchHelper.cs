@@ -15,23 +15,24 @@ namespace HousingRegisterApi.V1.Infrastructure
                 new ScanCondition("MainApplicant.Person.Surname", ScanOperator.Equal, searchTerm),
             };
 
-            var referenceNumberRegEx = @".*\\d+.*";
-            var isReferenceNumber = searchTerm.Length == 10 && Regex.Match(searchTerm, referenceNumberRegEx, RegexOptions.IgnoreCase).Success;
+            var referenceNumberRegEx = @"^[a-z,0-9]{10,10}$";
+            var isReferenceNumber = Regex.Match(searchTerm, referenceNumberRegEx, RegexOptions.IgnoreCase).Success;
 
             if (isReferenceNumber)
             {
                 conditions.Clear();
                 conditions.Add(new ScanCondition("Reference", ScanOperator.Equal, searchTerm));
+                return conditions;
             }
 
-            var nationalInsuranceRegEx = @"^\s*[a-zA-Z]{2}(?:\s*\d\s*){6}[a-zA-Z]?\s*$";
-
+            var nationalInsuranceRegEx = @"^(?!BG|GB|NK|KN|TN|NT|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z](?:\s*\d{2}){3}\s*[A-D]$";
             var isNationalInsuranceNuber = Regex.Match(searchTerm, nationalInsuranceRegEx, RegexOptions.IgnoreCase).Success;
 
             if (isNationalInsuranceNuber)
             {
                 conditions.Clear();
                 conditions.Add(new ScanCondition("MainApplicant.Person.NationalInsuranceNumber", ScanOperator.Equal, searchTerm));
+                return conditions;
             }
 
             bool isValidGuid = Guid.TryParse(searchTerm, out Guid guidOutput);
@@ -39,7 +40,8 @@ namespace HousingRegisterApi.V1.Infrastructure
             if (isValidGuid)
             {
                 conditions.Clear();
-                conditions.Add(new ScanCondition("Id", ScanOperator.Equal, guidOutput));
+                conditions.Add(new ScanCondition("Id", ScanOperator.Equal, searchTerm));
+                return conditions;
             }
 
             return conditions;
