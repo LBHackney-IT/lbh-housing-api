@@ -16,9 +16,7 @@ namespace HousingRegisterApi.V1.Infrastructure
 
             if (isReferenceNumber)
             {
-                conditions.Clear();
                 conditions.Add(new ScanCondition("Reference", ScanOperator.Equal, searchTerm));
-                return conditions;
             }
 
             return conditions;
