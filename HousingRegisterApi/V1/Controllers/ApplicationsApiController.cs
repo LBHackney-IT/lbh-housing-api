@@ -47,8 +47,16 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications()
+        public IActionResult ListApplications(string searchterm = "")
         {
+            if (!string.IsNullOrEmpty(searchterm))
+            {
+                var result = _getApplicationBySearchTermUseCase.Execute(searchterm);
+                if (result == null) return NotFound(searchterm);
+
+                return Ok(result);
+            }
+
             return Ok(_getAllUseCase.Execute());
         }
 
@@ -123,19 +131,6 @@ namespace HousingRegisterApi.V1.Controllers
         {
             var result = _completeApplicationUseCase.Execute(id);
             if (result == null) return NotFound(id);
-
-            return Ok(result);
-        }
-
-        [ProducesResponseType(typeof(ApplicationList), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet]
-        [Route("search/{searchTerm}")]
-        public IActionResult Seach([FromRoute][Required] string searchTerm)
-        {
-            var result = _getApplicationBySearchTermUseCase.Execute(searchTerm);
-            if (result == null) return NotFound(searchTerm);
 
             return Ok(result);
         }

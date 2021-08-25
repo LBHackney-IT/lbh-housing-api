@@ -1,5 +1,7 @@
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
@@ -17,7 +19,8 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly ISHA256Helper _hashHelper;
         private readonly IDynamoDBSearchHelper _dynamoDBSearchHelper;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
+        public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
+            ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
@@ -33,8 +36,14 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
         {
-            var conditions = _dynamoDBSearchHelper.Execute(searchTerm);
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var scanConditions = _dynamoDBSearchHelper.Execute(searchTerm);
+
+            if (scanConditions.Count == 0)
+            {
+                return new List<Application>();
+            }
+
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(scanConditions).GetNextSetAsync().GetAwaiter().GetResult();
             return search.Select(x => x.ToDomain());
         }
 
