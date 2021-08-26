@@ -33,7 +33,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             };
 
             // Act
-            var conditions = _classUnderTest.Object.Execute(searchTerm);
+            var conditions = _classUnderTest.Object.GetScanConditions(searchTerm);
 
             // Assert
             conditions.Should().BeEquivalentTo(expectedResult);

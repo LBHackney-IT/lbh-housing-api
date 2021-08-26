@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.Infrastructure
 {
     public interface IDynamoDBSearchHelper
     {
-        List<ScanCondition> Execute(string searchTerm);
+        List<ScanCondition> GetScanConditions(string searchTerm);
     }
 }

@@ -36,8 +36,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
         {
-            var scanConditions = _dynamoDBSearchHelper.Execute(searchTerm);
-
+            var scanConditions = _dynamoDBSearchHelper.GetScanConditions(searchTerm);
             if (scanConditions.Count == 0)
             {
                 return new List<Application>();
