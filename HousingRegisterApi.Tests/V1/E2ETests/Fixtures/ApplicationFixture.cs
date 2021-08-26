@@ -17,6 +17,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
         {
             var entity = _fixture.Create<Application>();
             entity.CreatedAt = DateTime.UtcNow;
+            entity.SubmittedAt = null;
             return entity;
         }
 
