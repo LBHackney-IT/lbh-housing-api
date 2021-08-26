@@ -18,6 +18,7 @@ namespace HousingRegisterApi.V1.Domain
         public string Title { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
+
         public string Surname { get; set; }
 
         public string PlaceOfBirth { get; set; }
@@ -29,6 +30,7 @@ namespace HousingRegisterApi.V1.Domain
         public string Ethnicity { get; set; }
         public string Nationality { get; set; }
         public string Gender { get; set; }
+
         public string NationalInsuranceNumber { get; set; }
     }
 }

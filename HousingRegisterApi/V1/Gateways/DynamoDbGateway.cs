@@ -13,17 +13,32 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
+        private readonly IDynamoDBSearchHelper _dynamoDBSearchHelper;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ISHA256Helper hashHelper)
+        public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
+            ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
+            _dynamoDBSearchHelper = dynamoDBSearchHelper;
         }
 
         public IEnumerable<Application> GetAll()
         {
             var conditions = new List<ScanCondition>();
             var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            return search.Select(x => x.ToDomain());
+        }
+
+        public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
+        {
+            var scanConditions = _dynamoDBSearchHelper.GetScanConditions(searchTerm);
+            if (scanConditions.Count == 0)
+            {
+                return new List<Application>();
+            }
+
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(scanConditions).GetNextSetAsync().GetAwaiter().GetResult();
             return search.Select(x => x.ToDomain());
         }
 

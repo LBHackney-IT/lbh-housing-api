@@ -18,13 +18,15 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         private Mock<IDynamoDBContext> _dynamoDb;
         private Mock<ISHA256Helper> _hashHelper;
         private DynamoDbGateway _classUnderTest;
+        private Mock<IDynamoDBSearchHelper> _searchHelper;
 
         [SetUp]
         public void Setup()
         {
             _dynamoDb = new Mock<IDynamoDBContext>();
             _hashHelper = new Mock<ISHA256Helper>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object);
+            _searchHelper = new Mock<IDynamoDBSearchHelper>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object, _searchHelper.Object);
         }
 
         [Test]

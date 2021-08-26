@@ -19,19 +19,22 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
+        private readonly IGetApplicationBySearchTermUseCase _getApplicationBySearchTermUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getAllUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
-            ICompleteApplicationUseCase completeApplicationUseCase)
+            ICompleteApplicationUseCase completeApplicationUseCase,
+            IGetApplicationBySearchTermUseCase getApplicationBySearchTermUseCase)
         {
             _getAllUseCase = getAllUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
             _completeApplicationUseCase = completeApplicationUseCase;
+            _getApplicationBySearchTermUseCase = getApplicationBySearchTermUseCase;
         }
 
         /// <summary>
@@ -44,8 +47,16 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications()
+        public IActionResult ListApplications(string searchterm = "")
         {
+            if (!string.IsNullOrEmpty(searchterm))
+            {
+                var result = _getApplicationBySearchTermUseCase.Execute(searchterm);
+                if (result == null) return NotFound(searchterm);
+
+                return Ok(result);
+            }
+
             return Ok(_getAllUseCase.Execute());
         }
 
