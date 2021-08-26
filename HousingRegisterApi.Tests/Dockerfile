@@ -14,7 +14,7 @@ WORKDIR /app
 COPY ./HousingRegisterApi.sln ./
 COPY ./HousingRegisterApi/HousingRegisterApi.csproj ./HousingRegisterApi/
 COPY ./HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj ./HousingRegisterApi.Tests/
-COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
+COPY /NuGet.config /root/.nuget/NuGet/NuGet.Config
 
 RUN dotnet restore ./HousingRegisterApi/HousingRegisterApi.csproj
 RUN dotnet restore ./HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj

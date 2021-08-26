@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copy csproj and nuget config and restore as distinct layers
 COPY */HousingRegisterApi/HousingRegisterApi.csproj ./
-COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
+COPY /NuGet.config /root/.nuget/NuGet/NuGet.Config
 
 RUN dotnet restore ./HousingRegisterApi.csproj
 
