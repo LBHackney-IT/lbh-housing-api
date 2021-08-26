@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using Amazon.DynamoDBv2.DataModel;
 
 namespace HousingRegisterApi.V1.Domain
 {
     public class Applicant
-    {
-        [DynamoDBProperty("Person")]
+    {        
         public Person Person { get; set; }
 
         public Address Address { get; set; }
