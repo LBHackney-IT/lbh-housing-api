@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace HousingRegisterApi.V1.Domain
 {
     public class Applicant
-    {        
+    {
         public Person Person { get; set; }
 
         public Address Address { get; set; }
