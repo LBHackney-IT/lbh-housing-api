@@ -47,12 +47,12 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications(string searchterm = "")
+        public IActionResult ListApplications([FromQuery] SearchApplicationRequest searchParameters)
         {
-            if (!string.IsNullOrEmpty(searchterm))
+            if (!string.IsNullOrEmpty(searchParameters.NationalInsuranceNumber) || !string.IsNullOrEmpty(searchParameters.ReferenceNumber) || !string.IsNullOrEmpty(searchParameters.Surname))
             {
-                var result = _getApplicationBySearchTermUseCase.Execute(searchterm);
-                if (result == null) return NotFound(searchterm);
+                var result = _getApplicationBySearchTermUseCase.Execute(searchParameters);
+                if (result == null) return NotFound(searchParameters);
 
                 return Ok(result);
             }

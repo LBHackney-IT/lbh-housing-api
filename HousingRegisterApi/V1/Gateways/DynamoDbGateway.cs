@@ -13,14 +13,12 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
-        private readonly IDynamoDBSearchHelper _dynamoDBSearchHelper;
 
         public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
-            ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
+            ISHA256Helper hashHelper)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
-            _dynamoDBSearchHelper = dynamoDBSearchHelper;
         }
 
         public IEnumerable<Application> GetAll()
@@ -30,16 +28,24 @@ namespace HousingRegisterApi.V1.Gateways
             return search.Select(x => x.ToDomain());
         }
 
-        public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
+        public IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters)
         {
-            var scanConditions = _dynamoDBSearchHelper.GetScanConditions(searchTerm);
-            if (scanConditions.Count == 0)
+            if (!string.IsNullOrEmpty(searchParameters.ReferenceNumber))
             {
-                return new List<Application>();
+                return GetAll().Where(x => x.Reference == searchParameters.ReferenceNumber).ToList();
             }
 
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(scanConditions).GetNextSetAsync().GetAwaiter().GetResult();
-            return search.Select(x => x.ToDomain());
+            if (!string.IsNullOrEmpty(searchParameters.Surname))
+            {
+                return GetAll().Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(searchParameters.NationalInsuranceNumber))
+            {
+                return GetAll().Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsuranceNumber)).ToList();
+            }
+
+            return GetAll();
         }
 
         public Application GetApplicationById(Guid id)

@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
+using System;
+using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -9,7 +9,7 @@ namespace HousingRegisterApi.V1.Gateways
     {
         IEnumerable<Application> GetAll();
 
-        IEnumerable<Application> GetAllBySearchTerm(string searchTerm);
+        IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters);
 
         Application GetApplicationById(Guid id);
 
