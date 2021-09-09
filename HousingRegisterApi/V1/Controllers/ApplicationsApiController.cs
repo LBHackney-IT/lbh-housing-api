@@ -57,7 +57,7 @@ namespace HousingRegisterApi.V1.Controllers
                 return Ok(result);
             }
 
-            return Ok(_getAllUseCase.Execute());
+            return Ok(_getAllUseCase.Execute(searchParameters));
         }
 
         /// <summary>

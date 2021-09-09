@@ -8,6 +8,8 @@ namespace HousingRegisterApi.V1.Boundary.Request
 
         public string NationalInsuranceNumber { get; set; }
 
+        public string Status { get; set; }
+
         public string OrderBy { get; set; }
     }
 }
