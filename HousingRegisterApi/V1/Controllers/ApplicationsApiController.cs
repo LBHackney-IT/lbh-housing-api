@@ -49,7 +49,7 @@ namespace HousingRegisterApi.V1.Controllers
         [HttpGet]
         public IActionResult ListApplications([FromQuery] SearchApplicationRequest searchParameters)
         {
-            if (!string.IsNullOrEmpty(searchParameters.NationalInsuranceNumber) || !string.IsNullOrEmpty(searchParameters.ReferenceNumber) || !string.IsNullOrEmpty(searchParameters.Surname))
+            if (!string.IsNullOrEmpty(searchParameters.NationalInsurance) || !string.IsNullOrEmpty(searchParameters.Reference) || !string.IsNullOrEmpty(searchParameters.Surname))
             {
                 var result = _getApplicationBySearchTermUseCase.Execute(searchParameters);
                 if (result == null) return NotFound(searchParameters);

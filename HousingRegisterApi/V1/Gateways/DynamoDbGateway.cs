@@ -30,9 +30,9 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters)
         {
-            if (!string.IsNullOrEmpty(searchParameters.ReferenceNumber))
+            if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
-                return GetAll().Where(x => x.Reference == searchParameters.ReferenceNumber).ToList();
+                return GetAll().Where(x => x.Reference == searchParameters.Reference).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchParameters.Surname))
@@ -40,9 +40,9 @@ namespace HousingRegisterApi.V1.Gateways
                 return GetAll().Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
             }
 
-            if (!string.IsNullOrEmpty(searchParameters.NationalInsuranceNumber))
+            if (!string.IsNullOrEmpty(searchParameters.NationalInsurance))
             {
-                return GetAll().Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsuranceNumber)).ToList();
+                return GetAll().Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance)).ToList();
             }
 
             return GetAll();
