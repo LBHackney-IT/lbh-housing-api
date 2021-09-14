@@ -30,22 +30,29 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters)
         {
+            var searchItems = GetAll();
+
+            if (!string.IsNullOrEmpty(searchParameters.Status))
+            {
+                searchItems = searchItems.Where(x => x.Status == searchParameters.Status).ToList();
+            }
+
             if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
-                return GetAll().Where(x => x.Reference == searchParameters.Reference).ToList();
+                return searchItems.Where(x => x.Reference == searchParameters.Reference).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchParameters.Surname))
             {
-                return GetAll().Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
+                return searchItems.Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchParameters.NationalInsurance))
             {
-                return GetAll().Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance)).ToList();
+                return searchItems.Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance)).ToList();
             }
 
-            return GetAll();
+            return searchItems;
         }
 
         public Application GetApplicationById(Guid id)

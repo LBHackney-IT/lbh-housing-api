@@ -23,6 +23,11 @@ namespace HousingRegisterApi.V1.UseCase
         {
             var totalItems = _gateway.GetAll();
 
+            if (!string.IsNullOrWhiteSpace(searchParameters.Status))
+            {
+                totalItems = totalItems.Where(x => x.Status.ToLower() == searchParameters.Status.ToLower());
+            }
+
             var updateditems = _paginationHelper.OrderData(totalItems, searchParameters.OrderBy);
             updateditems = _paginationHelper.PageData(updateditems, searchParameters.Page, searchParameters.NumberOfItemsPerPage);
 
