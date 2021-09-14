@@ -30,6 +30,7 @@ namespace HousingRegisterApi.V1.Domain
         public string Ethnicity { get; set; }
         public string Nationality { get; set; }
         public string Gender { get; set; }
+        public string GenderDescription { get; set; }
 
         public string NationalInsuranceNumber { get; set; }
     }
