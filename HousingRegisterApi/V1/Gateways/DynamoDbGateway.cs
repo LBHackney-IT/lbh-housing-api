@@ -13,14 +13,12 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
-        private readonly IDynamoDBSearchHelper _dynamoDBSearchHelper;
 
         public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
-            ISHA256Helper hashHelper, IDynamoDBSearchHelper dynamoDBSearchHelper)
+            ISHA256Helper hashHelper)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
-            _dynamoDBSearchHelper = dynamoDBSearchHelper;
         }
 
         public IEnumerable<Application> GetAll()
@@ -30,16 +28,31 @@ namespace HousingRegisterApi.V1.Gateways
             return search.Select(x => x.ToDomain());
         }
 
-        public IEnumerable<Application> GetAllBySearchTerm(string searchTerm)
+        public IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters)
         {
-            var scanConditions = _dynamoDBSearchHelper.GetScanConditions(searchTerm);
-            if (scanConditions.Count == 0)
+            var searchItems = GetAll();
+
+            if (!string.IsNullOrEmpty(searchParameters.Status))
             {
-                return new List<Application>();
+                searchItems = searchItems.Where(x => x.Status == searchParameters.Status).ToList();
             }
 
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(scanConditions).GetNextSetAsync().GetAwaiter().GetResult();
-            return search.Select(x => x.ToDomain());
+            if (!string.IsNullOrEmpty(searchParameters.Reference))
+            {
+                return searchItems.Where(x => x.Reference == searchParameters.Reference).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(searchParameters.Surname))
+            {
+                return searchItems.Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(searchParameters.NationalInsurance))
+            {
+                return searchItems.Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance)).ToList();
+            }
+
+            return searchItems;
         }
 
         public Application GetApplicationById(Guid id)

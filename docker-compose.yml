@@ -37,15 +37,6 @@ services:
 
   dynamodb-database:
     image: amazon/dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb"
     ports:
       - 8000:8000
-
-  # uncomment the below to persist data locally
-  # dynamodb-database:
-  #   image: amazon/dynamodb-local
-  #   command: "-jar DynamoDBLocal.jar -sharedDb -optimizeDbBeforeStartup -dbPath ./data"
-  #   ports:
-  #     - 8000:8000
-  #   volumes:
-  #     - "./database:/home/dynamodblocal/data"
-  #   working_dir: /home/dynamodblocal
