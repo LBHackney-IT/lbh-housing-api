@@ -22,9 +22,9 @@ namespace HousingRegisterApi.V1.Infrastructure
                 "created_at_desc" => data.OrderByDescending(x => x.CreatedAt).ToList(),
                 "surname" => data.OrderBy(x => x.MainApplicant.Person.Surname).ToList(),
                 "surname_desc" => data.OrderByDescending(x => x.MainApplicant.Person.Surname).ToList(),
-                "submited_at" => data.OrderBy(x => x.SubmittedAt).ToList(),
+                "submitted_at" => data.OrderBy(x => x.SubmittedAt).ToList(),
                 "submitted_at_desc" => data.OrderByDescending(x => x.SubmittedAt).ToList(),
-                _ => data.OrderBy(x => x.SubmittedAt).ToList()
+                _ => data.OrderByDescending(x => x.SubmittedAt).ToList()
             };
         }
 

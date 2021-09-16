@@ -1,6 +1,5 @@
 using System.Linq;
 using AutoFixture;
-using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -17,7 +16,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IPaginationHelper> _mockPaginationHelper;
-        private Mock<SearchApplicationRequest> _mockSearchApplicationRequest;
         private GetAllApplicationsUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -26,7 +24,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
             _mockPaginationHelper = new Mock<IPaginationHelper>();
-            _mockSearchApplicationRequest = new Mock<SearchApplicationRequest>();
             _classUnderTest = new GetAllApplicationsUseCase(_mockGateway.Object, _mockPaginationHelper.Object);
             _fixture = new Fixture();
         }
@@ -39,10 +36,11 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockGateway.Setup(x => x.GetAll()).Returns(stubbedEntities);
 
             // Act
-            var expectedResponse = new PaginatedApplicationListResponse { Results = stubbedEntities.ToResponse() };
+            var searchParameters = new SearchApplicationRequest();
+            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, stubbedEntities.ToResponse(), stubbedEntities.Count);
 
             // Assert
-            _classUnderTest.Execute(_mockSearchApplicationRequest.Object).Should().BeEquivalentTo(expectedResponse);
+            _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);
         }
 
         //TODO: Add extra tests here for extra functionality added to the use case
