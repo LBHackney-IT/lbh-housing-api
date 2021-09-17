@@ -23,6 +23,10 @@ namespace HousingRegisterApi.V1.UseCase
         {
             var totalItems = _gateway.GetAll();
 
+            totalItems = !string.IsNullOrWhiteSpace(searchParameters.AssignedTo)
+                ? totalItems.Where(x => x.AssignedTo == searchParameters.AssignedTo)
+                : totalItems.Where(x => x.AssignedTo == null);
+
             if (!string.IsNullOrWhiteSpace(searchParameters.Status))
             {
                 totalItems = totalItems.Where(x => x.Status.ToLower() == searchParameters.Status.ToLower());
