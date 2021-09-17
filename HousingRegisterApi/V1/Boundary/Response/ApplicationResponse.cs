@@ -8,7 +8,7 @@ namespace HousingRegisterApi.V1.Boundary.Response
     public class ApplicationResponse
     {
         public Guid Id { get; set; }
-        
+
         public string Reference { get; set; }
 
         /// <example>Pending</example>
