@@ -8,15 +8,19 @@ namespace HousingRegisterApi.V1.Boundary.Response
     public class ApplicationResponse
     {
         public Guid Id { get; set; }
-        /// <example>Pending</example>
-
+        
         public string Reference { get; set; }
 
+        /// <example>Pending</example>
         public string Status { get; set; }
 
-        /// <example>2021-04-12</example>
+        /// <example>test@hackney.gov.uk</example>
+        public string AssignedTo { get; set; }
+
+        /// <example>2021-04-01</example>
         public DateTime CreatedAt { get; set; }
 
+        /// <example>2021-04-01</example>
         public DateTime? SubmittedAt { get; set; }
 
         public Applicant MainApplicant { get; set; }
