@@ -38,7 +38,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Act
             var searchParameters = new SearchApplicationRequest();
             var assignedEntities = stubbedEntities.Where(x => x.AssignedTo == null);
-            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());            
+            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());
 
             // Assert
             _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);
