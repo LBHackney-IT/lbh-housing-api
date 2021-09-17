@@ -89,6 +89,9 @@ namespace HousingRegisterApi.V1.Gateways
             if (!string.IsNullOrEmpty(request.Status))
                 entity.Status = request.Status;
 
+            if (!string.IsNullOrEmpty(request.AssignedTo))
+                entity.AssignedTo = request.AssignedTo;
+
             if (request.MainApplicant != null)
                 entity.MainApplicant = request.MainApplicant;
 

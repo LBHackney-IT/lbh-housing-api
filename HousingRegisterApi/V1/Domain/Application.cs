@@ -22,6 +22,12 @@ namespace HousingRegisterApi.V1.Domain
         public string Status { get; set; }
 
         /// <summary>
+        /// The officer who this application is assigned to.
+        /// e.g. officer@hackney.gov.uk
+        /// </summary>
+        public string AssignedTo { get; set; }
+
+        /// <summary>
         /// The date the application was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }

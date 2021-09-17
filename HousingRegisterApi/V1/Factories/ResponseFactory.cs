@@ -15,6 +15,7 @@ namespace HousingRegisterApi.V1.Factories
                 Id = domain.Id,
                 Reference = domain.Reference,
                 Status = domain.Status,
+                AssignedTo = domain.AssignedTo,
                 CreatedAt = domain.CreatedAt,
                 SubmittedAt = domain.SubmittedAt,
                 MainApplicant = domain.MainApplicant,
