@@ -37,7 +37,27 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Act
             var searchParameters = new SearchApplicationRequest();
-            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, stubbedEntities.ToResponse(), stubbedEntities.Count);
+            var assignedEntities = stubbedEntities.Where(x => x.AssignedTo == null);
+            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());
+
+            // Assert
+            _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);
+        }
+
+        [Test]
+        public void GetsAllApplicationsByAssignee()
+        {
+            // Arrange
+            var stubbedEntities = _fixture.CreateMany<Application>().ToList();
+            _mockGateway.Setup(x => x.GetAll()).Returns(stubbedEntities);
+
+            // Act
+            var searchParameters = new SearchApplicationRequest()
+            {
+                AssignedTo = "test@hackney.gov.uk"
+            };
+            var assignedEntities = stubbedEntities.Where(x => x.AssignedTo == searchParameters.AssignedTo);
+            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());
 
             // Assert
             _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);

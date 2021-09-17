@@ -37,6 +37,11 @@ namespace HousingRegisterApi.V1.Gateways
                 searchItems = searchItems.Where(x => x.Status == searchParameters.Status).ToList();
             }
 
+            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
+            {
+                searchItems = searchItems.Where(x => x.AssignedTo == searchParameters.AssignedTo).ToList();
+            }
+
             if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
                 return searchItems.Where(x => x.Reference == searchParameters.Reference).ToList();
