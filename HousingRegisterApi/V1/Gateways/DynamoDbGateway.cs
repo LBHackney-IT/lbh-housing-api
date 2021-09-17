@@ -103,12 +103,7 @@ namespace HousingRegisterApi.V1.Gateways
         public Application CompleteApplication(Guid id)
         {
             var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
-            if (entity == null)
-            {
-                return null;
-            }
-
-            if (entity.MainApplicant != null)
+            if (entity?.MainApplicant == null)
             {
                 return null;
             }
