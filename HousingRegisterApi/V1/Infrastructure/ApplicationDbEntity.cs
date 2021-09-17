@@ -15,6 +15,8 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public string Status { get; set; }
 
+        public string AssignedTo { get; set; }
+
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime CreatedAt { get; set; }
 
