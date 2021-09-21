@@ -123,5 +123,36 @@ namespace HousingRegisterApi.V1.Gateways
 
             return entity.ToDomain();
         }
+
+        public Application CreateVerifyCode(Guid id, CreateAuthRequest request)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null
+                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+            {
+                return null;
+            }
+
+            entity.VerifyCode = "Testing";
+            entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(10);
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
+            return entity.ToDomain();
+        }
+
+        public Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null
+                || entity.VerifyCode != request.Code
+                || entity.VerifyExpiresAt < DateTime.UtcNow
+                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+            {
+                return null;
+            }
+
+            return entity.ToDomain();
+        }
     }
 }

@@ -18,5 +18,9 @@ namespace HousingRegisterApi.V1.Gateways
         Application UpdateApplication(Guid id, UpdateApplicationRequest request);
 
         Application CompleteApplication(Guid id);
+
+        Application CreateVerifyCode(Guid id, CreateAuthRequest request);
+
+        Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request);
     }
 }

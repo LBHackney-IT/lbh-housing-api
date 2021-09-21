@@ -13,7 +13,7 @@ namespace HousingRegisterApi.V1.Domain
         /// <summary>
         /// A unique refrence for the application
         /// </summary>
-        public string Reference { get; set; }
+        public string Reference { get; set; }        
 
         // TODO: should this be a type?
         /// <summary>
@@ -46,5 +46,15 @@ namespace HousingRegisterApi.V1.Domain
         /// Other members involved with the application.
         /// </summary>
         public IEnumerable<Applicant> OtherMembers { get; set; }
+
+        /// <summary>
+        /// A verify code for the application
+        /// </summary>
+        public string VerifyCode { get; set; }
+
+        /// <summary>
+        /// The date which the verify code expires
+        /// </summary>
+        public DateTime? VerifyExpiresAt { get; set; }
     }
 }

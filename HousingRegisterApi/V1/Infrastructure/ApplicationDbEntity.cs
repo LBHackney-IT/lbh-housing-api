@@ -28,5 +28,10 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<Applicant>))]
         public List<Applicant> OtherMembers { get; set; } = new List<Applicant>();
+
+        public string VerifyCode { get; set; }
+
+        [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
+        public DateTime? VerifyExpiresAt { get; set; }
     }
 }
