@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -13,15 +14,17 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 {
     public class CreateAuthUseCaseTests
     {
-        private Mock<IApplicationApiGateway> _mockGateway;
+        private Mock<IApplicationApiGateway> _mockApplicationGateway;
+        private Mock<INotifyGateway> _mockNotifyGateway;
         private CreateAuthUseCase _classUnderTest;
         private Fixture _fixture;
 
         [SetUp]
         public void SetUp()
         {
-            _mockGateway = new Mock<IApplicationApiGateway>();
-            _classUnderTest = new CreateAuthUseCase(_mockGateway.Object);
+            _mockApplicationGateway = new Mock<IApplicationApiGateway>();
+            _mockNotifyGateway = new Mock<INotifyGateway>();
+            _classUnderTest = new CreateAuthUseCase(_mockApplicationGateway.Object, _mockNotifyGateway.Object);
             _fixture = new Fixture();
         }
 
@@ -31,7 +34,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
-            _mockGateway
+            _mockApplicationGateway
                 .Setup(x => x.CreateVerifyCode(id, It.IsAny<CreateAuthRequest>()))
                 .Returns(application);
 
@@ -39,8 +42,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id, new CreateAuthRequest());
 
             // Assert
-            _mockGateway.Verify(x => x.CreateVerifyCode(id, It.IsAny<CreateAuthRequest>()));
-            response.Should().BeEquivalentTo(application.ToResponse());
+            _mockApplicationGateway.Verify(x => x.CreateVerifyCode(id, It.IsAny<CreateAuthRequest>()));
+            response.Should().BeOfType<CreateAuthResponse>();
         }
     }
 }

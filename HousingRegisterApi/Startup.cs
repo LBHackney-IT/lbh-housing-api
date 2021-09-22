@@ -22,6 +22,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Notify.Client;
+using Notify.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace HousingRegisterApi
@@ -142,6 +144,8 @@ namespace HousingRegisterApi
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
+            services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
         }
 
         private static void RegisterUseCases(IServiceCollection services)

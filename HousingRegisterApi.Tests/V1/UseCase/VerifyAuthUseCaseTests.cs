@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -40,7 +41,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Assert
             _mockGateway.Verify(x => x.ConfirmVerifyCode(id, It.IsAny<VerifyAuthRequest>()));
-            response.Should().BeEquivalentTo(application.ToResponse());
+            response.Should().BeOfType<VerifyAuthResponse>();
         }
     }
 }

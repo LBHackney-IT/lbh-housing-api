@@ -1,7 +1,6 @@
 using System;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 

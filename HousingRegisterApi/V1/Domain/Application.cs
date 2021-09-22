@@ -13,7 +13,7 @@ namespace HousingRegisterApi.V1.Domain
         /// <summary>
         /// A unique refrence for the application
         /// </summary>
-        public string Reference { get; set; }        
+        public string Reference { get; set; }
 
         // TODO: should this be a type?
         /// <summary>
