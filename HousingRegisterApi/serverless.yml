@@ -28,8 +28,9 @@ functions:
     handler: HousingRegisterApi::HousingRegisterApi.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
     environment:
-      NOTIFY_API_KEY: ${ssm:/housing-register-api/${self:provider.stage}/notify-api-key~true}
-      NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register-api/notify/email/verify-code}
+      HACKNEY_JWT_SECRET: ${ssm:/housing-register/${self:provider.stage}/hackney-jwt-secret}
+      NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
+      NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register/notify/email/verify-code}
     events:
       - http:
           path: /{proxy+}

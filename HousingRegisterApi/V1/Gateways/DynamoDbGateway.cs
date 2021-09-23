@@ -133,7 +133,8 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
-            entity.VerifyCode = "Testing";
+            // TODO: generate verify code
+            entity.VerifyCode = "123456";
             entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(10);
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();

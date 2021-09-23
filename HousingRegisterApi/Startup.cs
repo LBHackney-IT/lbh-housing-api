@@ -6,6 +6,7 @@ using System.Reflection;
 using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using dotenv.net;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -115,6 +116,11 @@ namespace HousingRegisterApi
             ConfigureLogging(services, Configuration);
             AWSXRayRecorder.InitializeInstance(Configuration);
             AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+
+            DotEnv.Fluent()
+                .WithTrimValues()
+                .WithProbeForEnv(probeLevelsToSearch: 5)
+                .Load();
 
             services.ConfigureDynamoDB();
             RegisterGateways(services);
