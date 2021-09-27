@@ -58,6 +58,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
+            apiEntity.SensitiveData.Should().Be(request.SensitiveData);
             apiEntity.AssignedTo.Should().Be(request.AssignedTo);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
             apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
@@ -74,6 +75,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = new UpdateApplicationRequest()
             {
                 Status = "Pending",
+                SensitiveData = false,
                 AssignedTo = "test@hackney.gov.uk",
                 OtherMembers = new List<Applicant>()
             };
@@ -90,6 +92,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
+            apiEntity.SensitiveData.Should().Be(request.SensitiveData);
             apiEntity.AssignedTo.Should().Be(request.AssignedTo);
             apiEntity.CreatedAt.Should().Be(entity.CreatedAt);
             apiEntity.MainApplicant.Should().BeEquivalentTo(entity.MainApplicant);

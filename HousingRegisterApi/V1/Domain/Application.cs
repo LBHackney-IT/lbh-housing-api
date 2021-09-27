@@ -28,6 +28,11 @@ namespace HousingRegisterApi.V1.Domain
         public string AssignedTo { get; set; }
 
         /// <summary>
+        /// Does the application contain sensative data
+        /// </summary>
+        public bool SensitiveData { get; set; }
+
+        /// <summary>
         /// The date the application was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }
