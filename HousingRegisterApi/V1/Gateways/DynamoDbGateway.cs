@@ -73,6 +73,7 @@ namespace HousingRegisterApi.V1.Gateways
                 Id = Guid.NewGuid(),
                 Reference = _hashHelper.Generate(request.MainApplicant.ContactInformation.EmailAddress).Substring(0, 10),
                 CreatedAt = DateTime.UtcNow,
+                SensitiveData = request.SensitiveData,
                 SubmittedAt = null,
                 Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
                 MainApplicant = request.MainApplicant,
@@ -102,6 +103,8 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (request.OtherMembers != null)
                 entity.OtherMembers = request.OtherMembers.ToList();
+
+            entity.SensitiveData = request.SensitiveData;
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 

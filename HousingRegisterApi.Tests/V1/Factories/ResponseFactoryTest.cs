@@ -16,6 +16,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             response.Id.Should().Be(domain.Id);
             response.Reference.Should().Be(domain.Reference);
             response.Status.Should().Be(domain.Status);
+            response.SensitiveData.Should().Be(domain.SensitiveData);
             response.AssignedTo.Should().Be(domain.AssignedTo);
             response.CreatedAt.Should().Be(domain.CreatedAt);
             response.SubmittedAt.Should().Be(domain.SubmittedAt);

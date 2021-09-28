@@ -17,6 +17,8 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public string AssignedTo { get; set; }
 
+        public bool SensitiveData { get; set; }
+
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime CreatedAt { get; set; }
 

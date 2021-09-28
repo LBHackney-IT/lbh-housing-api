@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
-    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
+    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests
     public class CreateNewApplicationTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
@@ -35,17 +35,18 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = _applicationFixture.ConstructCreateApplicationRequest();
             var json = JsonConvert.SerializeObject(request);
 
-            // Act            
+            // Act
             var response = await PostTestRequestAsync(json).ConfigureAwait(false);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiEntity = JsonConvert.DeserializeObject<ApplicationResponse>(responseContent);
 
-            // Assert            
+            // Assert
             apiEntity.Should().NotBeNull();
             apiEntity.Id.Should().NotBeEmpty();
             apiEntity.Status.Should().Be(request.Status);
+            apiEntity.SensitiveData.Should().Be(request.SensitiveData);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
             apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
