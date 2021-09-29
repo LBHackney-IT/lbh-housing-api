@@ -1,21 +1,22 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HousingRegisterApi.V1.UseCase
 {
     public class VerifyAuthUseCase : IVerifyAuthUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        public VerifyAuthUseCase(IApplicationApiGateway gateway)
+        private readonly ITokenGenerator _tokenGenerator;
+
+        public VerifyAuthUseCase(IApplicationApiGateway gateway,
+            ITokenGenerator tokenGenerator)
         {
             _gateway = gateway;
+            _tokenGenerator = tokenGenerator;
         }
 
         public VerifyAuthResponse Execute(Guid id, VerifyAuthRequest request)
@@ -26,31 +27,11 @@ namespace HousingRegisterApi.V1.UseCase
                 return null;
             }
 
-            var accessToken = GenerateJwtToken(response.Id);
+            var accessToken = _tokenGenerator.GenerateTokenForApplication(response.Id);
             return new VerifyAuthResponse()
             {
                 AccessToken = accessToken
             };
-        }
-
-        // TODO: move to separate class
-        private static string GenerateJwtToken(Guid id)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("HACKNEY_JWT_SECRET"));
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim("application_id", id.ToString()),
-                }),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Expires = DateTime.UtcNow.AddDays(30)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }

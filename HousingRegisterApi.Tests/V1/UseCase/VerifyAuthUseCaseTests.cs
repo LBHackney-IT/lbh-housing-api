@@ -5,6 +5,7 @@ using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
 using NUnit.Framework;
@@ -15,6 +16,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class VerifyAuthUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
+        private Mock<ITokenGenerator> _mockTokenGenerator;
         private VerifyAuthUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -22,7 +24,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _classUnderTest = new VerifyAuthUseCase(_mockGateway.Object);
+            _mockTokenGenerator = new Mock<ITokenGenerator>();
+            _classUnderTest = new VerifyAuthUseCase(_mockGateway.Object, _mockTokenGenerator.Object);
             _fixture = new Fixture();
         }
 
