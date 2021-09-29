@@ -17,6 +17,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         private readonly Fixture _fixture = new Fixture();
         private Mock<IDynamoDBContext> _dynamoDb;
         private Mock<ISHA256Helper> _hashHelper;
+        private Mock<IVerifyCodeGenerator> _codeGenerator;
         private DynamoDbGateway _classUnderTest;
 
         [SetUp]
@@ -24,7 +25,8 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         {
             _dynamoDb = new Mock<IDynamoDBContext>();
             _hashHelper = new Mock<ISHA256Helper>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object);
+            _codeGenerator = new Mock<IVerifyCodeGenerator>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object, _codeGenerator.Object);
         }
 
         [Test]

@@ -13,12 +13,16 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
+        private readonly IVerifyCodeGenerator _codeGenerator;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
-            ISHA256Helper hashHelper)
+        public DynamoDbGateway(
+            IDynamoDBContext dynamoDbContext,
+            ISHA256Helper hashHelper,
+            IVerifyCodeGenerator codeGenerator)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
+            _codeGenerator = codeGenerator;
         }
 
         public IEnumerable<Application> GetAll()
@@ -133,8 +137,7 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
-            // TODO: generate verify code
-            entity.VerifyCode = "123456";
+            entity.VerifyCode = _codeGenerator.GenerateCode();
             entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(10);
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
