@@ -51,5 +51,15 @@ namespace HousingRegisterApi.V1.Domain
         /// Other members involved with the application.
         /// </summary>
         public IEnumerable<Applicant> OtherMembers { get; set; }
+
+        /// <summary>
+        /// A verify code for the application
+        /// </summary>
+        public string VerifyCode { get; set; }
+
+        /// <summary>
+        /// The date which the verify code expires
+        /// </summary>
+        public DateTime? VerifyExpiresAt { get; set; }
     }
 }

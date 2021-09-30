@@ -13,12 +13,16 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
+        private readonly IVerifyCodeGenerator _codeGenerator;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext,
-            ISHA256Helper hashHelper)
+        public DynamoDbGateway(
+            IDynamoDBContext dynamoDbContext,
+            ISHA256Helper hashHelper,
+            IVerifyCodeGenerator codeGenerator)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
+            _codeGenerator = codeGenerator;
         }
 
         public IEnumerable<Application> GetAll()
@@ -123,6 +127,37 @@ namespace HousingRegisterApi.V1.Gateways
             entity.Status = "Submitted";
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
+            return entity.ToDomain();
+        }
+
+        public Application CreateVerifyCode(Guid id, CreateAuthRequest request)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null
+                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+            {
+                return null;
+            }
+
+            entity.VerifyCode = _codeGenerator.GenerateCode();
+            entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
+            return entity.ToDomain();
+        }
+
+        public Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request)
+        {
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+            if (entity == null
+                || entity.VerifyCode != request.Code
+                || entity.VerifyExpiresAt < DateTime.UtcNow
+                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+            {
+                return null;
+            }
 
             return entity.ToDomain();
         }

@@ -6,6 +6,7 @@ using System.Reflection;
 using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using dotenv.net;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -22,6 +23,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Notify.Client;
+using Notify.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace HousingRegisterApi
@@ -114,6 +117,11 @@ namespace HousingRegisterApi
             AWSXRayRecorder.InitializeInstance(Configuration);
             AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
 
+            DotEnv.Fluent()
+                .WithTrimValues()
+                .WithProbeForEnv(probeLevelsToSearch: 5)
+                .Load();
+
             services.ConfigureDynamoDB();
             RegisterGateways(services);
             RegisterUseCases(services);
@@ -142,6 +150,8 @@ namespace HousingRegisterApi
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
+            services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -150,10 +160,16 @@ namespace HousingRegisterApi
             services.AddScoped<ICreateNewApplicationUseCase, CreateNewApplicationUseCase>();
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
-            services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
             services.AddScoped<IGetApplicationBySearchTermUseCase, GetApplicationBySearchTermUseCase>();
+
+            services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
+            services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
+
+            services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
+            services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

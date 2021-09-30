@@ -18,7 +18,9 @@ namespace HousingRegisterApi.V1.Factories
                 CreatedAt = databaseEntity.CreatedAt,
                 SubmittedAt = databaseEntity.SubmittedAt,
                 MainApplicant = databaseEntity.MainApplicant,
-                OtherMembers = databaseEntity.OtherMembers
+                OtherMembers = databaseEntity.OtherMembers,
+                VerifyCode = databaseEntity.VerifyCode,
+                VerifyExpiresAt = databaseEntity.VerifyExpiresAt
             };
         }
 
@@ -34,7 +36,9 @@ namespace HousingRegisterApi.V1.Factories
                 CreatedAt = entity.CreatedAt,
                 SubmittedAt = entity.SubmittedAt,
                 MainApplicant = entity.MainApplicant,
-                OtherMembers = entity.OtherMembers.ToList()
+                OtherMembers = entity.OtherMembers.ToList(),
+                VerifyCode = entity.VerifyCode,
+                VerifyExpiresAt = entity.VerifyExpiresAt
             };
         }
     }
