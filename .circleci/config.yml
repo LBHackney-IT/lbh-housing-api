@@ -99,6 +99,7 @@ jobs:
       - run:
           name: Run formatter check
           command: ./dotnet-format-local/dotnet-format --check
+
   build-and-test:
     executor: docker-python
     steps:
@@ -110,6 +111,7 @@ jobs:
       - run:
           name: Run tests
           command: docker-compose run housing-register-api-test
+
   assume-role-development:
     executor: docker-python
     steps:
@@ -125,6 +127,7 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
+
   terraform-init-and-apply-to-development:
     executor: docker-terraform
     steps:
@@ -140,6 +143,7 @@ jobs:
     steps:
       - terraform-init-then-apply:
           environment: "production"
+
   deploy-to-development:
     executor: docker-dotnet
     steps:
@@ -184,31 +188,32 @@ workflows:
           filters:
             branches:
               only: master
+
   check-and-deploy-staging-and-production:
       jobs:
       - build-and-test:
           filters:
             branches:
-              only: release
+              only: master
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
           requires:
               - build-and-test
           filters:
              branches:
-               only: release
+               only: master
       - terraform-init-and-apply-to-staging:
           requires:
             - assume-role-staging
           filters:
             branches:
-              only: release
+              only: master
       - deploy-to-staging:
           requires:
             - terraform-init-and-apply-to-staging
           filters:
             branches:
-              only: release
+              only: master
       - permit-production-terraform-release:
           type: approval
           requires:
@@ -219,13 +224,13 @@ workflows:
               - permit-production-terraform-release
           filters:
              branches:
-               only: release
+               only: master
       - terraform-init-and-apply-to-production:
           requires:
             - assume-role-production
           filters:
             branches:
-              only: release
+              only: master
       - permit-production-release:
           type: approval
           requires:
@@ -233,7 +238,7 @@ workflows:
             - terraform-init-and-apply-to-production
           filters:
             branches:
-              only: release
+              only: master
       - deploy-to-production:
           context: api-assume-role-housing-production-context
           requires:
@@ -241,4 +246,4 @@ workflows:
             - terraform-init-and-apply-to-production
           filters:
             branches:
-              only: release
+              only: master
