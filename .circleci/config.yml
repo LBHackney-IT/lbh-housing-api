@@ -73,7 +73,7 @@ commands:
             apt-get update && apt-get install -y nodejs
       - run:
           name: Install serverless CLI
-          command: npm i -g serverless@2.59.0
+          command: npm i -g serverless
       - run:
           name: Build lambda
           command: |
@@ -179,7 +179,7 @@ workflows:
             branches:
               only: development
   check-and-deploy-staging-and-production:
-      jobs:
+    jobs:
       - build-and-test:
           filters:
             branches:
@@ -187,10 +187,10 @@ workflows:
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
           requires:
-              - build-and-test
+            - build-and-test
           filters:
-             branches:
-               only: master
+            branches:
+              only: master
       - terraform-init-and-apply-to-staging:
           requires:
             - assume-role-staging
@@ -210,10 +210,10 @@ workflows:
       - assume-role-production:
           context: api-assume-role-housing-production-context
           requires:
-              - permit-production-terraform-release
+            - permit-production-terraform-release
           filters:
-             branches:
-               only: master
+            branches:
+              only: master
       - terraform-init-and-apply-to-production:
           requires:
             - assume-role-production
