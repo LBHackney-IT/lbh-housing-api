@@ -20,7 +20,8 @@ namespace HousingRegisterApi.V1.Factories
                 CreatedAt = domain.CreatedAt,
                 SubmittedAt = domain.SubmittedAt,
                 MainApplicant = domain.MainApplicant,
-                OtherMembers = domain.OtherMembers
+                OtherMembers = domain.OtherMembers,
+                Assessment = domain.Assessment
             };
         }
 

@@ -10,5 +10,6 @@ namespace HousingRegisterApi.V1.Boundary.Request
         public string AssignedTo { get; set; }
         public Applicant MainApplicant { get; set; }
         public IEnumerable<Applicant> OtherMembers { get; set; }
+        public Assessment Assessment { get; set; }
     }
 }

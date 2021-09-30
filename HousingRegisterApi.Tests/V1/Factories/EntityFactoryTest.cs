@@ -25,6 +25,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             databaseEntity.CreatedAt.Should().BeSameDateAs(entity.CreatedAt);
             databaseEntity.MainApplicant.Should().BeEquivalentTo(entity.MainApplicant);
             databaseEntity.OtherMembers.Should().BeEquivalentTo(entity.OtherMembers);
+            databaseEntity.Assessment.Should().BeEquivalentTo(entity.Assessment);
         }
 
         [Test]
@@ -40,6 +41,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             entity.CreatedAt.Should().BeSameDateAs(databaseEntity.CreatedAt);
             entity.MainApplicant.Should().BeEquivalentTo(databaseEntity.MainApplicant);
             entity.OtherMembers.Should().BeEquivalentTo(databaseEntity.OtherMembers);
+            entity.Assessment.Should().BeEquivalentTo(databaseEntity.Assessment);
         }
     }
 }
