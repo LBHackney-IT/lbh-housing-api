@@ -99,7 +99,6 @@ jobs:
       - run:
           name: Run formatter check
           command: ./dotnet-format-local/dotnet-format --check
-
   build-and-test:
     executor: docker-python
     steps:
@@ -111,7 +110,6 @@ jobs:
       - run:
           name: Run tests
           command: docker-compose run housing-register-api-test
-
   assume-role-development:
     executor: docker-python
     steps:
@@ -127,7 +125,6 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-
   terraform-init-and-apply-to-development:
     executor: docker-terraform
     steps:
@@ -143,7 +140,6 @@ jobs:
     steps:
       - terraform-init-then-apply:
           environment: "production"
-
   deploy-to-development:
     executor: docker-dotnet
     steps:
@@ -187,7 +183,6 @@ workflows:
           filters:
             branches:
               only: master
-
   check-and-deploy-staging-and-production:
       jobs:
       - build-and-test:
