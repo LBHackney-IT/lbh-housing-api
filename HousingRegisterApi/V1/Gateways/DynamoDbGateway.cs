@@ -96,7 +96,8 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
-            entity.SensitiveData = request.SensitiveData;
+            if (request.SensitiveData.HasValue)
+                entity.SensitiveData = request.SensitiveData.Value;
 
             if (!string.IsNullOrEmpty(request.Status))
                 entity.Status = request.Status;
