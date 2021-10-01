@@ -22,17 +22,6 @@ namespace HousingRegisterApi.V1.Domain
         public string Status { get; set; }
 
         /// <summary>
-        /// The officer who this application is assigned to.
-        /// e.g. officer@hackney.gov.uk
-        /// </summary>
-        public string AssignedTo { get; set; }
-
-        /// <summary>
-        /// Does the application contain sensative data
-        /// </summary>
-        public bool SensitiveData { get; set; }
-
-        /// <summary>
         /// The date the application was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }
@@ -61,5 +50,21 @@ namespace HousingRegisterApi.V1.Domain
         /// The date which the verify code expires
         /// </summary>
         public DateTime? VerifyExpiresAt { get; set; }
+
+        /// <summary>
+        /// The officer who this application is assigned to.
+        /// e.g. officer@hackney.gov.uk
+        /// </summary>
+        public string AssignedTo { get; set; }
+
+        /// <summary>
+        /// Does the application contain sensitive data
+        /// </summary>
+        public bool SensitiveData { get; set; }
+
+        /// <summary>
+        /// Populated after assessment.
+        /// </summary>
+        public Assessment Assessment { get; set; }
     }
 }

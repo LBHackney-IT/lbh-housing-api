@@ -96,6 +96,8 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
+            entity.SensitiveData = request.SensitiveData;
+
             if (!string.IsNullOrEmpty(request.Status))
                 entity.Status = request.Status;
 
@@ -108,7 +110,8 @@ namespace HousingRegisterApi.V1.Gateways
             if (request.OtherMembers != null)
                 entity.OtherMembers = request.OtherMembers.ToList();
 
-            entity.SensitiveData = request.SensitiveData;
+            if (request.Assessment != null)
+                entity.Assessment = request.Assessment;
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 

@@ -63,6 +63,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
             apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+            apiEntity.Assessment.Should().BeEquivalentTo(request.Assessment);
         }
 
         [Test]

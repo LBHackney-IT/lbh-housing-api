@@ -15,10 +15,6 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public string Status { get; set; }
 
-        public string AssignedTo { get; set; }
-
-        public bool SensitiveData { get; set; }
-
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime CreatedAt { get; set; }
 
@@ -35,5 +31,12 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime? VerifyExpiresAt { get; set; }
+
+        public string AssignedTo { get; set; }
+
+        public bool SensitiveData { get; set; }
+
+        [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Assessment>))]
+        public Assessment Assessment { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace HousingRegisterApi.V1.Boundary.Response
         /// <example>Pending</example>
         public string Status { get; set; }
 
+        /// <example>true</example>
         public bool SensitiveData { get; set; }
 
         /// <example>test@hackney.gov.uk</example>
@@ -28,5 +29,7 @@ namespace HousingRegisterApi.V1.Boundary.Response
         public Applicant MainApplicant { get; set; }
 
         public IEnumerable<Applicant> OtherMembers { get; set; }
+
+        public Assessment Assessment { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace HousingRegisterApi.Tests.V1.Factories
             response.SubmittedAt.Should().Be(domain.SubmittedAt);
             response.MainApplicant.Should().BeEquivalentTo(domain.MainApplicant);
             response.OtherMembers.Should().BeEquivalentTo(domain.OtherMembers);
+            response.Assessment.Should().BeEquivalentTo(domain.Assessment);
         }
     }
 }

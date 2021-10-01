@@ -20,7 +20,8 @@ namespace HousingRegisterApi.V1.Factories
                 MainApplicant = databaseEntity.MainApplicant,
                 OtherMembers = databaseEntity.OtherMembers,
                 VerifyCode = databaseEntity.VerifyCode,
-                VerifyExpiresAt = databaseEntity.VerifyExpiresAt
+                VerifyExpiresAt = databaseEntity.VerifyExpiresAt,
+                Assessment = databaseEntity.Assessment
             };
         }
 
@@ -38,7 +39,8 @@ namespace HousingRegisterApi.V1.Factories
                 MainApplicant = entity.MainApplicant,
                 OtherMembers = entity.OtherMembers.ToList(),
                 VerifyCode = entity.VerifyCode,
-                VerifyExpiresAt = entity.VerifyExpiresAt
+                VerifyExpiresAt = entity.VerifyExpiresAt,
+                Assessment = entity.Assessment
             };
         }
     }
