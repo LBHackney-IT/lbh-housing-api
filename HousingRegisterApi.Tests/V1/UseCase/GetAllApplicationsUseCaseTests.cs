@@ -1,7 +1,6 @@
 using System.Linq;
 using AutoFixture;
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase;
 using FluentAssertions;
@@ -15,7 +14,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class GetAllApplicationsUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private Mock<IPaginationHelper> _mockPaginationHelper;
+        private IPaginationHelper _paginationHelper;
         private GetAllApplicationsUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -23,8 +22,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _mockPaginationHelper = new Mock<IPaginationHelper>();
-            _classUnderTest = new GetAllApplicationsUseCase(_mockGateway.Object, _mockPaginationHelper.Object);
+            _paginationHelper = new PaginationHelper();
+            _classUnderTest = new GetAllApplicationsUseCase(_mockGateway.Object, _paginationHelper);
             _fixture = new Fixture();
         }
 
@@ -32,37 +31,36 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void GetsAllApplicationsFromTheGateway()
         {
             // Arrange
+            var queryParam = new SearchQueryParameter();
             var stubbedEntities = _fixture.CreateMany<Application>().ToList();
-            _mockGateway.Setup(x => x.GetAll()).Returns(stubbedEntities);
+            _mockGateway.Setup(x => x.GetApplications(queryParam)).Returns(stubbedEntities);
 
             // Act
-            var searchParameters = new SearchApplicationRequest();
-            var assignedEntities = stubbedEntities.Where(x => x.AssignedTo == null);
-            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());
+            var expectedResponse = _paginationHelper.BuildResponse(queryParam, stubbedEntities, stubbedEntities.Count);
 
             // Assert
-            _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);
+            _classUnderTest.Execute(queryParam).Should().BeEquivalentTo(expectedResponse);
+            Assert.AreEqual(expectedResponse.PageSize, queryParam.PageSize);
         }
 
         [Test]
         public void GetsAllApplicationsByAssignee()
         {
             // Arrange
+            var queryParam = new SearchQueryParameter()
+            {
+                AssignedTo = "test@hackney.gov.uk",
+                PageSize = 50
+            };
             var stubbedEntities = _fixture.CreateMany<Application>().ToList();
-            _mockGateway.Setup(x => x.GetAll()).Returns(stubbedEntities);
+            _mockGateway.Setup(x => x.GetApplications(queryParam)).Returns(stubbedEntities);
 
             // Act
-            var searchParameters = new SearchApplicationRequest()
-            {
-                AssignedTo = "test@hackney.gov.uk"
-            };
-            var assignedEntities = stubbedEntities.Where(x => x.AssignedTo == searchParameters.AssignedTo);
-            var expectedResponse = _mockPaginationHelper.Object.BuildResponse(searchParameters, assignedEntities.ToResponse(), assignedEntities.Count());
+            var expectedResponse = _paginationHelper.BuildResponse(queryParam, stubbedEntities, stubbedEntities.Count);
 
             // Assert
-            _classUnderTest.Execute(searchParameters).Should().BeEquivalentTo(expectedResponse);
+            _classUnderTest.Execute(queryParam).Should().BeEquivalentTo(expectedResponse);
+            Assert.AreEqual(expectedResponse.PageSize, queryParam.PageSize);
         }
-
-        //TODO: Add extra tests here for extra functionality added to the use case
     }
 }

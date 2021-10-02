@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace HousingRegisterApi.V1.Controllers
 {
@@ -14,27 +15,24 @@ namespace HousingRegisterApi.V1.Controllers
     [ApiVersion("1.0")]
     public class ApplicationsApiController : BaseController
     {
-        private readonly IGetAllApplicationsUseCase _getAllUseCase;
+        private readonly IGetAllApplicationsUseCase _getApplicationsUseCase;
         private readonly IGetApplicationByIdUseCase _getByIdUseCase;
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
-        private readonly IGetApplicationBySearchTermUseCase _getApplicationBySearchTermUseCase;
 
         public ApplicationsApiController(
-            IGetAllApplicationsUseCase getAllUseCase,
+            IGetAllApplicationsUseCase getApplicationsUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
-            ICompleteApplicationUseCase completeApplicationUseCase,
-            IGetApplicationBySearchTermUseCase getApplicationBySearchTermUseCase)
+            ICompleteApplicationUseCase completeApplicationUseCase)
         {
-            _getAllUseCase = getAllUseCase;
+            _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
             _completeApplicationUseCase = completeApplicationUseCase;
-            _getApplicationBySearchTermUseCase = getApplicationBySearchTermUseCase;
         }
 
         /// <summary>
@@ -42,22 +40,19 @@ namespace HousingRegisterApi.V1.Controllers
         /// </summary>
         /// <response code="200">Success</response>
         /// <response code="400">Invalid Query Parameter.</response>
+        /// <response code="404">No records found for the specified query</response>
         /// <response code="500">Something went wrong</response>
-        [ProducesResponseType(typeof(ApplicationList), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedApplicationListResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications([FromQuery] SearchApplicationRequest searchParameters)
+        public IActionResult ListApplications([FromQuery] SearchQueryParameter searchParameters)
         {
-            if (!string.IsNullOrEmpty(searchParameters.NationalInsurance) || !string.IsNullOrEmpty(searchParameters.Reference) || !string.IsNullOrEmpty(searchParameters.Surname))
-            {
-                var result = _getApplicationBySearchTermUseCase.Execute(searchParameters);
-                if (result == null) return NotFound(searchParameters);
+            var response = _getApplicationsUseCase.Execute(searchParameters);
+            if (response == null || response.Results.Any()) return NotFound(searchParameters);
 
-                return Ok(result);
-            }
-
-            return Ok(_getAllUseCase.Execute(searchParameters));
+            return Ok(response);
         }
 
         /// <summary>
@@ -102,8 +97,10 @@ namespace HousingRegisterApi.V1.Controllers
         /// </summary>
         /// <response code="200">Success</response>
         /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="404">No record found for the specified ID</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPatch]
@@ -120,7 +117,7 @@ namespace HousingRegisterApi.V1.Controllers
         /// Completes an existing application
         /// </summary>
         /// <response code="200">Success</response>
-        /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="404">No record found for the specified ID</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

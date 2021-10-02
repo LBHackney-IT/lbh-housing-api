@@ -1,6 +1,7 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Factories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,14 +29,17 @@ namespace HousingRegisterApi.V1.Infrastructure
             };
         }
 
-        public PaginatedApplicationListResponse BuildResponse(SearchApplicationRequest searchParameters, List<ApplicationResponse> results, int totalItems)
+        public PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems)
         {
-            var pageStartItem = (searchParameters.Page - 1) * searchParameters.NumberOfItemsPerPage + 1;
+            var results = OrderData(data, searchParameters.OrderBy);
+            results = PageData(results, searchParameters.Page, searchParameters.PageSize);
+
+            var pageStartItem = (searchParameters.Page - 1) * searchParameters.PageSize + 1;
             var pageEndItem = totalItems;
 
-            if (searchParameters.NumberOfItemsPerPage < totalItems)
+            if (searchParameters.PageSize < totalItems)
             {
-                pageEndItem = searchParameters.NumberOfItemsPerPage * searchParameters.Page;
+                pageEndItem = searchParameters.PageSize * searchParameters.Page;
 
                 if (pageEndItem > totalItems)
                 {
@@ -45,11 +49,11 @@ namespace HousingRegisterApi.V1.Infrastructure
 
             return new PaginatedApplicationListResponse
             {
-                NumberOfItemsPerPage = searchParameters.NumberOfItemsPerPage,
+                PageSize = searchParameters.PageSize,
                 Page = searchParameters.Page,
-                Results = results,
+                Results = results.ToResponse(),
                 TotalItems = totalItems,
-                TotalNumberOfPages = (int) Math.Ceiling((decimal) totalItems / searchParameters.NumberOfItemsPerPage),
+                TotalNumberOfPages = (int) Math.Ceiling((decimal) totalItems / searchParameters.PageSize),
                 PageStartOffSet = pageStartItem,
                 PageEndOffSet = pageEndItem
             };

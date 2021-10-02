@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface IGetAllApplicationsUseCase
     {
-        PaginatedApplicationListResponse Execute(SearchApplicationRequest searchParameters);
+        PaginatedApplicationListResponse Execute(SearchQueryParameter searchParameters);
     }
 }

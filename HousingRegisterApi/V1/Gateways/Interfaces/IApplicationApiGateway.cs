@@ -7,9 +7,7 @@ namespace HousingRegisterApi.V1.Gateways
 {
     public interface IApplicationApiGateway
     {
-        IEnumerable<Application> GetAll();
-
-        IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters);
+        IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters);
 
         Application GetApplicationById(Guid id);
 
