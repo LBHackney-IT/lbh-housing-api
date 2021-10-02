@@ -34,13 +34,17 @@ namespace HousingRegisterApi.V1.Gateways
             {
                 conditions.Add(new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status));
             }
-            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
-            {
-                conditions.Add(new ScanCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo));
-            }
             if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
                 conditions.Add(new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference));
+            }
+            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
+            {
+                var assignCondition = searchParameters.AssignedTo == "unassigned"
+                    ? new ScanCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull)
+                    : new ScanCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
+
+                conditions.Add(assignCondition);
             }
 
             // query dynamodb
