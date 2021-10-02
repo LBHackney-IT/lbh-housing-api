@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
-    // TODO: This should go in a common NuGet package...
+    // TODO: Use Hackney.Core NuGet package...
 
     /// <summary>
     /// Converter for sub-objects

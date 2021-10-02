@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
-    // TODO: This should go in a common NuGet package...
+    // TODO: Use Hackney.Core NuGet package...
 
     /// <summary>
     /// Converter for enum lists where the value stored should be the enum value name (not the numeric value)
