@@ -50,7 +50,7 @@ namespace HousingRegisterApi.V1.Controllers
         public IActionResult ListApplications([FromQuery] SearchQueryParameter searchParameters)
         {
             var response = _getApplicationsUseCase.Execute(searchParameters);
-            if (response == null || response.Results.Any()) return NotFound(searchParameters);
+            if (response == null || !response.Results.Any()) return NotFound(searchParameters);
 
             return Ok(response);
         }
