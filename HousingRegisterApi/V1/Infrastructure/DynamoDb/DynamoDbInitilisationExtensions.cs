@@ -5,6 +5,8 @@ using System;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
+    // TODO: Use Hackney.Core NuGet package...
+
     public static class DynamoDbInitilisationExtensions
     {
         public static void ConfigureDynamoDB(this IServiceCollection services)

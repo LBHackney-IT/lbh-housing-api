@@ -4,7 +4,7 @@ using System;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
-    // TODO: This should go in a common NuGet package...
+    // TODO: Use Hackney.Core NuGet package...
 
     /// <summary>
     /// Converter for DateTime objects because the default handling expects the data time string to alays be in a very specific
