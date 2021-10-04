@@ -1,6 +1,5 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
@@ -19,23 +18,10 @@ namespace HousingRegisterApi.V1.UseCase
             _paginationHelper = paginationHelper;
         }
 
-        public PaginatedApplicationListResponse Execute(SearchApplicationRequest searchParameters)
+        public PaginatedApplicationListResponse Execute(SearchQueryParameter searchParameters)
         {
-            var totalItems = _gateway.GetAll();
-
-            totalItems = !string.IsNullOrWhiteSpace(searchParameters.AssignedTo)
-                ? totalItems.Where(x => x.AssignedTo == searchParameters.AssignedTo)
-                : totalItems.Where(x => x.AssignedTo == null);
-
-            if (!string.IsNullOrWhiteSpace(searchParameters.Status))
-            {
-                totalItems = totalItems.Where(x => x.Status.ToLower() == searchParameters.Status.ToLower());
-            }
-
-            var updateditems = _paginationHelper.OrderData(totalItems, searchParameters.OrderBy);
-            updateditems = _paginationHelper.PageData(updateditems, searchParameters.Page, searchParameters.NumberOfItemsPerPage);
-
-            return _paginationHelper.BuildResponse(searchParameters, updateditems.ToResponse(), totalItems.Count());
+            var totalItems = _gateway.GetApplications(searchParameters);
+            return _paginationHelper.BuildResponse(searchParameters, totalItems, totalItems.Count());
         }
     }
 }

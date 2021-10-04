@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
@@ -25,40 +26,39 @@ namespace HousingRegisterApi.V1.Gateways
             _codeGenerator = codeGenerator;
         }
 
-        public IEnumerable<Application> GetAll()
+        public IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters)
         {
+            // scan conditions
             var conditions = new List<ScanCondition>();
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
-            return search.Select(x => x.ToDomain());
-        }
-
-        public IEnumerable<Application> GetAllBySearchTerm(SearchApplicationRequest searchParameters)
-        {
-            var searchItems = GetAll();
-
             if (!string.IsNullOrEmpty(searchParameters.Status))
             {
-                searchItems = searchItems.Where(x => x.Status == searchParameters.Status).ToList();
+                conditions.Add(new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status));
             }
-
-            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
-            {
-                searchItems = searchItems.Where(x => x.AssignedTo == searchParameters.AssignedTo).ToList();
-            }
-
             if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
-                return searchItems.Where(x => x.Reference == searchParameters.Reference).ToList();
+                conditions.Add(new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference));
+            }
+            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
+            {
+                var assignCondition = searchParameters.AssignedTo == "unassigned"
+                    ? new ScanCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull)
+                    : new ScanCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
+
+                conditions.Add(assignCondition);
             }
 
+            // query dynamodb
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+
+            // filter on nested values
             if (!string.IsNullOrEmpty(searchParameters.Surname))
             {
-                return searchItems.Where(x => x.MainApplicant.Person.Surname.ToLower().Contains(searchParameters.Surname.ToLower())).ToList();
+                return searchItems.Where(x => x.MainApplicant.Person.Surname.Contains(searchParameters.Surname, StringComparison.InvariantCultureIgnoreCase));
             }
-
             if (!string.IsNullOrEmpty(searchParameters.NationalInsurance))
             {
-                return searchItems.Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance)).ToList();
+                return searchItems.Where(x => x.MainApplicant.Person.NationalInsuranceNumber.Contains(searchParameters.NationalInsurance, StringComparison.InvariantCultureIgnoreCase));
             }
 
             return searchItems;
