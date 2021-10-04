@@ -13,5 +13,7 @@ namespace HousingRegisterApi.V1.Boundary.Request
         public string NationalInsurance { get; set; }
 
         public string OrderBy { get; set; }
+
+        public bool HasAssessment { get; set; }
     }
 }
