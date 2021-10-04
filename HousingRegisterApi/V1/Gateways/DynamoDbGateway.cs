@@ -46,6 +46,10 @@ namespace HousingRegisterApi.V1.Gateways
 
                 conditions.Add(assignCondition);
             }
+            if (searchParameters.HasAssessment)
+            {
+                conditions.Add(new ScanCondition(nameof(Assessment), ScanOperator.IsNotNull));
+            }
 
             // query dynamodb
             var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();

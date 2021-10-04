@@ -169,6 +169,7 @@ namespace HousingRegisterApi
             services.AddScoped<IPaginationHelper, PaginationHelper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IBiddingNumberGenerator, BiddingNumberGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
