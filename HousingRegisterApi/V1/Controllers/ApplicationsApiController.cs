@@ -4,8 +4,10 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Controllers
 {
@@ -20,19 +22,22 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
+        private readonly ICreateEvidenceRequestUseCase _createEvidenceRequestUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
-            ICompleteApplicationUseCase completeApplicationUseCase)
+            ICompleteApplicationUseCase completeApplicationUseCase,
+            ICreateEvidenceRequestUseCase createEvidenceRequestUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
             _completeApplicationUseCase = completeApplicationUseCase;
+            _createEvidenceRequestUseCase = createEvidenceRequestUseCase;
         }
 
         /// <summary>
@@ -127,6 +132,25 @@ namespace HousingRegisterApi.V1.Controllers
         public IActionResult CompleteApplication([FromRoute][Required] Guid id)
         {
             var result = _completeApplicationUseCase.Execute(id);
+            if (result == null) return NotFound(id);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Create evidence requests for an application
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">No record found for the specified ID</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("{id}/evidence")]
+        public async Task<IActionResult> CreateEvidenceRequestAsync([FromRoute][Required] Guid id, [FromBody] CreateEvidenceRequestBase request)
+        {
+            var result = await _createEvidenceRequestUseCase.ExecuteAsync(id, request).ConfigureAwait(false);
             if (result == null) return NotFound(id);
 
             return Ok(result);

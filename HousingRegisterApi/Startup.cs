@@ -152,6 +152,7 @@ namespace HousingRegisterApi
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
+            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -161,7 +162,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
-
+            services.AddScoped<ICreateEvidenceRequestUseCase, CreateEvidenceRequestUseCase>();
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
 

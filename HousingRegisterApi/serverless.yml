@@ -30,6 +30,9 @@ functions:
       HACKNEY_JWT_SECRET: ${ssm:/housing-register/${self:provider.stage}/hackney-jwt-secret}
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
       NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register/${self:provider.stage}/notify-template-verify-code}
+      EVIDENCE_API_URL: ${ssm:/housing-register/${self:provider.stage}/evidence-api/base-url}
+      EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/get/evidence-requests/token}
+      EVIDENCE_API_POST_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/post/evidence-requests/token}
     events:
       - http:
           path: /{proxy+}
