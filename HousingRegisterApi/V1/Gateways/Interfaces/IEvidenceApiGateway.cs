@@ -8,7 +8,7 @@ namespace HousingRegisterApi.V1.Gateways
 {
     public interface IEvidenceApiGateway
     {
-        public Task<EvidenceRequestResponse> CreateEvidenceRequest(CreateEvidenceRequest request);
+        Task<EvidenceRequestResponse> CreateEvidenceRequest(CreateEvidenceRequest request);
 
         Task<List<EvidenceRequestResponse>> GetEvidenceRequests(string team);
 
