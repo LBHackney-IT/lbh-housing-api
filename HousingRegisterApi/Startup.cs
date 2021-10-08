@@ -7,6 +7,7 @@ using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
+using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -121,6 +122,9 @@ namespace HousingRegisterApi
                 .WithTrimValues()
                 .WithProbeForEnv(probeLevelsToSearch: 5)
                 .Load();
+
+            var options = ApiOptions.FromEnv();
+            services.AddSingleton(x => options);
 
             services.ConfigureDynamoDB();
             RegisterGateways(services);
