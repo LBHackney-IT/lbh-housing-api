@@ -19,6 +19,7 @@ namespace HousingRegisterApi.V1.Domain
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string Surname { get; set; }
+        public string FullName => FirstName + " " + Surname;
 
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; }

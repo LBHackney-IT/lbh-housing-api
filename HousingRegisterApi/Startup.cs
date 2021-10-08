@@ -7,6 +7,7 @@ using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
+using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -122,6 +123,9 @@ namespace HousingRegisterApi
                 .WithProbeForEnv(probeLevelsToSearch: 5)
                 .Load();
 
+            var options = ApiOptions.FromEnv();
+            services.AddSingleton(x => options);
+
             services.ConfigureDynamoDB();
             RegisterGateways(services);
             RegisterUseCases(services);
@@ -152,6 +156,7 @@ namespace HousingRegisterApi
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
+            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -161,7 +166,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
-
+            services.AddScoped<ICreateEvidenceRequestUseCase, CreateEvidenceRequestUseCase>();
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
 
