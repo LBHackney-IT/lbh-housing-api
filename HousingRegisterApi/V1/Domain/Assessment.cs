@@ -8,6 +8,8 @@ namespace HousingRegisterApi.V1.Domain
 
         public DateTime? InformationReceivedDate { get; set; }
 
+        public int BedroomNeed { get; set; }
+
         public string Band { get; set; }
 
         public string Reason { get; set; }
