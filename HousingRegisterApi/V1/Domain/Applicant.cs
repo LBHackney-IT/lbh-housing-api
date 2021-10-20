@@ -8,7 +8,8 @@ namespace HousingRegisterApi.V1.Domain
         public Address Address { get; set; }
         public ContactInformation ContactInformation { get; set; }
         public IEnumerable<Question> Questions { get; set; }
+
+        public bool RequiresMedical => Questions.GetAnswer("medical-needs/medical-needs") == "yes";
         public MedicalNeed MedicalNeed { get; set; }
-        public MedicalOutcome MedicalOutcome { get; set; }
     }
 }
