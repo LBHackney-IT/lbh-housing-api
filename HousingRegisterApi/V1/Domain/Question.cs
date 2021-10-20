@@ -18,7 +18,7 @@ namespace HousingRegisterApi.V1.Domain
         public static string GetAnswer(this IEnumerable<Question> questions, string name)
         {
             var question = questions?.FirstOrDefault(x => x.Id == name);
-            return JsonSerializer.Deserialize<string>(question?.Answer) ?? string.Empty;
+            return question != null ? JsonSerializer.Deserialize<string>(question.Answer) : string.Empty;
         }
     }
 }
