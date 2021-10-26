@@ -168,7 +168,7 @@ namespace HousingRegisterApi.Tests.V1.Domain
             {
                 return new Applicant
                 {
-                    Person = new Person {
+                        Person = new Person {
                         DateOfBirth = CalculateDob(age),
                         Gender = gender,
                         RelationshipType = hasPartnerSharing ? "partner"  : string.Empty

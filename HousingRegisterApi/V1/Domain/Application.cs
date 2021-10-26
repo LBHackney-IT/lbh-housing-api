@@ -94,7 +94,7 @@ namespace HousingRegisterApi.V1.Domain
 
             // each child gender must have their own room
             var peopleBetween10And16 = people.Where(x => x.Age >= 10 && x.Age < 16).ToList();
-           
+
             var over10PerGenderCount = peopleBetween10And16
                 .GroupBy(x => x.Gender)
                 .Select(gender =>
@@ -123,7 +123,7 @@ namespace HousingRegisterApi.V1.Domain
                     Gender = gender.Key,
                     Count = Decimal.Divide(genderCount, 2)
                 };
-              
+
             }).ToList();
 
             decimal over10PerGenderBedroomCount = over10PerGenderCount.Select(x => x.Count).Sum(x => Math.Ceiling(x));
