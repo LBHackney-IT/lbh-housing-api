@@ -168,10 +168,11 @@ namespace HousingRegisterApi.Tests.V1.Domain
             {
                 return new Applicant
                 {
-                        Person = new Person {
+                    Person = new Person
+                    {
                         DateOfBirth = CalculateDob(age),
                         Gender = gender,
-                        RelationshipType = hasPartnerSharing ? "partner"  : string.Empty
+                        RelationshipType = hasPartnerSharing ? "partner" : string.Empty
                     }
                 };
             }
@@ -180,6 +181,6 @@ namespace HousingRegisterApi.Tests.V1.Domain
             {
                 return DateTime.UtcNow.AddYears(-age);
             }
-        }   
+        }
     }
 }
