@@ -79,11 +79,13 @@ namespace HousingRegisterApi.V1.Domain
                 throw new InvalidOperationException("Main applicant doesn't exist");
             }
 
-            var people = new List<Person> { this.MainApplicant.Person }
-                .Concat(this.OtherMembers.Select(x => x.Person))
-                .Select(x => new { Age = x.Age, Gender = x.Gender });
+            // combine all applicant into one collection
+            var applicants = new List<Person> { this.MainApplicant.Person }.Concat(this.OtherMembers.Select(x => x.Person));
 
-            bool hasPartnerSharing = this.MainApplicant.Person.RelationshipType.Equals("partner", StringComparison.CurrentCultureIgnoreCase);
+            // get a list of applicant's ages and gender
+            var people = applicants.Select(x => new { Age = x.Age, Gender = x.Gender });
+
+            bool hasPartnerSharing = applicants.Any(x => x.RelationshipType.Equals("partner", StringComparison.CurrentCultureIgnoreCase));
 
             // one bedroom each... except when there's a couple
             int over16Count = people.Where(x => x.Age >= 16).Count();
