@@ -20,7 +20,7 @@ namespace BedroomCalculator
                 .AddJsonFile($"appsettings.{environmentName}.json", false, true)
                 .AddEnvironmentVariables()
                 .Build();
-                     
+
             IServiceCollection serviceCollection = new ServiceCollection();
             IServiceProvider serviceProvider = serviceCollection.AddConfiguration(configuration);
 

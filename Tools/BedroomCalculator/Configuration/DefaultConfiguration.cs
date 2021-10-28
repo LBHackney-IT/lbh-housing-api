@@ -63,7 +63,7 @@ namespace BedroomCalculator.Configuration
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();         
+            services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
