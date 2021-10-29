@@ -34,7 +34,7 @@ namespace HousingRegisterApi.Tests
             {
                 services.ConfigureDynamoDB();
 
-                var serviceProvider = services.BuildServiceProvider();                
+                var serviceProvider = services.BuildServiceProvider();
                 DynamoDb = serviceProvider.GetRequiredService<IAmazonDynamoDB>();
                 DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
 
@@ -43,8 +43,8 @@ namespace HousingRegisterApi.Tests
 
             // lets not send emails, but mock them
             builder.ConfigureTestServices(services =>
-            {           
-                services.AddTransient(x => new Mock<INotificationClient>().Object);            
+            {
+                services.AddTransient(x => new Mock<INotificationClient>().Object);
             });
         }
 

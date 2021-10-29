@@ -30,7 +30,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (incompleteApplication == null)
             {
-               var blankApplication = _applicationGateway.CreateNewApplication(new CreateApplicationRequest()
+                var blankApplication = _applicationGateway.CreateNewApplication(new CreateApplicationRequest()
                 {
                     MainApplicant = new Applicant()
                     {
@@ -41,7 +41,7 @@ namespace HousingRegisterApi.V1.UseCase
                     },
                     OtherMembers = new List<Applicant>(),
                     Status = "Verification"
-               });
+                });
 
                 applicationId = blankApplication.Id;
             }

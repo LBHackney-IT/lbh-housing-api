@@ -25,7 +25,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockNotifyGateway = new Mock<INotifyGateway>();
             _classUnderTest = new CreateAuthUseCase(_mockApplicationGateway.Object, _mockNotifyGateway.Object);
             _fixture = new Fixture();
-        }   
+        }
 
         [Test]
         public void CreateVerifyCodeCallsGatewayWhenAnExistingApplicationIsIncomplete()

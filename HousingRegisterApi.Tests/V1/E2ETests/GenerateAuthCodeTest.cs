@@ -24,8 +24,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             using var data = new StringContent(input, Encoding.UTF8, "application/json");
             var uri = new Uri($"api/v1/auth/generate", UriKind.Relative);
             return await Client.PostAsync(uri, data).ConfigureAwait(false);
-        }     
-                
+        }
+
         [Test]
         public async Task GenerateAuthCodeReturnsValidResponse()
         {
@@ -38,6 +38,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }    
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     {
         private readonly AuthFixture _authFixture;
         private readonly ApplicationFixture _applicationFixture;
-      
+
 
         public VerifyAuthCodeTest()
         {
@@ -50,7 +50,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var application = _applicationFixture.ConstructTestEntity();
             string email = application.MainApplicant.ContactInformation.EmailAddress;
             application.Status = "New";
-            application.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(25);          
+            application.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(25);
             await SetupTestData(application).ConfigureAwait(false);
 
             var request = _authFixture.ConstructVerifyAuthRequestRequest();
@@ -137,6 +137,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }           
+        }
     }
 }

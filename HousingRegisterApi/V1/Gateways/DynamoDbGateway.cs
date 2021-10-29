@@ -81,7 +81,7 @@ namespace HousingRegisterApi.V1.Gateways
             var conditions = new List<ScanCondition>
             {
                 new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
-                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, "Verification", "New"),             
+                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, "Verification", "New"),
             };
 
             // query dynamodb
@@ -179,7 +179,7 @@ namespace HousingRegisterApi.V1.Gateways
         /// <param name="request"></param>
         /// <returns>An application or null</returns>
         public Application ConfirmVerifyCode(VerifyAuthRequest request)
-        {          
+        {
             string reference = _hashHelper.Generate(request.Email).Substring(0, 10);
 
             var conditions = new List<ScanCondition>
@@ -205,6 +205,6 @@ namespace HousingRegisterApi.V1.Gateways
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
-        }    
+        }
     }
 }
