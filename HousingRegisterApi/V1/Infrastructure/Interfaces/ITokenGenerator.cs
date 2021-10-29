@@ -6,8 +6,7 @@ namespace HousingRegisterApi.V1.Infrastructure
 {
     public interface ITokenGenerator
     {
-        public string GenerateTokenForApplication(Guid id);
-
-        public IEnumerable<Claim> ValidateTokenAndGetClaims(string accessToken);
+        string GenerateTokenForApplication(Guid id);
+        bool ValidateToken(string accessToken, out IEnumerable<Claim> claims);
     }
 }

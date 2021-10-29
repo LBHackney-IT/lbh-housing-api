@@ -13,6 +13,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
@@ -67,8 +69,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
 
             // Assert application id in token
             var tokenGenerator = new TokenGenerator();
-            var claims = tokenGenerator.ValidateTokenAndGetClaims(responseBody.AccessToken);
+            var valid = tokenGenerator.ValidateToken(responseBody.AccessToken, out IEnumerable<Claim> claims);
 
+            valid.Should().BeTrue();
             claims.Any(x => x.Type == "application_id").Should().BeTrue();
             claims.Where(x => x.Type == "application_id" && x.Value == application.Id.ToString()).Should().NotBeNull();
         }

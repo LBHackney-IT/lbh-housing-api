@@ -28,8 +28,10 @@ namespace HousingRegisterApi.V1.Infrastructure
             return tokenHandler.WriteToken(token);
         }
 
-        public IEnumerable<Claim> ValidateTokenAndGetClaims(string accessToken)
+        public bool ValidateToken(string accessToken, out IEnumerable<Claim> claims)
         {
+            claims = new List<Claim>();
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("HACKNEY_JWT_SECRET"));
 
@@ -42,9 +44,16 @@ namespace HousingRegisterApi.V1.Infrastructure
                 ValidateIssuer = false
             };
 
-            var claimsPrincipal = tokenHandler.ValidateToken(accessToken, validations, out SecurityToken secToken);
-
-            return claimsPrincipal.Claims;
+            try
+            {
+                var claimsPrincipal = tokenHandler.ValidateToken(accessToken, validations, out SecurityToken secToken);
+                claims = claimsPrincipal.Claims;
+                return true; ;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
