@@ -173,13 +173,27 @@ namespace HousingRegisterApi.V1.Gateways
             return entity.ToDomain();
         }
 
-        public Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request)
-        {
-            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
+        /// <summary>
+        /// Verifies that an application exists for the specified email and verification code
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>An application or null</returns>
+        public Application ConfirmVerifyCode(VerifyAuthRequest request)
+        {          
+            string reference = _hashHelper.Generate(request.Email).Substring(0, 10);
+
+            var conditions = new List<ScanCondition>
+            {
+                new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
+            };
+
+            // query dynamodb
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var entity = search.FirstOrDefault();
+
             if (entity == null
                 || entity.VerifyCode != request.Code
-                || entity.VerifyExpiresAt < DateTime.UtcNow
-                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+                || entity.VerifyExpiresAt < DateTime.UtcNow)
             {
                 return null;
             }

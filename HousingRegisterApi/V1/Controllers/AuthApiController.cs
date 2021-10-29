@@ -43,7 +43,7 @@ namespace HousingRegisterApi.V1.Controllers
         }
 
         /// <summary>
-        /// Confirm a verify code for an existing application
+        /// Verfies and email and verification code belong to an application
         /// </summary>
         /// <response code="200">Success</response>
         /// <response code="404">Application not found</response>
@@ -52,11 +52,11 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Route("{id}/verify")]
-        public IActionResult VerifyCode([FromRoute][Required] Guid id, [FromBody] VerifyAuthRequest request)
+        [Route("verify")]
+        public IActionResult VerifyCode([FromBody] VerifyAuthRequest request)
         {
-            var result = _verifyAuthUseCase.Execute(id, request);
-            if (result == null) return NotFound(id);
+            var result = _verifyAuthUseCase.Execute(request);
+            if (result == null) return NotFound();
 
             return Ok(result);
         }

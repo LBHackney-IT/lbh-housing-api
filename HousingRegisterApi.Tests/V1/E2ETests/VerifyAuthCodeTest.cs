@@ -1,7 +1,10 @@
 using FluentAssertions;
 using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
+using HousingRegisterApi.Tests.V1.Helper;
+using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
+using HousingRegisterApi.V1.Infrastructure;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -9,6 +12,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
@@ -17,6 +21,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     {
         private readonly AuthFixture _authFixture;
         private readonly ApplicationFixture _applicationFixture;
+      
+
         public VerifyAuthCodeTest()
         {
             _authFixture = new AuthFixture();
@@ -28,30 +34,89 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
-        private async Task<HttpResponseMessage> PostTestRequestAsync(Guid applicationId, string requestBody)
+        private async Task<HttpResponseMessage> PostTestRequestAsync(string requestBody)
         {
             using var data = new StringContent(requestBody, Encoding.UTF8, "application/json");
-            var uri = new Uri($"api/v1/auth/{applicationId.ToString()}/verify", UriKind.Relative);
+            var uri = new Uri($"api/v1/auth/verify", UriKind.Relative);
             return await Client.PostAsync(uri, data).ConfigureAwait(false);
         }
 
-        [Test]
-        public async Task InvalidVerificationAuthCodeAndApplicationIdReturnsNotFound()
+        [Test(Description = "A valid verification code and email returns an access token and application id")]
+        public async Task ValidVerificationCodeAndEmailReturnsAnAccessTokenAndApplicationId()
         {
             // Arrange
-            Guid applicationId = Guid.NewGuid();
+            var application = _applicationFixture.ConstructTestEntity();
+            string email = application.MainApplicant.ContactInformation.EmailAddress;
+            application.Status = "New";
+            application.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(25);          
+            await SetupTestData(application).ConfigureAwait(false);
+
             var request = _authFixture.ConstructVerifyAuthRequestRequest();
+            request.Email = email;
+            request.Code = application.VerifyCode;
+
             var json = JsonConvert.SerializeObject(request);
 
             // Act
-            var response = await PostTestRequestAsync(applicationId, json).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var responseBody = response.GetResponse<VerifyAuthResponse>();
+            responseBody.Should().NotBeNull();
+
+            // Assert application id in token
+            var tokenGenerator = new TokenGenerator();
+            var claims = tokenGenerator.ValidateTokenAndGetClaims(responseBody.AccessToken);
+
+            claims.Any(x => x.Type == "application_id").Should().BeTrue();
+            claims.Where(x => x.Type == "application_id" && x.Value == application.Id.ToString()).Should().NotBeNull();
+        }
+
+        [Test(Description = "Validating a verification code and email a second time returns NotFound")]
+        public async Task ValidatingVerificationCodeAndEmailASecondTimeReturnsNotFound()
+        {
+            // Arrange
+            var application = _applicationFixture.ConstructTestEntity();
+            application.Status = "New";
+            application.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(25);
+            await SetupTestData(application).ConfigureAwait(false);
+
+            var request = _authFixture.ConstructVerifyAuthRequestRequest();
+            request.Email = application.MainApplicant.ContactInformation.EmailAddress;
+            request.Code = application.VerifyCode;
+
+            var json = JsonConvert.SerializeObject(request);
+
+            // Act
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            // Act
+            response = await PostTestRequestAsync(json).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        [Test]
-        public async Task ExpiredVerificationAuthCodeForApplicationReturnsNotFound()
+        [Test(Description = "Validating a verification code and email that has no applications returns NotFound")]
+        public async Task ValidatingAVerificationCodeAndEmailThatHasNoApplicationsReturnsNotFound()
+        {
+            // Arrange        
+            var request = _authFixture.ConstructVerifyAuthRequestRequest();
+            var json = JsonConvert.SerializeObject(request);
+
+            // Act
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        [Test(Description = "Expired verification code returns NotFound")]
+        public async Task ExpiredVerificationCodeReturnsNotFound()
         {
             // Arrange
             var application = _applicationFixture.ConstructTestEntity();
@@ -65,33 +130,10 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var json = JsonConvert.SerializeObject(request);
 
             // Act
-            var response = await PostTestRequestAsync(application.Id, json).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Test]
-        public async Task ValidVerificationAuthCodeAndApplicationIdReturnsOk()
-        {
-            // Arrange
-            var application = _applicationFixture.ConstructTestEntity();
-            application.Status = "New";
-            application.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(25);
-
-            await SetupTestData(application).ConfigureAwait(false);
-
-            var request = _authFixture.ConstructVerifyAuthRequestRequest();
-            request.Email = application.MainApplicant.ContactInformation.EmailAddress;
-            request.Code = application.VerifyCode;
-
-            var json = JsonConvert.SerializeObject(request);
-
-            // Act
-            var response = await PostTestRequestAsync(application.Id, json).ConfigureAwait(false);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
+        }           
     }
 }
