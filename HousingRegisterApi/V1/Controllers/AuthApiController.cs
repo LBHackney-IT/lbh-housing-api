@@ -35,12 +35,10 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Route("{id}/generate")]
-        public IActionResult GenerateCode([FromRoute][Required] Guid id, [FromBody] CreateAuthRequest applicationRequest)
+        [Route("generate")]
+        public IActionResult GenerateCode([FromBody] CreateAuthRequest request)
         {
-            var result = _createAuthUseCase.Execute(id, applicationRequest);
-            if (result == null) return NotFound(id);
-
+            var result = _createAuthUseCase.Execute(request);
             return Ok(result);
         }
 
@@ -55,9 +53,9 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Route("{id}/verify")]
-        public IActionResult VerifyCode([FromRoute][Required] Guid id, [FromBody] VerifyAuthRequest applicationRequest)
+        public IActionResult VerifyCode([FromRoute][Required] Guid id, [FromBody] VerifyAuthRequest request)
         {
-            var result = _verifyAuthUseCase.Execute(id, applicationRequest);
+            var result = _verifyAuthUseCase.Execute(id, request);
             if (result == null) return NotFound(id);
 
             return Ok(result);

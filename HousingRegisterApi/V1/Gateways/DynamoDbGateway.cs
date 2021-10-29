@@ -74,6 +74,23 @@ namespace HousingRegisterApi.V1.Gateways
             return result?.ToDomain();
         }
 
+        public Application GetIncompleteApplication(string email)
+        {
+            string reference = _hashHelper.Generate(email).Substring(0, 10);
+
+            var conditions = new List<ScanCondition>
+            {
+                new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
+                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, "Verification", "New"),             
+            };
+
+            // query dynamodb
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+            var result = searchItems.FirstOrDefault();
+            return result;
+        }
+
         public Application CreateNewApplication(CreateApplicationRequest request)
         {
             var entity = new ApplicationDbEntity
@@ -167,7 +184,13 @@ namespace HousingRegisterApi.V1.Gateways
                 return null;
             }
 
+            // if code has been verified, nullify the fields so they can't be used again
+            entity.VerifyCode = null;
+            entity.VerifyExpiresAt = null;
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+
             return entity.ToDomain();
-        }
+        }    
     }
 }
