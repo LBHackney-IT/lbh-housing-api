@@ -6,6 +6,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface ICreateAuthUseCase
     {
-        CreateAuthResponse Execute(Guid id, CreateAuthRequest request);
+        CreateAuthResponse Execute(CreateAuthRequest request);
     }
 }
