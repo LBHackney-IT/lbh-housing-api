@@ -95,8 +95,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var response = await PostTestRequestAsync(json).ConfigureAwait(false);
 
             // Assert
-            Assert.IsTrue(true);
-            // response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             //// Act
             //response = await PostTestRequestAsync(json).ConfigureAwait(false);
