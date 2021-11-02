@@ -180,28 +180,19 @@ namespace HousingRegisterApi.V1.Gateways
         /// <returns>An application or null</returns>
         public Application ConfirmVerifyCode(VerifyAuthRequest request)
         {
-            string reference = _hashHelper.Generate(request.Email).Substring(0, 10);
+            var application = GetIncompleteApplication(request.Email);
 
-            var conditions = new List<ScanCondition>
-            {
-                new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
-            };
-
-            // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
-            var entity = search.FirstOrDefault();
-
-            if (entity == null
-                || entity.VerifyCode != request.Code
-                || entity.VerifyExpiresAt < DateTime.UtcNow)
+            if (application == null
+                || application.VerifyCode != request.Code
+                || application.VerifyExpiresAt < DateTime.UtcNow)
             {
                 return null;
             }
 
             // if code has been verified, nullify the fields so they can't be used again
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(application.Id).GetAwaiter().GetResult();
             entity.VerifyCode = null;
             entity.VerifyExpiresAt = null;
-
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();

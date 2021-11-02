@@ -90,13 +90,13 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var request = _authFixture.ConstructVerifyAuthRequestRequest();
             request.Email = application.MainApplicant.ContactInformation.EmailAddress;
             request.Code = application.VerifyCode;
-
             var json = JsonConvert.SerializeObject(request);
 
             // Act
             var response = await PostTestRequestAsync(json).ConfigureAwait(false);
 
             // Assert
+            response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             // Act
