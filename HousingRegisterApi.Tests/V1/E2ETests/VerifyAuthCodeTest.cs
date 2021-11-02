@@ -43,7 +43,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             return await Client.PostAsync(uri, data).ConfigureAwait(false);
         }
 
-        [Ignore("Works locally")]
         [Test(Description = "A valid verification code and email returns an access token and application id")]
         public async Task ValidVerificationCodeAndEmailReturnsAnAccessTokenAndApplicationId()
         {
@@ -98,11 +97,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            //// Act
-            //response = await PostTestRequestAsync(json).ConfigureAwait(false);
+            // Act
+            response = await PostTestRequestAsync(json).ConfigureAwait(false);
 
-            //// Assert
-            //response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Test(Description = "Validating a verification code and email that has no applications returns NotFound")]
