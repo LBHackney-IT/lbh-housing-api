@@ -4,8 +4,11 @@ using Amazon.DynamoDBv2.Model;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Notify.Interfaces;
 using System.Collections.Generic;
 
 namespace HousingRegisterApi.Tests
@@ -36,6 +39,12 @@ namespace HousingRegisterApi.Tests
                 DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
 
                 EnsureTablesExist(DynamoDb, _tables);
+            });
+
+            // lets not send emails, but mock them
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddTransient(x => new Mock<INotificationClient>().Object);
             });
         }
 

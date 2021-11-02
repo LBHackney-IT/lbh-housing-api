@@ -6,6 +6,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface IVerifyAuthUseCase
     {
-        VerifyAuthResponse Execute(Guid id, VerifyAuthRequest request);
+        VerifyAuthResponse Execute(VerifyAuthRequest request);
     }
 }

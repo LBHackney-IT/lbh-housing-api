@@ -3,7 +3,6 @@ using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
@@ -29,20 +28,50 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         }
 
         [Test]
-        public void CreateVerifyCodeCallsGateway()
+        public void CreateVerifyCodeCallsGatewayWhenAnExistingApplicationIsIncomplete()
         {
             // Arrange
-            var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
+
             _mockApplicationGateway
-                .Setup(x => x.CreateVerifyCode(id, It.IsAny<CreateAuthRequest>()))
+                .Setup(x => x.GetIncompleteApplication(It.IsAny<string>()))
+                .Returns(application);
+
+            _mockApplicationGateway
+                .Setup(x => x.CreateVerifyCode(application.Id, It.IsAny<CreateAuthRequest>()))
                 .Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(id, new CreateAuthRequest());
+            var response = _classUnderTest.Execute(new CreateAuthRequest());
 
             // Assert
-            _mockApplicationGateway.Verify(x => x.CreateVerifyCode(id, It.IsAny<CreateAuthRequest>()));
+            _mockApplicationGateway.Verify(x => x.CreateVerifyCode(application.Id, It.IsAny<CreateAuthRequest>()));
+            response.Should().BeOfType<CreateAuthResponse>();
+        }
+
+        [Test]
+        public void CreateVerifyCodeCallsGatewayWhenNoIncompleteApplicationsExist()
+        {
+            // Arrange
+            var application = _fixture.Create<Application>();
+
+            _mockApplicationGateway
+                .Setup(x => x.GetIncompleteApplication(It.IsAny<string>()))
+                .Returns<Application>(null);
+
+            _mockApplicationGateway
+               .Setup(x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()))
+               .Returns(application);
+
+            _mockApplicationGateway
+                .Setup(x => x.CreateVerifyCode(It.IsAny<Guid>(), It.IsAny<CreateAuthRequest>()))
+                .Returns(application);
+
+            // Act
+            var response = _classUnderTest.Execute(new CreateAuthRequest());
+
+            // Assert
+            _mockApplicationGateway.Verify(x => x.CreateVerifyCode(It.IsAny<Guid>(), It.IsAny<CreateAuthRequest>()));
             response.Should().BeOfType<CreateAuthResponse>();
         }
     }

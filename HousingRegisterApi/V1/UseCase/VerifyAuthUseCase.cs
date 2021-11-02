@@ -19,15 +19,15 @@ namespace HousingRegisterApi.V1.UseCase
             _tokenGenerator = tokenGenerator;
         }
 
-        public VerifyAuthResponse Execute(Guid id, VerifyAuthRequest request)
+        public VerifyAuthResponse Execute(VerifyAuthRequest request)
         {
-            var response = _gateway.ConfirmVerifyCode(id, request);
-            if (response == null)
+            var application = _gateway.ConfirmVerifyCode(request);
+            if (application == null)
             {
                 return null;
             }
 
-            var accessToken = _tokenGenerator.GenerateTokenForApplication(response.Id);
+            var accessToken = _tokenGenerator.GenerateTokenForApplication(application.Id);
             return new VerifyAuthResponse()
             {
                 AccessToken = accessToken
