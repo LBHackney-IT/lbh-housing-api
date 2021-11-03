@@ -185,7 +185,7 @@ namespace HousingRegisterApi.Tests.V1.Services
             // assert
             AssertBedrooms(1, application);
         }
-    
+
         [Test(Description = "Single person returns 1 bedrooms")]
         public void SinglePersonReturns1Bedroom()
         {
@@ -197,7 +197,7 @@ namespace HousingRegisterApi.Tests.V1.Services
 
             // assert
             AssertBedrooms(1, application);
-        }     
+        }
 
         [Test(Description = "Family with 1 child returns 2 bedrooms")]
         public void FamilyWith1ChildReturns2Bedrooms()
@@ -212,7 +212,7 @@ namespace HousingRegisterApi.Tests.V1.Services
 
             // assert
             AssertBedrooms(2, application);
-        }        
+        }
 
         [Test(Description = "Family with 2 children of the same sex under 21yrs returns 2 bedrooms")]
         public void FamilyWith2ChildrenOfTheSameSexUnder21yrsReturns2Bedrooms()
@@ -229,7 +229,7 @@ namespace HousingRegisterApi.Tests.V1.Services
             // assert
             AssertBedrooms(2, application);
         }
-        
+
         [Test(Description = "Family with 2 children of the same sex 21yrs and over returns 3 bedrooms")]
         public void FamilyWith2ChildrenOfTheSameSex21yrsAndOverReturns3Bedrooms()
         {
@@ -244,7 +244,7 @@ namespace HousingRegisterApi.Tests.V1.Services
 
             // assert
             AssertBedrooms(3, application);
-        }       
+        }
 
         [Test(Description = "Family with 2 children of opposite sex under 10yrs returns 2 bedrooms")]
         public void FamilyWith2ChildrenOfOppositeSexUnder10yrsReturns2Bedrooms()
@@ -260,7 +260,7 @@ namespace HousingRegisterApi.Tests.V1.Services
 
             // assert
             AssertBedrooms(2, application);
-        }      
+        }
 
         [Test(Description = "Family with 2 children of opposite sex with one aged 10yrs or over returns 3 bedrooms")]
         public void FamilyWith2ChildrenOfOppositeSexWithOneAged10yrsOrOverReturns3Bedrooms()
@@ -277,7 +277,7 @@ namespace HousingRegisterApi.Tests.V1.Services
             // assert
             AssertBedrooms(3, application);
         }
-      
+
         [Test(Description = "Family with 3 children of the same sex under 21yrs returns 3 bedrooms")]
         public void FamilyWith3ChildrenOfTheSameSexUnder21yrsReturns3Bedrooms()
         {
@@ -453,14 +453,14 @@ namespace HousingRegisterApi.Tests.V1.Services
         }
 
         [Test(Description = "Single parent under 21 with 3 children of opposite sex with all children under 10yrs returns 3 bedrooms")]
-        public void SingleParentUnder21With3ChildrenOfOppositeSexWithAllChildrednUnder21yrsReturns2Bedrooms()
+        public void SingleParentUnder21With3ChildrenOfOppositeSexWithAllChildrednUnder21yrsReturns3Bedrooms()
         {
             // arrange
             Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
               new Tuple<int, string, string>(20, Female, MainApplicant),
               new Tuple<int, string, string>(3, Female, MainApplicantIsMyParent),
-              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),  
+              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),
               new Tuple<int, string, string>(4, Female, MainApplicantIsMyParent),
             });
 

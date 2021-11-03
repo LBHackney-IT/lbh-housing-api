@@ -66,6 +66,6 @@ namespace HousingRegisterApi.V1.Domain
         /// <summary>
         /// Populated after assessment.
         /// </summary>
-        public Assessment Assessment { get; set; }      
+        public Assessment Assessment { get; set; }
     }
 }
