@@ -157,6 +157,7 @@ namespace HousingRegisterApi
             services.AddScoped<INotifyGateway, NotifyGateway>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
+            services.AddHttpClient<ISnsGateway, ApplicationSnsGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
