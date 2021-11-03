@@ -12,574 +12,284 @@ namespace HousingRegisterApi.Tests.V1.Services
     {
         private const string Male = "male";
         private const string Female = "female";
+        private const string MainApplicant = "";
+        private const string MainApplicantIsPartner = "partner";
+        private const string MainApplicantIsMyParent = "parent";
+        //private const string MainApplicantIsMyBrother = "brother";
+        //private const string MainApplicantIsMySister = "sister";
 
-        [Test(Description = "Should award 1 bedroom for different genders under the age of 10")]
-        public void ApplicationShouldAward1BedroomForDifferentGendersUnderTheAgeOf10()
+
+        [Test(Description = "Single parent with children under the age of 10 of different genders returns 2 bedrooms")]
+        public void SingleParentWithChildrenUnder10OfDifferentGendersReturns2Bedrooms()
         {
             // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-                new Tuple<int, string>(5, Male),
-                new Tuple<int, string>(5, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 1;
-            var actual = BedroomCalculationService.Calculate(application);
+                new Tuple<int, string, string>(25, Male, MainApplicant),
+                new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(8, Male, MainApplicantIsMyParent),
+            });
 
             // assert
-            Assert.AreEqual(expected, actual);
+            AssertBedrooms(2, application);
         }
 
-        [Test(Description = "Children of different genders where one is over 10 should be awarded 2 bedrooms")]
-        public void ApplicationWithChildrenOfDifferentGendersWhereOneIsOver10ShouldBeAwarded2Bedrooms()
+        [Test(Description = "Single parent with children of different genders where one is over 10 returns 3 bedrooms")]
+        public void SingleParentWithChildrenOfDifferentGendersWhereOneIsOver10ShouldBeAwarded2Bedrooms()
         {
             // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-                new Tuple<int, string>(5, Male),
-                new Tuple<int, string>(10, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 2;
-            var actual = BedroomCalculationService.Calculate(application);
+                new Tuple<int, string, string>(25, Male, MainApplicant),
+                new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent)
+            });
 
             // assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test(Description = "Children of ages between 5 to 15 of different genders should be awarded 2 bedrooms")]
-        public void ApplicationWithChildrenOfAgesBetween5To15OfDifferentGendersShouldBeAwarded2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-                new Tuple<int, string>(5, Male),
-                new Tuple<int, string>(15, Male),
-                new Tuple<int, string>(10, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 2;
-            var actual = BedroomCalculationService.Calculate(application);
-
-            // assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test(Description = "2 boys aged between 5 and 15 and 2 girls aged 10 and 12 should be awarded 2 bedrooms")]
-        public void ApplicationWith2BoysAgedBetween5And15And2GirlsAged10And12ShouldBeAwarded2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-                new Tuple<int, string>(5, Male),
-                new Tuple<int, string>(15, Male),
-                new Tuple<int, string>(10, Female),
-                new Tuple<int, string>(12, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 2;
-            var actual = BedroomCalculationService.Calculate(application);
-
-            // assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test(Description = "should calculate correct amount of bedrooms for couple without children")]
-        public void ApplicationShouldCalculateCorrectAmountOfBedroomsForCoupleWithoutChildren()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-                new Tuple<int, string>(30, Male),
-                new Tuple<int, string>(25, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 1;
-            var actual = BedroomCalculationService.Calculate(application);
-
-            // assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test(Description = "should calculate 2 bedrooms for couple with children under the age of 10(different gender)")]
-        public void ApplicationShouldCalculate2BedroomsForCoupleWithChildrenUnderTheAgeOf10WithDifferentGender()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-                new Tuple<int, string>(30, Male),
-                new Tuple<int, string>(25, Female),
-                new Tuple<int, string>(5, Male),
-                new Tuple<int, string>(7, Female)
-            }, partnerSharing);
-
-            // act
-            var expected = 2;
-            var actual = BedroomCalculationService.Calculate(application);
-
-            // assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test(Description = "should calculate 3 bedrooms for couple with children over the age of 10(different gender)")]
-        public void ApplicationShouldCalculate3BedroomsForCoupleWithChildrenOverTheAgeOf10WithDifferentGender()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-                new Tuple<int, string>(30, Male),
-                new Tuple<int, string>(25, Female),
-                new Tuple<int, string>(11, Male),
-                new Tuple<int, string>(12, Female)
-            }, partnerSharing);
-
             AssertBedrooms(3, application);
         }
 
-        [Test(Description = "Single person under 35yrs returns 0 bedrooms")]
-        public void SinglePersonUnder35yrsReturns0Bedrooms()
+        [Test(Description = "Single parent with children of ages between 5 to 15 of different genders returns 3 bedrooms")]
+        public void SingleParentWithChildrenOfAgesBetween5To15OfDifferentGendersReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(25, Male)
-            }, partnerSharing);
+                new Tuple<int, string, string>(25, Male, MainApplicant),
+                new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent)
+            });
 
             // assert
-            AssertBedrooms(0, application);
+            AssertBedrooms(3, application);
         }
 
-        [Test(Description = "Couple returns 1 bedrooms")]
-        public void CoupleReturns1Bedrooms()
+        [Test(Description = "Family with 2 boys aged between 5 and 15 and 2 girls aged 10 and 12 should return 3 bedrooms")]
+        public void FamilyWith2BoysAgedBetween5And15And2GirlsAged10And12ShouldBeAwarded2Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(25, Female)
-            }, partnerSharing);
+                new Tuple<int, string, string>(35, Male, MainApplicant),
+                new Tuple<int, string, string>(30, Female, MainApplicantIsPartner),
+                new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(12, Female, MainApplicantIsMyParent)
+            });
+
+            // assert
+            AssertBedrooms(3, application);
+        }
+
+        [Test(Description = "Family with 2 boys aged between 5 and 15 and 2 girls aged 10 and 12 should return 3 bedrooms")]
+        public void UnorderedFamilyWith2BoysAgedBetween5And15And2GirlsAged10And12ShouldBeAwarded2Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+                new Tuple<int, string, string>(30, Female, MainApplicantIsPartner),
+                new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(35, Male, MainApplicant),
+                new Tuple<int, string, string>(12, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+            });
+
+            // assert
+            AssertBedrooms(3, application);
+        }
+
+        [Test(Description = "Couple without children returns 1 bedroom")]
+        public void CoupleWithoutChildrenReturns1Bedroom()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+                new Tuple<int, string, string>(30, Male, MainApplicant),
+                new Tuple<int, string, string>(25, Female, MainApplicantIsPartner)
+            });
 
             // assert
             AssertBedrooms(1, application);
         }
 
-        [Test(Description = "Single person 35yrs Plus returns 1 bedrooms")]
-        public void SinglePerson35yrsPlusReturns1Bedrooms()
+        [Test(Description = "Family with children under the age of 10 returns 2 bedrooms")]
+        public void FamilyWithChildrenUnderTheAgeOf10WithDifferentGendersReturns2Bedrooms()
         {
             // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(35, Male)
-            }, partnerSharing);
+                new Tuple<int, string, string>(30, Male, MainApplicant),
+                new Tuple<int, string, string>(25, Female, MainApplicantIsPartner),
+                new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(7, Female, MainApplicantIsMyParent)
+            });
+
+            // assert
+            AssertBedrooms(2, application);
+        }
+
+        [Test(Description = "Family with children over the age of 10 of different genders returns 3 bedrooms")]
+        public void FamilyWithChildrenOverTheAgeOf10WithDifferentGendersReturns3Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+                new Tuple<int, string, string>(30, Male, MainApplicant),
+                new Tuple<int, string, string>(25, Female, MainApplicantIsPartner),
+                new Tuple<int, string, string>(11, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(12, Female, MainApplicantIsMyParent)
+            });
+
+            // assert
+            AssertBedrooms(3, application);
+        }
+
+        //[Test(Description = "Single person under 35yrs returns 0 bedrooms")]
+        //public void SinglePersonUnder35yrsReturns0Bedrooms()
+        //{
+        //    // arrange            
+        //    Application application = CreateApplication(new List<Tuple<int, string, string>>()
+        //    {
+        //      new Tuple<int, string, string>(25, Male, MainApplicant)
+        //    });
+
+        //    // assert
+        //    AssertBedrooms(0, application);
+        //}
+
+        [Test(Description = "Couple returns 1 bedroom")]
+        public void CoupleReturns1Bedroom()
+        {
+            // arrange            
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+              new Tuple<int, string, string>(25, Male, MainApplicant),
+              new Tuple<int, string, string>(25, Female, MainApplicantIsPartner)
+            });
 
             // assert
             AssertBedrooms(1, application);
         }
 
+        [Test(Description = "Single person 35yrs Plus returns 1 bedroom")]
+        public void SinglePerson35yrsPlusReturns1Bedroom()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+              new Tuple<int, string, string>(35, Male, MainApplicant)
+            });
+
+            // assert
+            AssertBedrooms(1, application);
+        }
+    
         [Test(Description = "Single person returns 1 bedrooms")]
-        public void SinglePersonReturns1Bedrooms()
+        public void SinglePersonReturns1Bedroom()
         {
-            // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            // arrange            
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(25, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(25, Male, MainApplicant)
+            });
 
             // assert
             AssertBedrooms(1, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Single person (social tenant only) returns 1 bedrooms")]
-        public void SinglePersonSocialTenantOnlyReturns1Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(1, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Single person not a social tenant returns 1 bedrooms")]
-        public void SinglePersonNotASocialTenantReturns1Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = false;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(1, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Couple (social tenant only) returns 1 bedrooms")]
-        public void CoupleSocialTenantOnlyReturns1Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(1, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Couple not a social tenant returns 1 bedrooms")]
-        public void CoupleNotASocialTenantReturns1Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(1, application);
-        }
+        }     
 
         [Test(Description = "Family with 1 child returns 2 bedrooms")]
         public void FamilyWith1ChildReturns2Bedrooms()
         {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            // arrange            
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(25, Female),
-              new Tuple<int, string>(5, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(25, Male, MainApplicant),
+              new Tuple<int, string, string>(25, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(2, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 1 child (social tenant only) returns 2 bedrooms")]
-        public void FamilyWith1ChildSocialTenantOnlyReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 1 child and not a social tenant returns 2 bedrooms")]
-        public void FamilyWith1ChildAndNotASocialTenantReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
+        }        
 
         [Test(Description = "Family with 2 children of the same sex under 21yrs returns 2 bedrooms")]
         public void FamilyWith2ChildrenOfTheSameSexUnder21yrsReturns2Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(38, Male),
-              new Tuple<int, string>(38, Female),
-              new Tuple<int, string>(16, Male),
-              new Tuple<int, string>(8, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(38, Male, MainApplicant),
+              new Tuple<int, string, string>(38, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(16, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(2, application);
         }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of the same sex under 21yrs (social tenant only) returns 2 bedrooms")]
-        public void FamilyWith2ChildrenOfTheSameSexUnder21yrsSocialTenantOnlyReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of the same sex under 21yrs and not a social tenant returns 2 bedrooms")]
-        public void FamilyWith2ChildrenOfTheSameSexUnder21yrsAndNotASocialTenantReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
-
+        
         [Test(Description = "Family with 2 children of the same sex 21yrs and over returns 3 bedrooms")]
         public void FamilyWith2ChildrenOfTheSameSex21yrsAndOverReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(55, Male),
-              new Tuple<int, string>(55, Female),
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(21, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(55, Male, MainApplicant),
+              new Tuple<int, string, string>(55, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(25, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(21, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of the same sex 21yrs and over (social tenants only) returns 3 bedrooms")]
-        public void FamilyWith2ChildrenOfTheSameSex21yrsAndOverSocialTenantsOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of the same sex 21yrs and over and not a social tenant returns 3 bedrooms")]
-        public void FamilyWith2ChildrenOfTheSameSex21yrsAndOverAndNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
+        }       
 
         [Test(Description = "Family with 2 children of opposite sex under 10yrs returns 2 bedrooms")]
         public void FamilyWith2ChildrenOfOppositeSexUnder10yrsReturns2Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(25, Female),
-              new Tuple<int, string>(5, Male),
-              new Tuple<int, string>(3, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(25, Male, MainApplicant),
+              new Tuple<int, string, string>(25, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(3, Female, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(2, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of opposite sex under 10yrs (Social tenants only) returns 2 bedrooms")]
-        public void FamilyWith2ChildrenOfOppositeSexUnder10yrsSocialTenantsOnlyReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of opposite sex under 10yrs and not a social tenant returns 2 bedrooms")]
-        public void FamilyWith2ChildrenOfOppositeSexUnder10yrsAndNotASocialTenantReturns2Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(2, application);
-        }
+        }      
 
         [Test(Description = "Family with 2 children of opposite sex with one aged 10yrs or over returns 3 bedrooms")]
         public void FamilyWith2ChildrenOfOppositeSexWithOneAged10yrsOrOverReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(40, Male),
-              new Tuple<int, string>(40, Female),
-              new Tuple<int, string>(12, Male),
-              new Tuple<int, string>(8, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(40, Male, MainApplicant),
+              new Tuple<int, string, string>(40, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(12, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(3, application);
         }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of opposite sex with one aged 10yrs or over (Social tenants only) returns 3 bedrooms")]
-        public void FamilyWith2ChildrenOfOppositeSexWithOneAged10yrsOrOverSocialTenantsOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 2 children of opposite sex with one aged 10yrs or over and not a social tenant returns 3 bedrooms")]
-        public void FamilyWith2ChildrenOfOppositeSexWithOneAged10yrsOrOverAndNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
+      
         [Test(Description = "Family with 3 children of the same sex under 21yrs returns 3 bedrooms")]
         public void FamilyWith3ChildrenOfTheSameSexUnder21yrsReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(45, Male),
-              new Tuple<int, string>(45, Female),
-              new Tuple<int, string>(16, Male),
-              new Tuple<int, string>(12, Male),
-              new Tuple<int, string>(5, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of the same sex under 21yrs (Social tenants only) returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfTheSameSexUnder21yrsSocialTenantsOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of the same sex under 21yrs and not a social tenant returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfTheSameSexUnder21yrsAndNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(45, Male, MainApplicant),
+              new Tuple<int, string, string>(45, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(16, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(12, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(3, application);
@@ -589,53 +299,14 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith3ChildrenOfTheSameSexWithTwoChildrenOver21yrsReturns4Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(55, Male),
-              new Tuple<int, string>(55, Female),
-              new Tuple<int, string>(28, Male),
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(16, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of the same sex with two children over 21yrs (social tenants only) returns 4 bedrooms")]
-        public void FamilyWith3ChildrenOfTheSameSexWithTwoChildrenOver21yrsSocialTenantsOnlyReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of the same sex with two children over 21yrs and not a social tenant returns 4 bedrooms")]
-        public void FamilyWith3ChildrenOfTheSameSexWithTwoChildrenOver21yrsAndNotASocialTenantReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(55, Male, MainApplicant),
+              new Tuple<int, string, string>(55, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(28, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(25, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(16, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(4, application);
@@ -645,53 +316,14 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith3ChildrenOfOppositeSexUnder10yrsReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(35, Male),
-              new Tuple<int, string>(35, Female),
-              new Tuple<int, string>(9, Male),
-              new Tuple<int, string>(8, Female),
-              new Tuple<int, string>(3, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex under 10yrs (social tenants only) returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexUnder10yrsSocialTenantsOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex under 10yrs and is not a social tenant returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexUnder10yrsAndIsNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(35, Male, MainApplicant),
+              new Tuple<int, string, string>(35, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(9, Male, MainApplicantIsMyParent),
+            });
 
             // assert
             AssertBedrooms(3, application);
@@ -701,53 +333,14 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith3ChildrenOfOppositeSexWith1GirlAnd1BoyAged10yrsOrOverReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(35, Male),
-              new Tuple<int, string>(35, Female),
-              new Tuple<int, string>(15, Male),
-              new Tuple<int, string>(18, Female),
-              new Tuple<int, string>(5, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex with 1 girl and 1 boy aged 10yrs or over (social tenant only) returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexWith1GirlAnd1BoyAged10yrsOrOverSocialTenantOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex with 1 girl and 1 boy aged 10yrs or over and is not a social tenant returns 3 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexWith1GirlAnd1BoyAged10yrsOrOverAndIsNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(35, Male, MainApplicant),
+              new Tuple<int, string, string>(35, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(18, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(5, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(3, application);
@@ -757,53 +350,14 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith3ChildrenOfOppositeSexWith1GirlUnder10yrs1BoyOver10yrsAnd1Girl21yrsOrOverReturns4Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(50, Male),
-              new Tuple<int, string>(50, Female),
-              new Tuple<int, string>(21, Female),
-              new Tuple<int, string>(12, Male),
-              new Tuple<int, string>(8, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex with 1 girl under 10yrs, 1 boy over 10yrs and 1 girl 21yrs or over (social tenant only) returns 4 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexWith1GirlUnder10yrs1BoyOver10yrsAnd1Girl21yrsOrOverSocialTenantOnlyReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 3 children of opposite sex with 1 girl under 10yrs  1 boy over 10yrs and 1 girl 21yrs or over and not a social tenant returns 4 bedrooms")]
-        public void FamilyWith3ChildrenOfOppositeSexWith1GirlUnder10yrs1BoyOver10yrsAnd1Girl21yrsOrOverAndNotASocialTenantReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(50, Male, MainApplicant),
+              new Tuple<int, string, string>(50, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(21, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(12, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(4, application);
@@ -813,115 +367,33 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith4ChildrenOfTheSameSexUnder21yrsReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(40, Male),
-              new Tuple<int, string>(40, Female),
-              new Tuple<int, string>(18, Female),
-              new Tuple<int, string>(12, Female),
-              new Tuple<int, string>(8, Female),
-              new Tuple<int, string>(5, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(40, Male, MainApplicant),
+              new Tuple<int, string, string>(40, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(18, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(12, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent),
+            });
 
             // assert
             AssertBedrooms(3, application);
         }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex under 21yrs (social tenant only) returns 3 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexUnder21yrsSocialTenantOnlyReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex under 21yrs and is not a social tenant returns 3 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexUnder21yrsAndIsNotASocialTenantReturns3Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(3, application);
-        }       
 
         [Test(Description = "Family with 4 children of the same sex with one child over 21yrs returns 4 bedrooms")]
         public void FamilyWith4ChildrenOfTheSameSexWithOneChildOver21yrsReturns4Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(45, Male),
-              new Tuple<int, string>(45, Female),
-              new Tuple<int, string>(25, Female),
-              new Tuple<int, string>(18, Female),
-              new Tuple<int, string>(16, Female),
-              new Tuple<int, string>(5, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex with one child over 21yrs (social tenants only) returns 4 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexWithOneChildOver21yrsSocialTenantsOnlyReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
-
-            // assert
-            AssertBedrooms(4, application);
-        }
-
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex with one child over 21yrs and is not a social tenant returns 4 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexWithOneChildOver21yrsAndIsNotASocialTenantReturns4Bedrooms()
-        {
-            // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
-            {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(45, Male, MainApplicant),
+              new Tuple<int, string, string>(45, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(25, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(16, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(18, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(4, application);
@@ -931,62 +403,70 @@ namespace HousingRegisterApi.Tests.V1.Services
         public void FamilyWith4ChildrenOfTheSameSexWithThreeChildOver21yrsReturns5Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(55, Male),
-              new Tuple<int, string>(55, Female),
-              new Tuple<int, string>(28, Male),
-              new Tuple<int, string>(25, Male),
-              new Tuple<int, string>(21, Male),
-              new Tuple<int, string>(16, Male)
-            }, partnerSharing);
+              new Tuple<int, string, string>(55, Male, MainApplicant),
+              new Tuple<int, string, string>(55, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(28, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(25, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(21, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(16, Male, MainApplicantIsMyParent)
+            });
 
             // assert
             AssertBedrooms(5, application);
         }
 
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex with three child over 21yrs (social tenants only) returns 5 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexWithThreeChildOver21yrsSocialTenantsOnlyReturns5Bedrooms()
+        [Test(Description = "Family with 4 children of opposite sex with all children under 21yrs returns 3 bedrooms")]
+        public void FamilyWith4ChildrenOfOppositeSexWithAllChildrednUnder21yrsReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(55, Male, MainApplicant),
+              new Tuple<int, string, string>(55, Female, MainApplicantIsPartner),
+              new Tuple<int, string, string>(7, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(7, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(14, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(15, Female, MainApplicantIsMyParent),
+            });
 
             // assert
-            AssertBedrooms(5, application);
+            AssertBedrooms(3, application);
         }
 
-        [Ignore("What is a social tenant")]
-        [Test(Description = "Family with 4 children of the same sex with three child over 21yrs and is not a social tenant) returns 5 bedrooms")]
-        public void FamilyWith4ChildrenOfTheSameSexWithThreeChildOver21yrsAndIsNotASocialTenantReturns5Bedrooms()
+        [Test(Description = "Single parent under 21 with 4 children of opposite sex with all children under 10yrs returns 3 bedrooms")]
+        public void SingleParentUnder21With4ChildrenOfOppositeSexWithAllChildrednUnder21yrsReturns3Bedrooms()
         {
             // arrange
-            bool partnerSharing = true;
-            Application application = CreateApplication(new List<Tuple<int, string>>()
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
             {
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female),
-              new Tuple<int, string>(0, Male),
-              new Tuple<int, string>(0, Female)
-            }, partnerSharing);
+              new Tuple<int, string, string>(20, Female, MainApplicant),
+              new Tuple<int, string, string>(3, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(4, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(4, Female, MainApplicantIsMyParent),
+            });
 
             // assert
-            AssertBedrooms(5, application);
+            AssertBedrooms(3, application);
         }
 
+        [Test(Description = "Single parent under 21 with 3 children of opposite sex with all children under 10yrs returns 3 bedrooms")]
+        public void SingleParentUnder21With3ChildrenOfOppositeSexWithAllChildrednUnder21yrsReturns2Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+              new Tuple<int, string, string>(20, Female, MainApplicant),
+              new Tuple<int, string, string>(3, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),  
+              new Tuple<int, string, string>(4, Female, MainApplicantIsMyParent),
+            });
 
+            // assert
+            AssertBedrooms(3, application);
+        }
         private static void AssertBedrooms(int expected, Application application)
         {
             // act
@@ -996,19 +476,19 @@ namespace HousingRegisterApi.Tests.V1.Services
             Assert.AreEqual(expected, actual);
         }
 
-        private static Application CreateApplication(List<Tuple<int, string>> people, bool mainApplicantHasPartnerSharing)
+        private static Application CreateApplication(List<Tuple<int, string, string>> people)
         {
             var application = new Application();
 
-            var mainApplicant = people.First();
-            application.MainApplicant = CreateApplicant(mainApplicant.Item1, mainApplicant.Item2, mainApplicantHasPartnerSharing);
+            var mainApplicant = people.First(x => String.IsNullOrWhiteSpace(x.Item3));
+            application.MainApplicant = CreateApplicant(mainApplicant.Item1, mainApplicant.Item2, "");
 
-            var otherApplicants = people.Skip(1).ToList();
-            application.OtherMembers = otherApplicants.Select(x => CreateApplicant(x.Item1, x.Item2, false));
+            var otherApplicants = people.Where(x => !String.IsNullOrWhiteSpace(x.Item3)).ToList();
+            application.OtherMembers = otherApplicants.Select(x => CreateApplicant(x.Item1, x.Item2, x.Item3));
 
             return application;
 
-            Applicant CreateApplicant(int age, string gender, bool hasPartnerSharing)
+            Applicant CreateApplicant(int age, string gender, string relationToMainApplicant)
             {
                 return new Applicant
                 {
@@ -1016,7 +496,7 @@ namespace HousingRegisterApi.Tests.V1.Services
                     {
                         DateOfBirth = CalculateDob(age),
                         Gender = gender,
-                        RelationshipType = hasPartnerSharing ? "partner" : string.Empty
+                        RelationshipType = relationToMainApplicant
                     }
                 };
             }
