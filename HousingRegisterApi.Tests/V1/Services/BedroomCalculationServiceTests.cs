@@ -10,14 +10,11 @@ namespace HousingRegisterApi.Tests.V1.Services
     [TestFixture]
     public class BedroomCalculationServiceTests
     {
-        private const string Male = "male";
-        private const string Female = "female";
+        private const string Male = "M";
+        private const string Female = "F";
         private const string MainApplicant = "";
         private const string MainApplicantIsPartner = "partner";
         private const string MainApplicantIsMyParent = "parent";
-        //private const string MainApplicantIsMyBrother = "brother";
-        //private const string MainApplicantIsMySister = "sister";
-
 
         [Test(Description = "Single parent with children under the age of 10 of different genders returns 2 bedrooms")]
         public void SingleParentWithChildrenUnder10OfDifferentGendersReturns2Bedrooms()
