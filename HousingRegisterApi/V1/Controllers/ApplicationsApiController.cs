@@ -4,7 +4,6 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +22,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
         private readonly ICreateEvidenceRequestUseCase _createEvidenceRequestUseCase;
+        private readonly ICalculateBedroomsUseCase _calculateBedroomsUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -30,7 +30,8 @@ namespace HousingRegisterApi.V1.Controllers
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
             ICompleteApplicationUseCase completeApplicationUseCase,
-            ICreateEvidenceRequestUseCase createEvidenceRequestUseCase)
+            ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
+            ICalculateBedroomsUseCase calculateBedroomsUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
@@ -38,6 +39,7 @@ namespace HousingRegisterApi.V1.Controllers
             _updateApplicationUseCase = updateApplicationUseCase;
             _completeApplicationUseCase = completeApplicationUseCase;
             _createEvidenceRequestUseCase = createEvidenceRequestUseCase;
+            _calculateBedroomsUseCase = calculateBedroomsUseCase;
         }
 
         /// <summary>
@@ -134,6 +136,17 @@ namespace HousingRegisterApi.V1.Controllers
             var result = _completeApplicationUseCase.Execute(id);
             if (result == null) return NotFound(id);
 
+            return Ok(result);
+        }
+
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("bedrooms")]
+        public IActionResult CalculateBedrooms([FromBody] CalculateBedroomsRequest request)
+        {
+            var result = _calculateBedroomsUseCase.Execute(request);
             return Ok(result);
         }
 

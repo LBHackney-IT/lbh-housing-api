@@ -44,6 +44,16 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
             return entity;
         }
 
+        /// <summary>
+        /// Method to construct <see cref="CalculateBedroomsRequest"/> that can be used in a test
+        /// </summary>
+        /// <returns></returns>
+        public CalculateBedroomsRequest ConstructCalculateBedroomsRequest()
+        {
+            var entity = _fixture.Create<CalculateBedroomsRequest>();
+            return entity;
+        }
+
         // TODO: add some more variations and example test data
     }
 }

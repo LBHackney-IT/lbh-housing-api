@@ -5,16 +5,17 @@ using System.Linq;
 
 namespace HousingRegisterApi.V1.Services
 {
-    public static class BedroomCalculationService
+    public class BedroomCalculatorService : IBedroomCalculatorService
     {
-        public static int Calculate(Application application)
+        public int Calculate(IEnumerable<Applicant> household)
         {
-            // combine all applicants into one collection
-            var people = new List<Person> { application.MainApplicant.Person }
-                .Concat(application.OtherMembers.Select(x => x.Person))
-                .ToList();
+            ValidateHoushold(household);
 
-            // create a list of available occupants, we will use this to remove occupants that have been allocated rooms
+            // combine all applicants into one collection           
+            var people = household.ToList().Select(x => x.Person);
+
+            // create a list of available occupants
+            // we will use this to remove occupants that have been allocated rooms
             var unoccupants = people.Select(x => new Occupant(x.Age, x.Gender, x.RelationshipType)).ToList();
 
             // rules must be applied in order
@@ -26,6 +27,29 @@ namespace HousingRegisterApi.V1.Services
             count += ApplyRule5(unoccupants);
 
             return count;
+        }
+
+        private static void ValidateHoushold(IEnumerable<Applicant> household)
+        {
+            // make sure data is valid
+            if (!household.Any())
+            {
+                throw new ApplicationException("Household is empty");
+            }
+            else
+            {
+                household.ToList().ForEach(app =>
+                {
+                    if (app == null)
+                    {
+                        throw new ApplicationException("Applicant is missing");
+                    }
+                    else if (app.Person == null)
+                    {
+                        throw new ApplicationException("Applicant Person is missing");
+                    }
+                });
+            }
         }
 
         /// <summary>
