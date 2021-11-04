@@ -52,7 +52,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        public async Task InvalildRequestToCalculateBedroomsReturnsBadRequest()
+        public async Task InvalildRequestToCalculateBedroomsReturnsNotFound()
         {
             var id = Guid.NewGuid();
             var response = await GetTestRequestAsync(id).ConfigureAwait(false);
