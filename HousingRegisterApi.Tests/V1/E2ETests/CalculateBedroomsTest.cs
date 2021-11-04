@@ -1,11 +1,12 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Factories;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -21,22 +22,26 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             _applicationFixture = new ApplicationFixture();
         }
 
-        private async Task<HttpResponseMessage> PostTestRequestAsync(string input)
+        private async Task SetupTestData(Application entity)
         {
-            using var data = new StringContent(input, Encoding.UTF8, "application/json");
-            var uri = new Uri($"api/v1/applications/bedrooms", UriKind.Relative);
-            return await Client.PostAsync(uri, data).ConfigureAwait(false);
+            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
+        }
+
+        private async Task<HttpResponseMessage> GetTestRequestAsync(Guid id)
+        {
+            var uri = new Uri($"api/v1/applications/{id}/bedrooms", UriKind.Relative);
+            return await Client.GetAsync(uri).ConfigureAwait(false);
         }
 
         [Test]
         public async Task ValidRequestToCalculateBedroomsReturnsOk()
         {
             // Arrange
-            var request = _applicationFixture.ConstructCalculateBedroomsRequest();
-            var json = JsonConvert.SerializeObject(request);
+            var entity = _applicationFixture.ConstructTestEntity();
+            await SetupTestData(entity).ConfigureAwait(false);
 
             // Act
-            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+            var response = await GetTestRequestAsync(entity.Id).ConfigureAwait(false);
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -49,11 +54,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         [Test]
         public async Task InvalildRequestToCalculateBedroomsReturnsBadRequest()
         {
-            // Act
-            var response = await PostTestRequestAsync("test").ConfigureAwait(false);
+            var id = Guid.NewGuid();
+            var response = await GetTestRequestAsync(id).ConfigureAwait(false);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
     }
 }

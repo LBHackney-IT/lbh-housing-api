@@ -139,14 +139,22 @@ namespace HousingRegisterApi.V1.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Returns the number of bedrooms required for an application
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost]
-        [Route("bedrooms")]
-        public IActionResult CalculateBedrooms([FromBody] CalculateBedroomsRequest request)
+        [HttpGet]
+        [Route("{id}/bedrooms")]
+        public IActionResult CalculateBedrooms([FromRoute][Required] Guid id)
         {
-            var result = _calculateBedroomsUseCase.Execute(request);
+            var entity = _getByIdUseCase.Execute(id);
+            if (entity == null) return NotFound(id);
+
+            var result = _calculateBedroomsUseCase.Execute(id);
             return Ok(result);
         }
 

@@ -7,9 +7,17 @@ namespace HousingRegisterApi.V1.Services
 {
     public class BedroomCalculatorService : IBedroomCalculatorService
     {
-        public int Calculate(IEnumerable<Applicant> household)
+        /// <summary>
+        /// Calculates the required number of bedrooms
+        /// </summary>
+        /// <param name="application"></param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
+        public int Calculate(Application application)
         {
-            ValidateHoushold(household);
+            ValidateApplication(application);
+
+            IEnumerable<Applicant> household = new List<Applicant> { application.MainApplicant }.Concat(application.OtherMembers);
 
             // combine all applicants into one collection           
             var people = household.ToList().Select(x => x.Person);
@@ -29,27 +37,31 @@ namespace HousingRegisterApi.V1.Services
             return count;
         }
 
-        private static void ValidateHoushold(IEnumerable<Applicant> household)
+        private static void ValidateApplication(Application application)
         {
+            if (application == null)
+            {
+                throw new ApplicationException("Application not found");
+            }
+
             // make sure data is valid
-            if (!household.Any())
+            if (application.MainApplicant == null)
             {
-                throw new ApplicationException("Household is empty");
+                throw new ApplicationException("Main applicant is missing");
             }
-            else
+
+            application.OtherMembers.ToList().ForEach(app =>
             {
-                household.ToList().ForEach(app =>
+                if (app == null)
                 {
-                    if (app == null)
-                    {
-                        throw new ApplicationException("Applicant is missing");
-                    }
-                    else if (app.Person == null)
-                    {
-                        throw new ApplicationException("Applicant Person is missing");
-                    }
-                });
-            }
+                    throw new ApplicationException("OtherMember is missing");
+                }
+
+                if (app.Person == null)
+                {
+                    throw new ApplicationException("OtherMember Person is missing");
+                }
+            });
         }
 
         /// <summary>

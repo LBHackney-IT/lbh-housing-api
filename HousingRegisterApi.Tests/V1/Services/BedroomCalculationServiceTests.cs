@@ -467,8 +467,7 @@ namespace HousingRegisterApi.Tests.V1.Services
         private static void AssertBedrooms(int expected, Application application)
         {
             // act
-            var household = new List<Applicant> { application.MainApplicant }.Concat(application.OtherMembers);
-            var actual = new BedroomCalculatorService().Calculate(household);
+            var actual = new BedroomCalculatorService().Calculate(application);
 
             // assert
             Assert.AreEqual(expected, actual);

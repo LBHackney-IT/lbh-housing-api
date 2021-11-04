@@ -1,9 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
-using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
@@ -17,6 +15,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class CalculateBedroomsUseCaseTests
     {
         private Mock<ILogger<CalculateBedroomsUseCase>> _loggerMock;
+        private Mock<IApplicationApiGateway> _gatewayMock;
         private CalculateBedroomsUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -24,18 +23,21 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _loggerMock = new Mock<ILogger<CalculateBedroomsUseCase>>();
-            _classUnderTest = new CalculateBedroomsUseCase(_loggerMock.Object, new BedroomCalculatorService());
+            _gatewayMock = new Mock<IApplicationApiGateway>();
+
+            _classUnderTest = new CalculateBedroomsUseCase(_loggerMock.Object, _gatewayMock.Object, new BedroomCalculatorService());
             _fixture = new Fixture();
         }
 
         [Test]
         public void CalculateBedroomsUseCaseLogsTheRequest()
         {
-            // Arrange            
-            var request = _fixture.Create<CalculateBedroomsRequest>();
+            // Arrange
+            var application = _fixture.Create<Application>();
+            _gatewayMock.Setup(x => x.GetApplicationById(It.IsAny<Guid>())).Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(request);
+            var response = _classUnderTest.Execute(application.Id);
 
             // Assert
             _loggerMock.Verify(m => m.Log<It.IsAnyType>(LogLevel.Information,
@@ -47,19 +49,35 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         }
 
         [Test]
-        public void WhenMainApplicantIsNullThenTheCalculateBedroomsUseCaseThrowsAnException()
+        public void WhenApplicationExistThenTheCalculateBedroomsUseReturnsAValue()
         {
             // Arrange
-            var request = _fixture.Create<CalculateBedroomsRequest>();
-            request.MainApplicant = null;
-
-            var exception = new ApplicationException("Applicant is missing");
+            var application = _fixture.Create<Application>();
+            _gatewayMock.Setup(x => x.GetApplicationById(It.IsAny<Guid>())).Returns(application);
 
             // Act
-            Func<SimpleTypeResponse<int>> func = () => _classUnderTest.Execute(request);
+            var response = _classUnderTest.Execute(application.Id);
+
+            // Assert
+            response.Value.Should().BeGreaterOrEqualTo(0);
+        }
+
+        [Test]
+        public void WhenApplicationDoesntExistThenTheCalculateBedroomsUseCaseThrowsAnException()
+        {
+            // Arrange
+            Guid id = Guid.NewGuid();
+            _gatewayMock.Setup(x => x.GetApplicationById(It.IsAny<Guid>())).Returns<Application>(null);
+
+            var exception = new ApplicationException("Application not found");
+
+            // Act
+            Func<SimpleTypeResponse<int>> func = () => _classUnderTest.Execute(id);
 
             // Assert
             func.Should().Throw<ApplicationException>().WithMessage(exception.Message);
         }
+
+
     }
 }
