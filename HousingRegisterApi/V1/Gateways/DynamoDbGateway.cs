@@ -108,6 +108,8 @@ namespace HousingRegisterApi.V1.Gateways
                 OtherMembers = request.OtherMembers.ToList()
             };
 
+            entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
+
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
         }
