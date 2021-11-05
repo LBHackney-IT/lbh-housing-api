@@ -64,6 +64,11 @@ namespace HousingRegisterApi.V1.Domain
         public bool SensitiveData { get; set; }
 
         /// <summary>
+        /// The calculated bedroom need prior to the assessment bedroom need
+        /// </summary>
+        public int? CalculatedBedroomNeed { get; set; }
+
+        /// <summary>
         /// Populated after assessment.
         /// </summary>
         public Assessment Assessment { get; set; }
