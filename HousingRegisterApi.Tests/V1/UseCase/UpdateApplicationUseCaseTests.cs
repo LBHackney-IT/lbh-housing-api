@@ -6,6 +6,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
 using NUnit.Framework;

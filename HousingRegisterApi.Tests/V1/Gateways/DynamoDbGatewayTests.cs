@@ -8,6 +8,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using System;
+using HousingRegisterApi.V1.Services;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
 {
@@ -19,6 +20,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         private Mock<ISHA256Helper> _hashHelper;
         private Mock<IVerifyCodeGenerator> _codeGenerator;
         private DynamoDbGateway _classUnderTest;
+        private Mock<IBedroomCalculatorService> _bedroomCalculatorService;
 
         [SetUp]
         public void Setup()
@@ -26,7 +28,8 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             _dynamoDb = new Mock<IDynamoDBContext>();
             _hashHelper = new Mock<ISHA256Helper>();
             _codeGenerator = new Mock<IVerifyCodeGenerator>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object, _codeGenerator.Object);
+            _bedroomCalculatorService = new Mock<IBedroomCalculatorService>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object, _codeGenerator.Object, _bedroomCalculatorService.Object);
         }
 
         [Test]

@@ -9,8 +9,7 @@ namespace HousingRegisterApi.V1.Services
         /// Calculates the required number of bedrooms
         /// </summary>
         /// <param name="application"></param>
-        /// <returns></returns>
-        /// <exception cref="ApplicationException"></exception>
-        int Calculate(Application application);
+        /// <returns>Null if a problem exists calculating the bedroom need</returns>
+        int? Calculate(Application application);
     }
 }

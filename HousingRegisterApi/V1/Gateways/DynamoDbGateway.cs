@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,17 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
         private readonly IVerifyCodeGenerator _codeGenerator;
-
+        private readonly IBedroomCalculatorService _bedroomCalculatorService;
         public DynamoDbGateway(
             IDynamoDBContext dynamoDbContext,
             ISHA256Helper hashHelper,
-            IVerifyCodeGenerator codeGenerator)
+            IVerifyCodeGenerator codeGenerator,
+            IBedroomCalculatorService bedroomCalculatorService)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
             _codeGenerator = codeGenerator;
+            _bedroomCalculatorService = bedroomCalculatorService;
         }
 
         public IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters)
@@ -105,6 +108,8 @@ namespace HousingRegisterApi.V1.Gateways
                 OtherMembers = request.OtherMembers.ToList()
             };
 
+            entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
+
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
         }
@@ -134,6 +139,8 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (request.Assessment != null)
                 entity.Assessment = request.Assessment;
+
+            entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 

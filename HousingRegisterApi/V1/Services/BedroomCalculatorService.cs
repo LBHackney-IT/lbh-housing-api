@@ -11,30 +11,36 @@ namespace HousingRegisterApi.V1.Services
         /// Calculates the required number of bedrooms
         /// </summary>
         /// <param name="application"></param>
-        /// <returns></returns>
-        /// <exception cref="ApplicationException"></exception>
-        public int Calculate(Application application)
+        /// <returns>Null if a problem exists calculating the bedroom need</returns>
+        public int? Calculate(Application application)
         {
-            ValidateApplication(application);
+            try
+            {
+                ValidateApplication(application);
 
-            IEnumerable<Applicant> household = new List<Applicant> { application.MainApplicant }.Concat(application.OtherMembers);
+                IEnumerable<Applicant> household = new List<Applicant> { application.MainApplicant }.Concat(application.OtherMembers);
 
-            // combine all applicants into one collection           
-            var people = household.ToList().Select(x => x.Person);
+                // combine all applicants into one collection           
+                var people = household.ToList().Select(x => x.Person);
 
-            // create a list of available occupants
-            // we will use this to remove occupants that have been allocated rooms
-            var unoccupants = people.Select(x => new Occupant(x.Age, x.Gender, x.RelationshipType)).ToList();
+                // create a list of available occupants
+                // we will use this to remove occupants that have been allocated rooms
+                var unoccupants = people.Select(x => new Occupant(x.Age, x.Gender, x.RelationshipType)).ToList();
 
-            // rules must be applied in order
-            var count = 0;
-            count += ApplyRule1(unoccupants);
-            count += ApplyRule2(unoccupants);
-            count += ApplyRule3(unoccupants);
-            count += ApplyRule4(unoccupants);
-            count += ApplyRule5(unoccupants);
+                // rules must be applied in order
+                var count = 0;
+                count += ApplyRule1(unoccupants);
+                count += ApplyRule2(unoccupants);
+                count += ApplyRule3(unoccupants);
+                count += ApplyRule4(unoccupants);
+                count += ApplyRule5(unoccupants);
 
-            return count;
+                return count;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private static void ValidateApplication(Application application)
@@ -44,22 +50,24 @@ namespace HousingRegisterApi.V1.Services
                 throw new ApplicationException("Application not found");
             }
 
+            if (application.Status == "Verification")
+            {
+                throw new ApplicationException("Application not in correct state");
+            }
+
             // make sure data is valid
-            if (application.MainApplicant == null)
+            if (application.MainApplicant == null
+                || application.MainApplicant.Person == null)
             {
                 throw new ApplicationException("Main applicant is missing");
             }
 
             application.OtherMembers.ToList().ForEach(app =>
             {
-                if (app == null)
+                if (app == null
+                    || app.Person == null)
                 {
-                    throw new ApplicationException("OtherMember is missing");
-                }
-
-                if (app.Person == null)
-                {
-                    throw new ApplicationException("OtherMember Person is missing");
+                    throw new ApplicationException("Other member is missing");
                 }
             });
         }

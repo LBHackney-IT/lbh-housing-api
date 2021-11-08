@@ -63,21 +63,17 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         }
 
         [Test]
-        public void WhenApplicationDoesntExistThenTheCalculateBedroomsUseCaseThrowsAnException()
+        public void WhenApplicationDoesntExistThenTheCalculateBedroomsUseCaseReturnsNull()
         {
             // Arrange
             Guid id = Guid.NewGuid();
             _gatewayMock.Setup(x => x.GetApplicationById(It.IsAny<Guid>())).Returns<Application>(null);
 
-            var exception = new ApplicationException("Application not found");
-
             // Act
-            Func<SimpleTypeResponse<int>> func = () => _classUnderTest.Execute(id);
+            SimpleTypeResponse<int?> response = _classUnderTest.Execute(id);
 
             // Assert
-            func.Should().Throw<ApplicationException>().WithMessage(exception.Message);
+            response.Value.Should().BeNull();
         }
-
-
     }
 }

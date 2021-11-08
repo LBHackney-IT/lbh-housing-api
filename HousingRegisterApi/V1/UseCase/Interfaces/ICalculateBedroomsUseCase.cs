@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface ICalculateBedroomsUseCase
     {
-        SimpleTypeResponse<int> Execute(Guid id);
+        SimpleTypeResponse<int?> Execute(Guid id);
     }
 }
