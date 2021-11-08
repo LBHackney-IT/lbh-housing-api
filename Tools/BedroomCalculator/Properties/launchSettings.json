@@ -3,8 +3,7 @@
     "BedroomCalculator": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "NOTIFY_API_KEY": "development-4edb4861-61b7-455f-9d61-085f633044d8-a8cc40c6-7b47-4c4d-aa5f-0d7eabb9dd49",
+        "ASPNETCORE_ENVIRONMENT": "Development",     
         "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "DynamoDb_LocalMode": "true"
       }
