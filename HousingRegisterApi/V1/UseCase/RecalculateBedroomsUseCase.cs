@@ -1,5 +1,6 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,10 +12,16 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly ILogger _logger;
         private readonly IApplicationApiGateway _gateway;
-        public RecalculateBedroomsUseCase(ILogger<RecalculateBedroomsUseCase> logger, IApplicationApiGateway gateway)
+        private readonly IBedroomCalculatorService _bedroomCalculatorService;
+
+        public RecalculateBedroomsUseCase(
+            ILogger<RecalculateBedroomsUseCase> logger,
+            IApplicationApiGateway gateway,
+            IBedroomCalculatorService bedroomCalculatorService)
         {
             _logger = logger;
             _gateway = gateway;
+            _bedroomCalculatorService = bedroomCalculatorService;
         }
 
         public void Execute()
@@ -46,14 +53,14 @@ namespace HousingRegisterApi.V1.UseCase
                         throw new InvalidOperationException($"No assessment exists");
                     }
 
-                    var currentBedroomNeed = application.Assessment.BedroomNeed;
-                    application.RecalulateBedrooms();
-                    var newBedroomNeed = application.Assessment.BedroomNeed;
+                    int? currentBedroomNeed = application.Assessment?.BedroomNeed ?? application.CalculatedBedroomNeed;
+                    int? newBedroomNeed = _bedroomCalculatorService.Calculate(application);
 
                     // only update if required
                     if (newBedroomNeed != currentBedroomNeed)
                     {
                         application.Assessment.BedroomNeed = newBedroomNeed;
+
                         UpdateApplicationRequest updateRequest = new UpdateApplicationRequest()
                         {
                             Assessment = application.Assessment,
@@ -61,16 +68,14 @@ namespace HousingRegisterApi.V1.UseCase
                             MainApplicant = application.MainApplicant,
                             OtherMembers = application.OtherMembers,
                             SensitiveData = application.SensitiveData,
-                            Status = application.Status
+                            Status = application.Status,                           
                         };
-                        _gateway.UpdateApplication(application.Id, updateRequest);
 
+                        _gateway.UpdateApplication(application.Id, updateRequest);
                         _logger.LogInformation($"Bedroom need changed for application {application.Id} from {currentBedroomNeed} to {newBedroomNeed}");
                     }
                 }
-#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception exp)
-#pragma warning restore CA1031 // Do not catch general exception types
                 {
                     _logger.LogError(exp, $"Error processing application {application.Id}");
                 }
