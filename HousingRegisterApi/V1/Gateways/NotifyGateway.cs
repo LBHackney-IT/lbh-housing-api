@@ -14,7 +14,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _client = client;
         }
-       
+
         public NotificationResponse SendVerifyCode(Applicant resident, string verifyCode)
         {
             var personalisation = new Dictionary<string, object>
