@@ -38,5 +38,7 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Assessment>))]
         public Assessment Assessment { get; set; }
+
+        public int? CalculatedBedroomNeed { get; set; }
     }
 }
