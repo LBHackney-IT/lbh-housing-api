@@ -6,5 +6,7 @@ namespace HousingRegisterApi.V1.Gateways
     public interface INotifyGateway
     {
         public NotificationResponse SendVerifyCode(Applicant resident, string verifyCode);
+
+        public NotificationResponse NotifyResidentOfBedroomChange(string email, int? oldBedroomNeed, int newBedroomNeed);
     }
 }

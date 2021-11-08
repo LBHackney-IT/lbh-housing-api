@@ -14,7 +14,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _client = client;
         }
-
+       
         public NotificationResponse SendVerifyCode(Applicant resident, string verifyCode)
         {
             var personalisation = new Dictionary<string, object>
@@ -24,6 +24,12 @@ namespace HousingRegisterApi.V1.Gateways
             };
             var templateId = Environment.GetEnvironmentVariable("NOTIFY_TEMPLATE_VERIFY_CODE");
             return DeliverEmail(templateId, resident.ContactInformation.EmailAddress, personalisation);
+        }
+
+        public NotificationResponse NotifyResidentOfBedroomChange(string email, int? oldBedroomNeed, int newBedroomNeed)
+        {
+            // TODO: create email template and send email
+            return new NotificationResponse();
         }
 
         private NotificationResponse DeliverEmail(string templateId, string emailAddress, Dictionary<string, object> personalisation)

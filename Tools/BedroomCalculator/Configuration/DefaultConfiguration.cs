@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Notify.Client;
+using Notify.Interfaces;
 using System;
 
 namespace BedroomCalculator.Configuration
@@ -66,6 +68,8 @@ namespace BedroomCalculator.Configuration
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
+            services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
         }
 
         private static void RegisterUseCases(IServiceCollection services)

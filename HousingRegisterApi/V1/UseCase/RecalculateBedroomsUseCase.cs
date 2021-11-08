@@ -13,15 +13,18 @@ namespace HousingRegisterApi.V1.UseCase
         private readonly ILogger _logger;
         private readonly IApplicationApiGateway _gateway;
         private readonly IBedroomCalculatorService _bedroomCalculatorService;
+        private readonly INotifyGateway _notifyGateway;
 
         public RecalculateBedroomsUseCase(
             ILogger<RecalculateBedroomsUseCase> logger,
             IApplicationApiGateway gateway,
-            IBedroomCalculatorService bedroomCalculatorService)
+            IBedroomCalculatorService bedroomCalculatorService,
+            INotifyGateway notifyGateway)
         {
             _logger = logger;
             _gateway = gateway;
             _bedroomCalculatorService = bedroomCalculatorService;
+            _notifyGateway = notifyGateway;
         }
 
         public void Execute()
@@ -52,6 +55,7 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         _gateway.UpdateApplication(application.Id, new UpdateApplicationRequest());
                         _logger.LogInformation($"Bedroom need for application {application.Id} recalculated from '{currentBedroomNeed}' to '{newBedroomNeed}'");
+                        _notifyGateway.NotifyResidentOfBedroomChange(application.MainApplicant.ContactInformation.EmailAddress, currentBedroomNeed, newBedroomNeed.Value);
                     }
 
                 }
