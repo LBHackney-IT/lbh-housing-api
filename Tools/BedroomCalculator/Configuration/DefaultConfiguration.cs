@@ -4,6 +4,7 @@ using dotenv.net;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,7 @@ namespace BedroomCalculator.Configuration
             services.ConfigureDynamoDB();
             RegisterGateways(services);
             RegisterUseCases(services);
+            RegisterServices(services);
 
             var provider = services.BuildServiceProvider();
 
@@ -72,6 +74,10 @@ namespace BedroomCalculator.Configuration
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
+        }
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
         }
     }
 }

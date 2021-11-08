@@ -26,20 +26,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public void Execute()
         {
-            var searchParameters = new SearchQueryParameter()
-            {
-                Status = "Submitted",
-                HasAssessment = true,
-            };
-
-            _logger.LogInformation($"Searching for submitted applications with assessments");
-            var applications = _gateway.GetApplications(searchParameters);
-
-            if (!applications.Any())
-            {
-                _logger.LogInformation($"No applications found");
-                return;
-            }
+            var applications = _gateway.GetApplicationsAtStatus("Submitted", "Active", "ActiveUnderAppeal");
 
             // code comes here if applications are found
             _logger.LogInformation($"Recalculating bedrooms needed for {applications.Count()} applications");
@@ -48,32 +35,25 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 try
                 {
-                    if (application.Assessment == null)
-                    {
-                        throw new InvalidOperationException($"No assessment exists");
-                    }
-
-                    int? currentBedroomNeed = application.Assessment?.BedroomNeed ?? application.CalculatedBedroomNeed;
+                    // have to use calculated bedroom need is null for backward compatibility,
+                    // but, at this point, it should have a value
+                    int? currentBedroomNeed = application.CalculatedBedroomNeed;
                     int? newBedroomNeed = _bedroomCalculatorService.Calculate(application);
 
-                    // only update if required
-                    if (newBedroomNeed != currentBedroomNeed)
+                    if (newBedroomNeed == null)
                     {
-                        application.Assessment.BedroomNeed = newBedroomNeed;
-
-                        UpdateApplicationRequest updateRequest = new UpdateApplicationRequest()
-                        {
-                            Assessment = application.Assessment,
-                            AssignedTo = application.AssignedTo,
-                            MainApplicant = application.MainApplicant,
-                            OtherMembers = application.OtherMembers,
-                            SensitiveData = application.SensitiveData,
-                            Status = application.Status,                           
-                        };
-
-                        _gateway.UpdateApplication(application.Id, updateRequest);
-                        _logger.LogInformation($"Bedroom need changed for application {application.Id} from {currentBedroomNeed} to {newBedroomNeed}");
+                        _logger.LogInformation($"Unable to recalculate bedroom need for application: {application.Id}");
                     }
+                    else if (newBedroomNeed == currentBedroomNeed)
+                    {
+                        _logger.LogInformation($"No bedroom changes for application: {application.Id}");
+                    }
+                    else 
+                    {
+                        _gateway.UpdateApplication(application.Id, new UpdateApplicationRequest());
+                        _logger.LogInformation($"Bedroom need for application {application.Id} recalculated from '{currentBedroomNeed}' to '{newBedroomNeed}'");
+                    }
+
                 }
                 catch (Exception exp)
                 {
