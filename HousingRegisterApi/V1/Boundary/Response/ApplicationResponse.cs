@@ -28,6 +28,8 @@ namespace HousingRegisterApi.V1.Boundary.Response
 
         public Applicant MainApplicant { get; set; }
 
+        public int? CalculatedBedroomNeed { get; set; }
+
         public IEnumerable<Applicant> OtherMembers { get; set; }
 
         public Assessment Assessment { get; set; }

@@ -11,6 +11,7 @@ using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.Versioning;
@@ -129,6 +130,7 @@ namespace HousingRegisterApi
             services.ConfigureDynamoDB();
             RegisterGateways(services);
             RegisterUseCases(services);
+            RegisterServices(services);
         }
 
         private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
@@ -170,12 +172,18 @@ namespace HousingRegisterApi
             services.AddScoped<ICreateEvidenceRequestUseCase, CreateEvidenceRequestUseCase>();
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
+            services.AddScoped<ICalculateBedroomsUseCase, CalculateBedroomsUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<IBiddingNumberGenerator, BiddingNumberGenerator>();
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

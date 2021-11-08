@@ -21,7 +21,8 @@ namespace HousingRegisterApi.V1.Factories
                 OtherMembers = databaseEntity.OtherMembers,
                 VerifyCode = databaseEntity.VerifyCode,
                 VerifyExpiresAt = databaseEntity.VerifyExpiresAt,
-                Assessment = databaseEntity.Assessment
+                Assessment = databaseEntity.Assessment,
+                CalculatedBedroomNeed = databaseEntity.CalculatedBedroomNeed,
             };
         }
 
@@ -40,7 +41,8 @@ namespace HousingRegisterApi.V1.Factories
                 OtherMembers = entity.OtherMembers.ToList(),
                 VerifyCode = entity.VerifyCode,
                 VerifyExpiresAt = entity.VerifyExpiresAt,
-                Assessment = entity.Assessment
+                Assessment = entity.Assessment,
+                CalculatedBedroomNeed = entity.CalculatedBedroomNeed,
             };
         }
     }
