@@ -51,7 +51,7 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         _logger.LogInformation($"No bedroom changes for application: {application.Id}");
                     }
-                    else 
+                    else
                     {
                         _gateway.UpdateApplication(application.Id, new UpdateApplicationRequest());
                         _logger.LogInformation($"Bedroom need for application {application.Id} recalculated from '{currentBedroomNeed}' to '{newBedroomNeed}'");
