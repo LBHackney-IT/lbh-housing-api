@@ -50,7 +50,7 @@ namespace HousingRegisterApi.V1.Services
                 throw new ApplicationException("Application not found");
             }
 
-            if (application.Status == "Verification")
+            if (application.Status == ApplicationStatus.Verification)
             {
                 throw new ApplicationException("Application not in correct state");
             }
