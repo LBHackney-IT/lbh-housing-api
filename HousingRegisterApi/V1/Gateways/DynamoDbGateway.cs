@@ -200,6 +200,7 @@ namespace HousingRegisterApi.V1.Gateways
             var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(application.Id).GetAwaiter().GetResult();
             entity.VerifyCode = null;
             entity.VerifyExpiresAt = null;
+            entity.Status = "New";
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
