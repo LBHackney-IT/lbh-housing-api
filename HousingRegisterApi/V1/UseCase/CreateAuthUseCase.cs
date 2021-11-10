@@ -34,13 +34,13 @@ namespace HousingRegisterApi.V1.UseCase
                 {
                     MainApplicant = new Applicant()
                     {
-                        ContactInformation = new Domain.ContactInformation()
+                        ContactInformation = new ContactInformation()
                         {
                             EmailAddress = request.Email
                         }
                     },
                     OtherMembers = new List<Applicant>(),
-                    Status = "Verification"
+                    Status = ApplicationStatus.Verification
                 });
 
                 applicationId = blankApplication.Id;
