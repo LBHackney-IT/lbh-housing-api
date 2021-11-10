@@ -15,9 +15,9 @@ namespace HousingRegisterApi.V1.Infrastructure
             _ = bool.TryParse(Environment.GetEnvironmentVariable("DynamoDb_LocalMode"), out localMode);
 
             if (localMode)
-            {              
+            {
                 var snsUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
-            
+
                 services.TryAddSingleton<IAmazonSimpleNotificationService>(sp =>
                 {
                     var clientConfig = new AmazonSimpleNotificationServiceConfig { ServiceURL = snsUrl };
@@ -26,8 +26,8 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
             else
             {
-                services.TryAddScoped<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();               
-            }           
+                services.TryAddScoped<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();
+            }
         }
     }
 }
