@@ -1,21 +1,19 @@
-using System.ComponentModel;
-
 namespace HousingRegisterApi.V1.Domain
 {
-    public enum ApplicationStatus
+    public static class ApplicationStatus
     {
-        Verification,
-        New,
-        Submitted,
-        Active,
-        Pending,
-        Referred,
-        Rejected,
-        Disqualified,
-        Cancelled,
-        Suspended,
-        Housed,
-        ActiveUnderAppeal,
-        InactiveUnderAppeal,
+        public static readonly string Verification = "Verification";
+        public static readonly string New = "New";
+        public static readonly string Submitted = "Submitted";
+        public static readonly string Active = "Active";
+        public static readonly string Pending = "Pending";
+        public static readonly string Referred = "Referred";
+        public static readonly string Rejected = "Rejected";
+        public static readonly string Disqualified = "Disqualified";
+        public static readonly string Cancelled = "Cancelled";
+        public static readonly string Suspended = "Suspended";
+        public static readonly string Housed = "Housed";
+        public static readonly string ActiveUnderAppeal = "ActiveUnderAppeal";
+        public static readonly string InactiveUnderAppeal = "InactiveUnderAppeal";
     }
 }

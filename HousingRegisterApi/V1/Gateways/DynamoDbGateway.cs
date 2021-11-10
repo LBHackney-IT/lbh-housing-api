@@ -84,7 +84,7 @@ namespace HousingRegisterApi.V1.Gateways
             var conditions = new List<ScanCondition>
             {
                 new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
-                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, "Verification", "New"),
+                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, ApplicationStatus.Verification, ApplicationStatus.New),
             };
 
             // query dynamodb
@@ -103,7 +103,7 @@ namespace HousingRegisterApi.V1.Gateways
                 CreatedAt = DateTime.UtcNow,
                 SensitiveData = request.SensitiveData,
                 SubmittedAt = null,
-                Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
+                Status = string.IsNullOrEmpty(request.Status) ? ApplicationStatus.New : request.Status,
                 MainApplicant = request.MainApplicant,
                 OtherMembers = request.OtherMembers.ToList()
             };
@@ -156,7 +156,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             entity.SubmittedAt = DateTime.UtcNow;
-            entity.Status = "Submitted";
+            entity.Status = ApplicationStatus.Submitted;
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
@@ -200,6 +200,13 @@ namespace HousingRegisterApi.V1.Gateways
             var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(application.Id).GetAwaiter().GetResult();
             entity.VerifyCode = null;
             entity.VerifyExpiresAt = null;
+
+            // progress this application to new if its at verfication
+            if (entity.Status == ApplicationStatus.Verification)
+            {
+                entity.Status = ApplicationStatus.New;
+            }
+
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
