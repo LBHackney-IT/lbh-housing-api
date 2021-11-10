@@ -9,14 +9,10 @@ namespace HousingRegisterApi.V1.UseCase
 {
     public class CompleteApplicationUseCase : ICompleteApplicationUseCase
     {
-        private readonly IAuditHistory _auditHistory;
         private readonly IApplicationApiGateway _gateway;
 
-        public CompleteApplicationUseCase(
-            IAuditHistory auditHistory,
-            IApplicationApiGateway gateway)
+        public CompleteApplicationUseCase(IApplicationApiGateway gateway)
         {
-            _auditHistory = auditHistory;
             _gateway = gateway;
         }
 
@@ -24,7 +20,6 @@ namespace HousingRegisterApi.V1.UseCase
         {
             var application = _gateway.CompleteApplication(id);
 
-            _auditHistory.Audit(application);
 
             return application.ToResponse();
         }

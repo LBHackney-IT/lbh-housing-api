@@ -21,7 +21,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DynamoDb_LocalMode": "true",
-        "DynamoDb_LocalServiceUrl": "http://localhost:8000"
+        "DynamoDb_LocalServiceUrl": "http://localhost:8000",
+        "Localstack_SnsServiceUrl": "http://localhost:4566"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }

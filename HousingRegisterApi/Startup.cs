@@ -2,6 +2,8 @@ using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
+using Hackney.Core.Http;
+using Hackney.Core.JWT;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Factories;
@@ -131,7 +133,10 @@ namespace HousingRegisterApi
             services.AddSingleton(x => options);
 
             services.ConfigureDynamoDB();
-            services.ConfigureSns();           
+            services.ConfigureSns();
+            services.AddTokenFactory();
+            services.AddHttpContextWrapper();
+            services.AddHttpContextAccessor();
 
             RegisterGateways(services);
             RegisterUseCases(services);
@@ -166,7 +171,7 @@ namespace HousingRegisterApi
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
-            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();            
+            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -189,7 +194,7 @@ namespace HousingRegisterApi
         }
 
         private static void RegisterServices(IServiceCollection services)
-        {            
+        {
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
         }
 

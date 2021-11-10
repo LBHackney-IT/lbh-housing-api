@@ -6,8 +6,8 @@ namespace HousingRegisterApi.V1.Factories
 {
     public interface ISnsFactory
     {
-        ApplicationSns Create(Application application);
+        ApplicationSns Create(Application application, Token token);
 
-        ApplicationSns Update(Application application);
+        ApplicationSns Update(Application application, Token token);
     }
 }

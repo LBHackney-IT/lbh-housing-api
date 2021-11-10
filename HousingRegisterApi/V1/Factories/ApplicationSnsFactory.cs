@@ -1,3 +1,4 @@
+using Hackney.Core.JWT;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Sns;
 using HousingRegisterApi.V1.Infrastructure;
@@ -7,7 +8,7 @@ namespace HousingRegisterApi.V1.Factories
 {
     public class ApplicationSnsFactory : ISnsFactory
     {
-        public ApplicationSns Create(Application application)
+        public ApplicationSns Create(Application application, Token token)
         {
             return new ApplicationSns
             {
@@ -21,8 +22,8 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = CreateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = application.MainApplicant.Person.FullName,
-                    Email = application.MainApplicant.ContactInformation.EmailAddress
+                    Name = token.Name,
+                    Email = token.Email
                 },
                 EventData = new EventData
                 {
@@ -31,7 +32,7 @@ namespace HousingRegisterApi.V1.Factories
             };
         }
 
-        public ApplicationSns Update(Application application)
+        public ApplicationSns Update(Application application, Token token)
         {
             return new ApplicationSns
             {
@@ -45,8 +46,8 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = UpdateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = application.MainApplicant.Person.FullName,
-                    Email = application.MainApplicant.ContactInformation.EmailAddress
+                    Name = token.Name,
+                    Email = token.Email
                 },
                 EventData = new EventData
                 {

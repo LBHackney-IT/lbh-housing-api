@@ -26,6 +26,8 @@ namespace HousingRegisterApi.Tests
         {
             EnsureEnvVarConfigured("DynamoDb_LocalMode", "true");
             EnsureEnvVarConfigured("DynamoDb_LocalServiceUrl", "http://localhost:8000");
+            EnsureEnvVarConfigured("Localstack_SnsServiceUrl", "http://localstack:4566");
+
             _factory = new DynamoDbMockWebApplicationFactory<TStartup>(_tables);
             Client = _factory.CreateClient();
         }

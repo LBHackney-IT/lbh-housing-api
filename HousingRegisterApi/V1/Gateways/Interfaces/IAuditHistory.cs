@@ -4,6 +4,6 @@ namespace HousingRegisterApi.V1.Gateways.Interfaces
 {
     public interface IAuditHistory
     {
-        void Audit(Application application);
+        void AuditUpdate(Application application);
     }
 }
