@@ -7,7 +7,7 @@ namespace HousingRegisterApi.V1.Factories
 {
     public class ApplicationSnsFactory : ISnsFactory
     {
-        public ApplicationSns Create(Application application, string token)
+        public ApplicationSns Create(Application application)
         {
             return new ApplicationSns
             {
@@ -21,12 +21,37 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = CreateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = token.Name,
-                    Email = token.Email
+                    Name = application.MainApplicant.Person.FullName,
+                    Email = application.MainApplicant.ContactInformation.EmailAddress
                 },
                 EventData = new EventData
                 {
-                    NewData = application
+                    NewData = application,
+                }
+            };
+        }
+
+        public ApplicationSns Update(Application application)
+        {
+            return new ApplicationSns
+            {
+                CorrelationId = Guid.NewGuid(),
+                DateTime = DateTime.UtcNow,
+                EntityId = application.Id,
+                Id = Guid.NewGuid(),
+                EventType = UpdateApplicationConstants.EVENTTYPE,
+                Version = UpdateApplicationConstants.V1VERSION,
+                SourceDomain = UpdateApplicationConstants.SOURCEDOMAIN,
+                SourceSystem = UpdateApplicationConstants.SOURCESYSTEM,
+                User = new UserSns
+                {
+                    Name = application.MainApplicant.Person.FullName,
+                    Email = application.MainApplicant.ContactInformation.EmailAddress
+                },
+                EventData = new EventData
+                {
+                    NewData = application,
+                    //NewData = updateResult.NewValues
                 }
             };
         }

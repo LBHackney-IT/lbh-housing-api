@@ -4,8 +4,8 @@ namespace HousingRegisterApi.V1.Infrastructure
     {
         // JWT TOKEN
         public const string V1VERSION = "v1";
-        public const string EVENTTYPE = "ApplicationCreatedEvent";
-        public const string SOURCEDOMAIN = "Application";
+        public const string EVENTTYPE = "HousingApplicationCreatedEvent";
+        public const string SOURCEDOMAIN = "HousingRegisterApplication";
         public const string SOURCESYSTEM = "HousingRegisterAPI";
     }
 
@@ -13,8 +13,8 @@ namespace HousingRegisterApi.V1.Infrastructure
     {
         // JWT TOKEN
         public const string V1VERSION = "v1";
-        public const string EVENTTYPE = "ApplicationUpdatedEvent";
-        public const string SOURCEDOMAIN = "Application";
+        public const string EVENTTYPE = "HousingApplicationUpdatedEvent";
+        public const string SOURCEDOMAIN = "HousingRegisterApplication";
         public const string SOURCESYSTEM = "HousingRegisterAPI";
     }
 }

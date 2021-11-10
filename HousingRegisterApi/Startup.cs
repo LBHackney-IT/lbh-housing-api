@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
+using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
@@ -17,6 +14,7 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -28,6 +26,11 @@ using Microsoft.OpenApi.Models;
 using Notify.Client;
 using Notify.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace HousingRegisterApi
 {
@@ -128,6 +131,8 @@ namespace HousingRegisterApi
             services.AddSingleton(x => options);
 
             services.ConfigureDynamoDB();
+            services.ConfigureSns();           
+
             RegisterGateways(services);
             RegisterUseCases(services);
             RegisterServices(services);
@@ -157,9 +162,11 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddScoped<IAuditHistory, ApplicationAuditHistory>();
+            services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
+            services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
-            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
-            services.AddHttpClient<ISnsGateway, ApplicationSnsGateway>();
+            services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();            
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -182,7 +189,7 @@ namespace HousingRegisterApi
         }
 
         private static void RegisterServices(IServiceCollection services)
-        {
+        {            
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
         }
 
