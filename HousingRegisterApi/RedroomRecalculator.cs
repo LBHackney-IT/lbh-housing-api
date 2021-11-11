@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -29,7 +30,7 @@ namespace HousingRegisterApi
             // add dependencies here ex: Logging, IMemoryCache, Interface mapping to concrete class, etc...
 
             // add a hook to your class that will actually do the application logic
-            services.AddTransient<IRecalculateBedroomsUseCase>();
+            services.AddTransient<IRecalculateBedroomsUseCase, RecalculateBedroomsUseCase>();
         }
 
         /// <summary>
