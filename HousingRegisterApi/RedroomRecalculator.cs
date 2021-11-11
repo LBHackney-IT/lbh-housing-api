@@ -7,7 +7,7 @@ namespace HousingRegisterApi
     {
         protected override void Recalculate()
         {
-            throw new Exception('this is happening')
+            throw new Exception('this is happening');
         }
     }
 }
