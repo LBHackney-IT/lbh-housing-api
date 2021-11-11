@@ -24,13 +24,13 @@ namespace HousingRegisterApi
 
         public BedroomRecalculator()
         {
-            // var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             var configuration = new ConfigurationBuilder()
-               //.SetBasePath(Directory.GetCurrentDirectory())
-               //.AddJsonFile("appsettings.json", false, true)
-               //.AddJsonFile($"appsettings.{environmentName}.json", false, true)
+               .SetBasePath(Directory.GetCurrentDirectory())
                .AddEnvironmentVariables()
+               .AddJsonFile("appsettings.json", false, true)
+              // .AddJsonFile($"appsettings.{environmentName}.json", false, true)
                .Build();
 
             var services = new ServiceCollection();
@@ -47,13 +47,13 @@ namespace HousingRegisterApi
             services.AddSingleton(configuration);
 
             ConfigureLogging(services, configuration);
-            AWSXRayRecorder.InitializeInstance(configuration);
-            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+            //AWSXRayRecorder.InitializeInstance(configuration);
+            //AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
 
-            DotEnv.Fluent()
-                .WithTrimValues()
-                .WithProbeForEnv(probeLevelsToSearch: 5)
-                .Load();
+            //DotEnv.Fluent()
+            //    .WithTrimValues()
+            //    .WithProbeForEnv(probeLevelsToSearch: 5)
+            //    .Load();
 
             var options = ApiOptions.FromEnv();
             services.AddSingleton(x => options);

@@ -27,8 +27,10 @@ namespace HousingRegisterApi.V1.UseCase
             _notifyGateway = notifyGateway;
         }
 
-        public void Execute()
+        public bool Execute()
         {
+            bool success = true;
+
             var applications = _gateway.GetApplicationsAtStatus("Submitted", "Active", "ActiveUnderAppeal");
 
             // code comes here if applications are found
@@ -62,9 +64,13 @@ namespace HousingRegisterApi.V1.UseCase
                 catch (Exception exp)
                 {
                     _logger.LogError(exp, $"Error processing application {application.Id}");
-                }
 
+                    // carry on processing the rest
+                    success = false;
+                }
             }
+
+            return success;
         }
     }
 }
