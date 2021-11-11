@@ -30,7 +30,7 @@ namespace HousingRegisterApi
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddEnvironmentVariables()
                .AddJsonFile("appsettings.json", false, true)
-              // .AddJsonFile($"appsettings.{environmentName}.json", false, true)
+               // .AddJsonFile($"appsettings.{environmentName}.json", false, true)
                .Build();
 
             var services = new ServiceCollection();

@@ -34,7 +34,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 new BedroomCalculatorService());
 
             _fixture = new Fixture();
-        }     
+        }
 
         [Test]
         public void WhenRecalculatingBedroomNeedForAValidApplicationThenTheCalculationReturnsTrue()
@@ -48,6 +48,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Assert
             success.Should().BeTrue();
-        }       
+        }
     }
 }
