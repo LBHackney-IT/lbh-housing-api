@@ -1,13 +1,14 @@
 using Amazon.Lambda.AspNetCoreServer;
 using Microsoft.AspNetCore.Hosting;
+using System;
 
 namespace HousingRegisterApi
 {
-    public class BedroomRecalculator
+    public static class BedroomRecalculator
     {
-        public void Recalculate()
+        public static void Recalculate()
         {
-            throw new Exception('this is happening');
+            throw new Exception("this is happening");
         }
     }
 }
