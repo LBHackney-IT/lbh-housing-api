@@ -71,6 +71,38 @@ namespace HousingRegisterApi.V1.Gateways
             return searchItems;
         }
 
+        public IEnumerable<Application> GetApplicationsAtStatus(params string[] status)
+        {
+            var statusNames = new List<string>();
+            var statusNameAndValues = new Dictionary<string, DynamoDBEntry>();
+
+            for (int i = 0; i < status.Length; i++)
+            {
+                string searchName = $":status{i}";
+                statusNames.Add(searchName);
+                statusNameAndValues.Add(searchName, new Primitive(status[i]));
+            }
+
+            // status is a reserved word, so we have to map it to something else, ie. #application_status
+            var scanConfig = new ScanOperationConfig
+            {
+                FilterExpression = new Expression()
+                {
+                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())})",
+                    ExpressionAttributeValues = statusNameAndValues,
+                    ExpressionAttributeNames = new Dictionary<string, string>()
+                    {
+                        {"#application_status", "status" }
+                    }
+                },
+            };
+
+            var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetNextSetAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+
+            return searchItems;
+        }
+
         public Application GetApplicationById(Guid id)
         {
             var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();

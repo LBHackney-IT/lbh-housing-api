@@ -26,6 +26,12 @@ namespace HousingRegisterApi.V1.Gateways
             return DeliverEmail(templateId, resident.ContactInformation.EmailAddress, personalisation);
         }
 
+        public NotificationResponse NotifyResidentOfBedroomChange(string email, int? oldBedroomNeed, int newBedroomNeed)
+        {
+            // TODO: create email template and send email
+            return new NotificationResponse();
+        }
+
         private NotificationResponse DeliverEmail(string templateId, string emailAddress, Dictionary<string, object> personalisation)
         {
             return _client.SendEmail(emailAddress, templateId, personalisation, null, null);

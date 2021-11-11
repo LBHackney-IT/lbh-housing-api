@@ -168,6 +168,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
+            services.AddScoped<IRecalculateBedroomsUseCase, RecalculateBedroomsUseCase>();
             services.AddScoped<ICreateEvidenceRequestUseCase, CreateEvidenceRequestUseCase>();
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
