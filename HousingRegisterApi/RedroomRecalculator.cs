@@ -5,7 +5,7 @@ namespace HousingRegisterApi
 {
     public class BedroomRecalculator
     {
-        protected override void Recalculate()
+        public void Recalculate()
         {
             throw new Exception('this is happening');
         }
