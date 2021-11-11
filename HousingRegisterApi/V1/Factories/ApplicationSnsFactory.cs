@@ -1,4 +1,5 @@
 using Hackney.Core.JWT;
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Sns;
 using HousingRegisterApi.V1.Infrastructure;
@@ -32,13 +33,13 @@ namespace HousingRegisterApi.V1.Factories
             };
         }
 
-        public ApplicationSns Update(Application application, Token token)
+        public ApplicationSns Update(Guid id, UpdateApplicationRequest application, Token token)
         {
             return new ApplicationSns
             {
                 CorrelationId = Guid.NewGuid(),
                 DateTime = DateTime.UtcNow,
-                EntityId = application.Id,
+                EntityId = id,
                 Id = Guid.NewGuid(),
                 EventType = UpdateApplicationConstants.EVENTTYPE,
                 Version = UpdateApplicationConstants.V1VERSION,
@@ -46,8 +47,8 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = UpdateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = token.Name,
-                    Email = token.Email
+                    Name = "",
+                    Email = ""
                 },
                 EventData = new EventData
                 {

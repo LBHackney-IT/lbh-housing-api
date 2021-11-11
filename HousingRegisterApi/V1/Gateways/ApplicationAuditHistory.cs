@@ -1,9 +1,10 @@
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
-using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -29,11 +30,12 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void AuditUpdate(Application application)
+        public void AuditUpdate(Guid id, UpdateApplicationRequest application)
         {
+            //TODO: we want to only after submission, but for now, test if it works
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
-            _snsGateway.Publish(_snsFactory.Update(application, token));
+            _snsGateway.Publish(_snsFactory.Update(id, application, token));
         }
     }
 }
