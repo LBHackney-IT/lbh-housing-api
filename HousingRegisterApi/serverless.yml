@@ -42,7 +42,7 @@ functions:
           private: true
   HousingRegisterBedroomRecalulator:
     name: ${self:service}-${self:provider.stage}-bedroom-recalculator
-    handler: HousingRegisterApi::HousingRegisterApi.BedroomRecalculator::Recalculate
+    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.BedroomRecalculator::Handle
     role: lambdaExecutionRole
     events:
       - schedule: rate(1 day)
