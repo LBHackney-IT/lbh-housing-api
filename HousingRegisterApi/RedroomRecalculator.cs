@@ -1,14 +1,22 @@
-using Amazon.Lambda.AspNetCoreServer;
-using Microsoft.AspNetCore.Hosting;
+using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
 
 namespace HousingRegisterApi
 {
-    public static class BedroomRecalculator
+    public class BedroomRecalculator
     {
-        public static void Recalculate()
+
+        private readonly IRecalculateBedroomsUseCase _recalculateBedroomsUseCase;
+
+        public BedroomRecalculator(IRecalculateBedroomsUseCase recalculateBedroomsUseCase)
         {
-            throw new Exception("this is happening");
+            _recalculateBedroomsUseCase = recalculateBedroomsUseCase;
+        }
+
+        public void Recalculate()
+        {
+            //throw new Exception("this is happening");           
+            _recalculateBedroomsUseCase.Execute();
         }
     }
 }
