@@ -11,7 +11,7 @@ provider:
   region: eu-west-2
   apiKeys:
     - secureAccess:
-      - api-key-${self:service}-${self:provider.stage}
+        - api-key-${self:service}-${self:provider.stage}
   usagePlan:
     - secureAccess:
         throttle:
@@ -39,6 +39,12 @@ functions:
           path: /{proxy+}
           method: ANY
           private: true
+  HousingRegisterBedroomRecalulator:
+    name: ${self:service}-${self:provider.stage}-bedroom-recalculator
+    handler: HousingRegisterApi::HousingRegisterApi.BedroomRecalculator::Recalculate
+    role: lambdaExecutionRole
+    events:
+      - schedule: cron(0 4 * * *)
 resources:
   Resources:
     LambdaSecurityGroup:
@@ -56,7 +62,7 @@ resources:
         Path: /${self:service}/${self:provider.stage}/
         RoleName: ${self:service}-lambdaExecutionRole
         AssumeRolePolicyDocument:
-          Version: '2012-10-17'
+          Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Principal:
@@ -69,7 +75,7 @@ resources:
         Policies:
           - PolicyName: dynamoDBAccess
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
@@ -84,21 +90,21 @@ resources:
                     - "dynamodb:Scan"
                     - "dynamodb:UpdateItem"
                   Resource:
-                    - 'Fn::Join':
-                        - ':'
-                        - - 'arn:aws:dynamodb'
-                          - Ref: 'AWS::Region'
-                          - Ref: 'AWS::AccountId'
-                          - 'table/HousingRegister'
-                    - 'Fn::Join':
-                        - ':'
-                        - - 'arn:aws:dynamodb'
-                          - Ref: 'AWS::Region'
-                          - Ref: 'AWS::AccountId'
-                          - 'table/HousingRegister/index/*'
+                    - "Fn::Join":
+                        - ":"
+                        - - "arn:aws:dynamodb"
+                          - Ref: "AWS::Region"
+                          - Ref: "AWS::AccountId"
+                          - "table/HousingRegister"
+                    - "Fn::Join":
+                        - ":"
+                        - - "arn:aws:dynamodb"
+                          - Ref: "AWS::Region"
+                          - Ref: "AWS::AccountId"
+                          - "table/HousingRegister/index/*"
           - PolicyName: manageLogs
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
@@ -106,12 +112,12 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                   Resource:
-                    - 'Fn::Join':
-                        - ':'
-                        - - 'arn:aws:logs'
-                          - Ref: 'AWS::Region'
-                          - Ref: 'AWS::AccountId'
-                          - 'log-group:/aws/lambda/*:*:*'
+                    - "Fn::Join":
+                        - ":"
+                        - - "arn:aws:logs"
+                          - Ref: "AWS::Region"
+                          - Ref: "AWS::AccountId"
+                          - "log-group:/aws/lambda/*:*:*"
                 - Effect: "Allow"
                   Action:
                     - "s3:PutObject"
@@ -123,7 +129,7 @@ resources:
                         - "Ref": "ServerlessDeploymentBucket"
           - PolicyName: lambdaInvocation
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
