@@ -44,7 +44,7 @@ functions:
     handler: HousingRegisterApi::HousingRegisterApi.BedroomRecalculator::Recalculate
     role: lambdaExecutionRole
     events:
-      - schedule: cron(0 4 * * *)
+      - schedule: rate(1 day)
 resources:
   Resources:
     LambdaSecurityGroup:
