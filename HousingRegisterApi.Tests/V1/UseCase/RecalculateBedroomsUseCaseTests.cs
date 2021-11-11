@@ -17,7 +17,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<ILogger<RecalculateBedroomsUseCase>> _loggerMock;
         private Mock<IApplicationApiGateway> _gatewayMock;
-        private Mock<INotifyGateway> _notifyGatewayMock;
+        //private Mock<INotifyGateway> _notifyGatewayMock;
         private RecalculateBedroomsUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -26,13 +26,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _loggerMock = new Mock<ILogger<RecalculateBedroomsUseCase>>();
             _gatewayMock = new Mock<IApplicationApiGateway>();
-            _notifyGatewayMock = new Mock<INotifyGateway>();
+            // _notifyGatewayMock = new Mock<INotifyGateway>();
 
             _classUnderTest = new RecalculateBedroomsUseCase(
                 _loggerMock.Object,
                 _gatewayMock.Object,
-                new BedroomCalculatorService(),
-                _notifyGatewayMock.Object);
+                new BedroomCalculatorService());
 
             _fixture = new Fixture();
         }     

@@ -91,8 +91,8 @@ namespace HousingRegisterApi
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
-            services.AddScoped<INotifyGateway, NotifyGateway>();
-            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
+            // services.AddScoped<INotifyGateway, NotifyGateway>();
+            // services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
         }
 
         private static void RegisterUseCases(IServiceCollection services)
