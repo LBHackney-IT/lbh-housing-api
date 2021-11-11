@@ -24,12 +24,12 @@ namespace HousingRegisterApi
 
         public BedroomRecalculator()
         {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            // var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             var configuration = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("appsettings.json", false, true)
-               .AddJsonFile($"appsettings.{environmentName}.json", false, true)
+               //.SetBasePath(Directory.GetCurrentDirectory())
+               //.AddJsonFile("appsettings.json", false, true)
+               //.AddJsonFile($"appsettings.{environmentName}.json", false, true)
                .AddEnvironmentVariables()
                .Build();
 
