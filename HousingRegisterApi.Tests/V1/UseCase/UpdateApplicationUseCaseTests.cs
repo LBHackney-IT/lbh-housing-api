@@ -5,6 +5,7 @@ using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
@@ -17,6 +18,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IBiddingNumberGenerator> _biddingNumberGenerator;
+        private Mock<IActivityHistory> _mockAudit;
         private UpdateApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -25,7 +27,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
             _biddingNumberGenerator = new Mock<IBiddingNumberGenerator>();
-            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object);
+            _mockAudit = new Mock<IActivityHistory>();
+            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockAudit.Object);
             _fixture = new Fixture();
         }
 

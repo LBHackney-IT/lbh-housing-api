@@ -36,14 +36,14 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
             _mockGateway
-                .Setup(x => x.ConfirmVerifyCode(id, It.IsAny<VerifyAuthRequest>()))
+                .Setup(x => x.ConfirmVerifyCode(It.IsAny<VerifyAuthRequest>()))
                 .Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(id, new VerifyAuthRequest());
+            var response = _classUnderTest.Execute(new VerifyAuthRequest());
 
             // Assert
-            _mockGateway.Verify(x => x.ConfirmVerifyCode(id, It.IsAny<VerifyAuthRequest>()));
+            _mockGateway.Verify(x => x.ConfirmVerifyCode(It.IsAny<VerifyAuthRequest>()));
             response.Should().BeOfType<VerifyAuthResponse>();
         }
     }

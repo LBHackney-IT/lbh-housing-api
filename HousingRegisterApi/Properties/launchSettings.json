@@ -14,9 +14,10 @@
       "launchBrowser": true,
       "launchUrl": "api/v1/healthcheck/ping",
       "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
         "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "DynamoDb_LocalMode": "true",
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "Localstack_SnsServiceUrl": "http://localhost:4566"
       },
       "applicationUrl": "http://localhost:5000"
     }

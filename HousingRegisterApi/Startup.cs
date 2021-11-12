@@ -1,21 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
+using Hackney.Core.Http;
+using Hackney.Core.JWT;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
+using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -27,6 +28,11 @@ using Microsoft.OpenApi.Models;
 using Notify.Client;
 using Notify.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace HousingRegisterApi
 {
@@ -127,8 +133,14 @@ namespace HousingRegisterApi
             services.AddSingleton(x => options);
 
             services.ConfigureDynamoDB();
+            services.ConfigureSns();
+            services.AddTokenFactory();
+            services.AddHttpContextWrapper();
+            services.AddHttpContextAccessor();
+
             RegisterGateways(services);
             RegisterUseCases(services);
+            RegisterServices(services);
         }
 
         private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
@@ -155,6 +167,9 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddScoped<IActivityHistory, ApplicationActivityHistory>();
+            services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
+            services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
         }
@@ -166,15 +181,22 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsUseCase, GetAllApplicationsUseCase>();
             services.AddScoped<IGetApplicationByIdUseCase, GetApplicationByIdUseCase>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
+            services.AddScoped<IRecalculateBedroomsUseCase, RecalculateBedroomsUseCase>();
             services.AddScoped<ICreateEvidenceRequestUseCase, CreateEvidenceRequestUseCase>();
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
+            services.AddScoped<ICalculateBedroomsUseCase, CalculateBedroomsUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<IBiddingNumberGenerator, BiddingNumberGenerator>();
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

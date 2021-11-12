@@ -21,7 +21,8 @@ namespace HousingRegisterApi.V1.Factories
                 SubmittedAt = domain.SubmittedAt,
                 MainApplicant = domain.MainApplicant,
                 OtherMembers = domain.OtherMembers,
-                Assessment = domain.Assessment
+                Assessment = domain.Assessment,
+                CalculatedBedroomNeed = domain.CalculatedBedroomNeed,
             };
         }
 

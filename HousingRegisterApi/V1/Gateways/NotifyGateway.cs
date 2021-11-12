@@ -19,11 +19,17 @@ namespace HousingRegisterApi.V1.Gateways
         {
             var personalisation = new Dictionary<string, object>
             {
-                {"resident_name", resident.Person.FirstName},
+                {"resident_name", ""},
                 {"verify_code", verifyCode},
             };
             var templateId = Environment.GetEnvironmentVariable("NOTIFY_TEMPLATE_VERIFY_CODE");
             return DeliverEmail(templateId, resident.ContactInformation.EmailAddress, personalisation);
+        }
+
+        public NotificationResponse NotifyResidentOfBedroomChange(string email, int? oldBedroomNeed, int newBedroomNeed)
+        {
+            // TODO: create email template and send email
+            return new NotificationResponse();
         }
 
         private NotificationResponse DeliverEmail(string templateId, string emailAddress, Dictionary<string, object> personalisation)

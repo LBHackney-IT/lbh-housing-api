@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,6 +26,34 @@ namespace HousingRegisterApi.V1.Infrastructure
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public bool ValidateToken(string accessToken, out IEnumerable<Claim> claims)
+        {
+            claims = new List<Claim>();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("HACKNEY_JWT_SECRET"));
+
+            var validations = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                RequireExpirationTime = true,
+                ValidateAudience = false,
+                ValidateIssuer = false
+            };
+
+            try
+            {
+                var claimsPrincipal = tokenHandler.ValidateToken(accessToken, validations, out SecurityToken secToken);
+                claims = claimsPrincipal.Claims;
+                return true; ;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

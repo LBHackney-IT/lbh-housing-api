@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,17 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ISHA256Helper _hashHelper;
         private readonly IVerifyCodeGenerator _codeGenerator;
-
+        private readonly IBedroomCalculatorService _bedroomCalculatorService;
         public DynamoDbGateway(
             IDynamoDBContext dynamoDbContext,
             ISHA256Helper hashHelper,
-            IVerifyCodeGenerator codeGenerator)
+            IVerifyCodeGenerator codeGenerator,
+            IBedroomCalculatorService bedroomCalculatorService)
         {
             _dynamoDbContext = dynamoDbContext;
             _hashHelper = hashHelper;
             _codeGenerator = codeGenerator;
+            _bedroomCalculatorService = bedroomCalculatorService;
         }
 
         public IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters)
@@ -68,10 +71,59 @@ namespace HousingRegisterApi.V1.Gateways
             return searchItems;
         }
 
+        public IEnumerable<Application> GetApplicationsAtStatus(params string[] status)
+        {
+            var statusNames = new List<string>();
+            var statusNameAndValues = new Dictionary<string, DynamoDBEntry>();
+
+            for (int i = 0; i < status.Length; i++)
+            {
+                string searchName = $":status{i}";
+                statusNames.Add(searchName);
+                statusNameAndValues.Add(searchName, new Primitive(status[i]));
+            }
+
+            // status is a reserved word, so we have to map it to something else, ie. #application_status
+            var scanConfig = new ScanOperationConfig
+            {
+                FilterExpression = new Expression()
+                {
+                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())})",
+                    ExpressionAttributeValues = statusNameAndValues,
+                    ExpressionAttributeNames = new Dictionary<string, string>()
+                    {
+                        {"#application_status", "status" }
+                    }
+                },
+            };
+
+            var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetNextSetAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+
+            return searchItems;
+        }
+
         public Application GetApplicationById(Guid id)
         {
             var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
             return result?.ToDomain();
+        }
+
+        public Application GetIncompleteApplication(string email)
+        {
+            string reference = _hashHelper.Generate(email).Substring(0, 10);
+
+            var conditions = new List<ScanCondition>
+            {
+                new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
+                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, ApplicationStatus.Verification, ApplicationStatus.New),
+            };
+
+            // query dynamodb
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+            var result = searchItems.FirstOrDefault();
+            return result;
         }
 
         public Application CreateNewApplication(CreateApplicationRequest request)
@@ -83,10 +135,12 @@ namespace HousingRegisterApi.V1.Gateways
                 CreatedAt = DateTime.UtcNow,
                 SensitiveData = request.SensitiveData,
                 SubmittedAt = null,
-                Status = string.IsNullOrEmpty(request.Status) ? "New" : request.Status,
+                Status = string.IsNullOrEmpty(request.Status) ? ApplicationStatus.New : request.Status,
                 MainApplicant = request.MainApplicant,
                 OtherMembers = request.OtherMembers.ToList()
             };
+
+            entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
@@ -118,6 +172,8 @@ namespace HousingRegisterApi.V1.Gateways
             if (request.Assessment != null)
                 entity.Assessment = request.Assessment;
 
+            entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
+
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
@@ -132,7 +188,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             entity.SubmittedAt = DateTime.UtcNow;
-            entity.Status = "Submitted";
+            entity.Status = ApplicationStatus.Submitted;
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
@@ -156,16 +212,34 @@ namespace HousingRegisterApi.V1.Gateways
             return entity.ToDomain();
         }
 
-        public Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request)
+        /// <summary>
+        /// Verifies that an application exists for the specified email and verification code
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>An application or null</returns>
+        public Application ConfirmVerifyCode(VerifyAuthRequest request)
         {
-            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
-            if (entity == null
-                || entity.VerifyCode != request.Code
-                || entity.VerifyExpiresAt < DateTime.UtcNow
-                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+            var application = GetIncompleteApplication(request.Email);
+
+            if (application == null
+                || application.VerifyCode != request.Code
+                || application.VerifyExpiresAt < DateTime.UtcNow)
             {
                 return null;
             }
+
+            // if code has been verified, nullify the fields so they can't be used again
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(application.Id).GetAwaiter().GetResult();
+            entity.VerifyCode = null;
+            entity.VerifyExpiresAt = null;
+
+            // progress this application to new if its at verfication
+            if (entity.Status == ApplicationStatus.Verification)
+            {
+                entity.Status = ApplicationStatus.New;
+            }
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
         }

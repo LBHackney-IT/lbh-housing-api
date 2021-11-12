@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 
@@ -13,10 +14,16 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly IApplicationApiGateway _gateway;
         private readonly IBiddingNumberGenerator _biddingNumberGenerator;
-        public UpdateApplicationUseCase(IApplicationApiGateway gateway, IBiddingNumberGenerator biddingNumberGenerator)
+        private readonly IActivityHistory _applicationHistory;
+
+        public UpdateApplicationUseCase(
+            IApplicationApiGateway gateway,
+            IBiddingNumberGenerator biddingNumberGenerator,
+            IActivityHistory applicationAudit)
         {
             _gateway = gateway;
             _biddingNumberGenerator = biddingNumberGenerator;
+            _applicationHistory = applicationAudit;
         }
 
         public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
@@ -42,7 +49,12 @@ namespace HousingRegisterApi.V1.UseCase
                 }
             }
 
-            return _gateway.UpdateApplication(id, request).ToResponse();
+            var result = _gateway.UpdateApplication(id, request).ToResponse();
+
+            // audit the update
+            _applicationHistory.LogUpdate(id, request);
+
+            return result;
         }
     }
 }

@@ -9,6 +9,8 @@ namespace HousingRegisterApi.V1.Gateways
     {
         IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters);
 
+        IEnumerable<Application> GetApplicationsAtStatus(params string[] status);
+
         Application GetApplicationById(Guid id);
 
         Application CreateNewApplication(CreateApplicationRequest request);
@@ -19,6 +21,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         Application CreateVerifyCode(Guid id, CreateAuthRequest request);
 
-        Application ConfirmVerifyCode(Guid id, VerifyAuthRequest request);
+        Application ConfirmVerifyCode(VerifyAuthRequest request);
+
+        Application GetIncompleteApplication(string email);
     }
 }
