@@ -18,7 +18,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IBiddingNumberGenerator> _biddingNumberGenerator;
-        private Mock<IAuditHistory> _mockAudit;
+        private Mock<IActivityHistory> _mockAudit;
         private UpdateApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -27,7 +27,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
             _biddingNumberGenerator = new Mock<IBiddingNumberGenerator>();
-            _mockAudit = new Mock<IAuditHistory>();
+            _mockAudit = new Mock<IActivityHistory>();
             _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockAudit.Object);
             _fixture = new Fixture();
         }
