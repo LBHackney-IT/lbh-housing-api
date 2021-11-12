@@ -8,7 +8,7 @@ using System;
 
 namespace HousingRegisterApi.V1.Gateways
 {
-    public class ApplicationAuditHistory : IAuditHistory
+    public class ApplicationActivityHistory : IActivityHistory
     {
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IHttpContextWrapper _contextWrapper;
@@ -16,7 +16,7 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly ISnsGateway _snsGateway;
         private readonly ISnsFactory _snsFactory;
 
-        public ApplicationAuditHistory(
+        public ApplicationActivityHistory(
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
@@ -30,12 +30,13 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void AuditUpdate(Guid id, UpdateApplicationRequest application)
+        public void LogUpdate(Guid id, UpdateApplicationRequest application)
         {
             //TODO: we want to only after submission, but for now, test if it works
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
-            _snsGateway.Publish(_snsFactory.Update(id, application, token));
+            var applicationSnsMessage = _snsFactory.Update(id, application, token);
+            _snsGateway.Publish(applicationSnsMessage);
         }
     }
 }

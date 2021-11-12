@@ -167,7 +167,7 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
-            services.AddScoped<IAuditHistory, ApplicationAuditHistory>();
+            services.AddScoped<IActivityHistory, ApplicationActivityHistory>();
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));

@@ -16,7 +16,6 @@
         <PackageReference Include="AWSSDK.Core" Version="3.7.3.30" />
         <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.0.91" />
         <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.1" />
-        <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.2.61" />
         <PackageReference Include="AWSXRayRecorder.Core" Version="2.10.0" />
         <PackageReference Include="AWSXRayRecorder.Handlers.AspNetCore" Version="2.7.2" />
         <PackageReference Include="AWSXRayRecorder.Handlers.AwsSdk" Version="2.8.2" />
@@ -26,6 +25,7 @@
         <PackageReference Include="dotenv.net" Version="3.1.0" />
         <PackageReference Include="GovukNotify" Version="4.0.1" />
         <PackageReference Include="Hackney.Core.Logging" Version="1.49.0" />
+        <PackageReference Include="Hackney.Core.Sns" Version="1.52.0" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.HealthChecks" Version="1.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.1" />
