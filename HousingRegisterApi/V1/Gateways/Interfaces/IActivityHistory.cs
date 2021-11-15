@@ -1,7 +1,7 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using System;
 
-namespace HousingRegisterApi.V1.Gateways.Interfaces
+namespace HousingRegisterApi.V1.Gateways
 {
     public interface IActivityHistory
     {
