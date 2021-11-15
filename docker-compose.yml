@@ -46,7 +46,6 @@ services:
       - 8000:8000
 
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack    
     hostname: awslocal    
     ports:

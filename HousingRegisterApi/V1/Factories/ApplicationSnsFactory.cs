@@ -47,8 +47,8 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = UpdateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = "",
-                    Email = ""
+                    Name = token.Name,
+                    Email = token.Email
                 },
                 EventData = new EventData
                 {
