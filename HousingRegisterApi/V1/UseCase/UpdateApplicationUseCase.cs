@@ -14,16 +14,16 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly IApplicationApiGateway _gateway;
         private readonly IBiddingNumberGenerator _biddingNumberGenerator;
-        private readonly IAuditHistory _applicationAudit;
+        private readonly IActivityHistory _applicationHistory;
 
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
             IBiddingNumberGenerator biddingNumberGenerator,
-            IAuditHistory applicationAudit)
+            IActivityHistory applicationAudit)
         {
             _gateway = gateway;
             _biddingNumberGenerator = biddingNumberGenerator;
-            _applicationAudit = applicationAudit;
+            _applicationHistory = applicationAudit;
         }
 
         public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
@@ -52,7 +52,7 @@ namespace HousingRegisterApi.V1.UseCase
             var result = _gateway.UpdateApplication(id, request).ToResponse();
 
             // audit the update
-            _applicationAudit.AuditUpdate(id, request);
+            _applicationHistory.LogUpdate(id, request);
 
             return result;
         }

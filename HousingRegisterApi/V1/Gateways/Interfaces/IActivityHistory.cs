@@ -3,8 +3,8 @@ using System;
 
 namespace HousingRegisterApi.V1.Gateways.Interfaces
 {
-    public interface IAuditHistory
+    public interface IActivityHistory
     {
-        void AuditUpdate(Guid id, UpdateApplicationRequest application);
+        void LogUpdate(Guid id, UpdateApplicationRequest application);
     }
 }
