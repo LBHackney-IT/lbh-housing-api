@@ -49,9 +49,11 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             var result = _gateway.UpdateApplication(id, request).ToResponse();
-
-            // audit the update
-            _applicationHistory.LogUpdate(id, request);
+            if (null != result)
+            {
+                // audit the update
+                _applicationHistory.LogUpdate(id, request);
+            }
 
             return result;
         }
