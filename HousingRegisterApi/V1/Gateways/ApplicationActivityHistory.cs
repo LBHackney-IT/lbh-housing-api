@@ -1,7 +1,8 @@
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
-using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
+using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using System;
 
@@ -29,12 +30,27 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void LogUpdate(Guid id, UpdateApplicationRequest application)
+        public void LogActivity(Guid applicationId, EntityActivity<ApplicationActivityType> activity)
         {
-            //TODO: we want to only after submission, but for now, test if it works
+            if (activity != null)
+            {
+                this.LogActivity(applicationId, activity.OldData, activity.NewData);
+            }
+        }
+
+        public void LogActivity(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities)
+        {
+            if (activities.Any())
+            {
+                this.LogActivity(applicationId, activities.OldData, activities.NewData);
+            }
+        }
+
+        private void LogActivity(Guid applicationId, object oldData, object newData)
+        {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
-            var applicationSnsMessage = _snsFactory.Update(id, application, token);
+            var applicationSnsMessage = _snsFactory.Update(applicationId, oldData, newData, token);
             _snsGateway.Publish(applicationSnsMessage);
         }
     }

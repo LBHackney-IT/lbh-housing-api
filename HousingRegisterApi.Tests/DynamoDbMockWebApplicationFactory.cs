@@ -90,7 +90,7 @@ namespace HousingRegisterApi.Tests
 
             var response = SimpleNotificationService.CreateTopicAsync(new CreateTopicRequest
             {
-                Name = "equalityInformation",
+                Name = "housingregister",
                 Attributes = snsAttrs
             }).Result;
 

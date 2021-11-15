@@ -1,12 +1,9 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using HousingRegisterApi.V1.Domain.Sns;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -42,7 +39,7 @@ namespace HousingRegisterApi.V1.Gateways
                 MessageGroupId = "SomeGroupId"
             };
 
-            var result = _amazonSimpleNotificationService.PublishAsync(request).Result;
+            _amazonSimpleNotificationService.PublishAsync(request);
         }
     }
 }
