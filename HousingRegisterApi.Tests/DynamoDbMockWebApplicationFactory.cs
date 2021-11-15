@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
+using Amazon.SimpleNotificationService;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -20,6 +21,7 @@ namespace HousingRegisterApi.Tests
 
         public IAmazonDynamoDB DynamoDb { get; private set; }
         public IDynamoDBContext DynamoDbContext { get; private set; }
+        public IAmazonSimpleNotificationService SimpleNotificationService { get; private set; }
 
         public DynamoDbMockWebApplicationFactory(List<TableDef> tables)
         {
@@ -33,10 +35,12 @@ namespace HousingRegisterApi.Tests
             builder.ConfigureServices(services =>
             {
                 services.ConfigureDynamoDB();
+                services.ConfigureSns();
 
                 var serviceProvider = services.BuildServiceProvider();
                 DynamoDb = serviceProvider.GetRequiredService<IAmazonDynamoDB>();
                 DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
+                SimpleNotificationService = serviceProvider.GetRequiredService<IAmazonSimpleNotificationService>();
 
                 EnsureTablesExist(DynamoDb, _tables);
             });
