@@ -32,7 +32,7 @@ namespace HousingRegisterApi.V1.Gateways
             return options;
         }
 
-        public async Task Publish(ApplicationSns applicationSns)
+        public void Publish(ApplicationSns applicationSns)
         {
             string message = JsonSerializer.Serialize(applicationSns, _jsonOptions);
             var request = new PublishRequest
@@ -42,7 +42,7 @@ namespace HousingRegisterApi.V1.Gateways
                 MessageGroupId = "SomeGroupId"
             };
 
-            await _amazonSimpleNotificationService.PublishAsync(request).ConfigureAwait(false);
+            var result = _amazonSimpleNotificationService.PublishAsync(request).Result;
         }
     }
 }

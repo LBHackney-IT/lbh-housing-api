@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using HousingRegisterApi.V1.Domain.Sns;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -10,6 +11,7 @@ namespace HousingRegisterApi.Tests
     {
         public HttpClient Client { get; private set; }
         public IDynamoDBContext DynamoDbContext => _factory?.DynamoDbContext;
+        public SnsEventVerifier<ApplicationSns> SnsVerifer => _factory?.SnsVerifer;
 
         private readonly DynamoDbMockWebApplicationFactory<TStartup> _factory;
         private readonly List<TableDef> _tables = new List<TableDef>
@@ -26,7 +28,7 @@ namespace HousingRegisterApi.Tests
         {
             EnsureEnvVarConfigured("DynamoDb_LocalMode", "true");
             EnsureEnvVarConfigured("DynamoDb_LocalServiceUrl", "http://localhost:8000");
-            EnsureEnvVarConfigured("Localstack_SnsServiceUrl", "http://localstack:4566");
+            EnsureEnvVarConfigured("Localstack_SnsServiceUrl", "http://localhost:4566");
 
             _factory = new DynamoDbMockWebApplicationFactory<TStartup>(_tables);
             Client = _factory.CreateClient();

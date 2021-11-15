@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -9,7 +10,9 @@ using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Domain.Sns;
 using HousingRegisterApi.V1.Factories;
+using HousingRegisterApi.V1.Infrastructure;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -19,6 +22,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     public class UpdateApplicationTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
+        private const string Token =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
 
         public UpdateApplicationTest()
         {
@@ -32,9 +37,45 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
 
         private async Task<HttpResponseMessage> PatchTestRequestAsync(Guid id, string input)
         {
-            using var data = new StringContent(input, Encoding.UTF8, "application/json");
+            //using var data = new StringContent(input, Encoding.UTF8, "application/json");
+            //var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
+            //return await Client.PatchAsync(uri, data).ConfigureAwait(false);
+
             var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
-            return await Client.PatchAsync(uri, data).ConfigureAwait(false);
+
+            var message = new HttpRequestMessage(HttpMethod.Patch, uri);
+            message.Headers.Add("Authorization", Token);
+
+            message.Content = new StringContent(input, Encoding.UTF8, "application/json");
+            message.Method = HttpMethod.Patch;
+
+            Client.DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var response = await Client.SendAsync(message).ConfigureAwait(false);
+            message.Dispose();
+
+            return response;
+        }
+
+        private static void VerifySnsMessage(ApplicationSns message, ApplicationResponse responseObject)
+        {
+            message.CorrelationId.Should().NotBeEmpty();
+            message.DateTime.Should().BeCloseTo(DateTime.UtcNow, 5000);
+            message.EntityId.Should().Be(responseObject.Id);
+
+            message.EventData.OldData.Should().BeNull();
+            // TODO - Verify that actual contents of the new data?
+            message.EventData.NewData.Should().NotBeNull();
+
+            message.EventType.Should().Be(UpdateApplicationConstants.EVENTTYPE);
+            message.Id.Should().NotBeEmpty();
+            message.SourceDomain.Should().Be(UpdateApplicationConstants.SOURCEDOMAIN);
+            message.SourceSystem.Should().Be(UpdateApplicationConstants.SOURCESYSTEM);
+            message.User.Email.Should().Be("e2e-testing@development.com");
+            message.User.Name.Should().Be("Tester");
+            message.Version.Should().Be(UpdateApplicationConstants.V1VERSION);
         }
 
         [Test]
@@ -64,6 +105,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
             apiEntity.Assessment.Should().BeEquivalentTo(request.Assessment);
+
+            SnsVerifer.VerifySnsEventRaised((actual) => VerifySnsMessage(actual, apiEntity));
         }
 
         [Test]
@@ -98,6 +141,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.CreatedAt.Should().Be(entity.CreatedAt);
             apiEntity.MainApplicant.Should().BeEquivalentTo(entity.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+
+            SnsVerifer.VerifySnsEventRaised((actual) => VerifySnsMessage(actual, apiEntity));
         }
 
         [Test]

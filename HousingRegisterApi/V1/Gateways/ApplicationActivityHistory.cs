@@ -2,7 +2,6 @@ using Hackney.Core.Http;
 using Hackney.Core.JWT;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Factories;
-using HousingRegisterApi.V1.Gateways.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
 

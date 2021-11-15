@@ -5,7 +5,6 @@ using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
-using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
 using Moq;

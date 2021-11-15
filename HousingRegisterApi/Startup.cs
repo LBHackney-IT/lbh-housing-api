@@ -4,11 +4,11 @@ using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using dotenv.net;
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
+using Hackney.Core.Logging;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
-using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
@@ -16,7 +16,6 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -120,7 +119,7 @@ namespace HousingRegisterApi
                     c.IncludeXmlComments(xmlPath);
             });
 
-            ConfigureLogging(services, Configuration);
+            services.ConfigureLambdaLogging(Configuration);
             AWSXRayRecorder.InitializeInstance(Configuration);
             AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
 
@@ -141,26 +140,6 @@ namespace HousingRegisterApi
             RegisterGateways(services);
             RegisterUseCases(services);
             RegisterServices(services);
-        }
-
-        private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
-        {
-            // We rebuild the logging stack so as to ensure the console logger is not used in production.
-            // See here: https://weblog.west-wind.com/posts/2018/Dec/31/Dont-let-ASPNET-Core-Default-Console-Logging-Slow-your-App-down
-            services.AddLogging(config =>
-            {
-                // clear out default configuration
-                config.ClearProviders();
-
-                config.AddConfiguration(configuration.GetSection("Logging"));
-                config.AddDebug();
-                config.AddEventSourceLogger();
-
-                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
-                {
-                    config.AddConsole();
-                }
-            });
         }
 
         private static void RegisterGateways(IServiceCollection services)
