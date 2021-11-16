@@ -73,12 +73,15 @@ namespace HousingRegisterApi.V1.Infrastructure
     public class EntityActivity<TActivityType>
         where TActivityType : Enum
     {
+        public TActivityType ActivityType { get; private set; }
+
         public object OldData { get; private set; }
 
         public object NewData { get; private set; }
 
         public EntityActivity(TActivityType activityType)
         {
+            ActivityType = activityType;
             SetOldData(null, null);
             SetNewData(null, activityType, null);
         }
@@ -86,6 +89,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         public EntityActivity(TActivityType activityType, string propertyName,
             object originalPropertyValue, object newPropertyValue)
         {
+            ActivityType = activityType;
             SetOldData(propertyName, originalPropertyValue);
             SetNewData(propertyName, activityType, newPropertyValue);
         }

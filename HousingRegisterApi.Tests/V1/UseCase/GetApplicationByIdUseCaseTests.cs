@@ -3,6 +3,7 @@ using FluentAssertions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
 using NUnit.Framework;
@@ -54,6 +55,22 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Assert
             response.Should().BeEquivalentTo(application.ToResponse());
+        }
+
+        [Test]
+        public void GetApplicationByIdLogsCaseViewedActivity()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var application = _fixture.Create<Application>();
+            _mockGateway.Setup(x => x.GetApplicationById(id)).Returns(application);
+
+            // Act
+            var response = _classUnderTest.Execute(id);
+
+            // Assert
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Guid>(),
+                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.CaseViewed)));
         }
 
         //TODO: Add extra tests here for extra functionality added to the use case
