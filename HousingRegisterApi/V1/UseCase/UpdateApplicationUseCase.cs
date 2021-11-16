@@ -19,11 +19,11 @@ namespace HousingRegisterApi.V1.UseCase
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
             IBiddingNumberGenerator biddingNumberGenerator,
-            IActivityHistory applicationAudit)
+            IActivityHistory applicationHistory)
         {
             _gateway = gateway;
             _biddingNumberGenerator = biddingNumberGenerator;
-            _applicationHistory = applicationAudit;
+            _applicationHistory = applicationHistory;
         }
 
         public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
@@ -57,7 +57,7 @@ namespace HousingRegisterApi.V1.UseCase
             if (null != result)
             {
                 // audit the update
-                _applicationHistory.LogUpdate(id, activities);
+                _applicationHistory.LogActivity(id, activities);
             }
 
             return result;
@@ -77,40 +77,33 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 if (request.SensitiveData.HasValue)
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(
-                        "SensitiveData",
-                        application.SensitiveData,
-                        new NewEntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChanged, request.SensitiveData)
-                    ));
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChanged,
+                        "SensitiveData", application.SensitiveData, request.SensitiveData));
                 }
 
                 if (!string.IsNullOrEmpty(request.Status))
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(
-                        "Status",
-                        application.Status,
-                        new NewEntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, request.Status)
-                    ));
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged,
+                        "Status", application.Status, request.Status));
                 }
 
                 if (!string.IsNullOrEmpty(request.AssignedTo))
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(
-                        "AssignedTo",
-                        application.AssignedTo,
-                        new NewEntityActivity<ApplicationActivityType>(ApplicationActivityType.AssignedTo, request.AssignedTo)
-                    ));
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.AssignedTo,
+                        "AssignedTo", application.AssignedTo, request.AssignedTo));
                 }
 
                 if (request.Assessment?.BedroomNeed.HasValue == true)
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(
-                        "Assessment.BedroomNeed",
-                        application.Assessment.BedroomNeed,
-                        new NewEntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChanged, request.Assessment.BedroomNeed)
-                    ));
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChanged,
+                        "Assessment.BedroomNeed", application.Assessment.BedroomNeed, request.Assessment.BedroomNeed));
                 }
 
+                if (request.Assessment?.EffectiveDate.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.DateChanged,
+                        "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
+                }               
             }
             return activities;
         }

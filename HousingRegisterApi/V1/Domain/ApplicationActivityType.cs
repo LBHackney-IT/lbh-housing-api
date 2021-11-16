@@ -5,30 +5,30 @@ namespace HousingRegisterApi.V1.Domain
     public enum ApplicationActivityType
     {
         [Description("Submitted")]
-        Submitted,
+        Submitted = 0,
 
         [Description("CaseViewed")]
-        CaseViewed,
+        CaseViewed = 1,
 
         [Description("StatusChanged")]
-        StatusChanged,
+        StatusChanged = 2,
 
         [Description("AssignedTo")]
-        AssignedTo,
+        AssignedTo = 3,
 
         [Description("CaseActivated")]
-        CaseActivated,
+        CaseActivated = 4,
 
         [Description("CaseRejected")]
-        CaseRejected,
+        CaseRejected = 5,
 
         [Description("SensitivityChanged")]
-        SensitivityChanged,
+        SensitivityChanged = 6,
 
         [Description("BedroomNeedChanged")]
-        BedroomNeedChanged,
+        BedroomNeedChanged = 7,
 
         [Description("DateChanged")]
-        DateChanged,
+        DateChanged = 8,
     }
 }

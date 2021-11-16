@@ -14,46 +14,56 @@ namespace HousingRegisterApi.V1.Infrastructure
         /// Combines all original data, prior to updates, into a single object
         /// </summary>
         /// <returns></returns>
-        public object OldData()
-        {
-            JObject jAllValues = new JObject();
-
-            _activities.ForEach(x =>
-            {
-                JObject values = JObject.FromObject(x.OldData);
-                jAllValues.Merge(values);
-            });
-
-            return jAllValues.ToObject<object>();
-        }
+        public object OldData { get; private set; }
 
         /// <summary>
         /// Combines all new data changes into a single object
         /// </summary>
         /// <returns></returns>
-        public object NewData()
-        {
-            JObject jAllValues = new JObject();
+        public object NewData { get; private set; }
 
-            _activities.ForEach(x =>
-            {
-                JObject values = JObject.FromObject(x.NewData);
-                jAllValues.Merge(values);
-            });
-
-            return jAllValues.ToObject<object>();
-        }
-
+        /// <summary>
+        /// Initialises a new instance    
+        /// </summary>
         public EntityActivityCollection()
         {
             _activities = new List<EntityActivity<TActivityType>>();
         }
 
+        /// <summary>
+        /// Add new activity type to the in-memory collection
+        /// </summary>
+        /// <param name="activity"></param>
         public void Add(EntityActivity<TActivityType> activity)
         {
             _activities.Add(activity);
+
+            JObject jOldDataCombined = new JObject();
+            JObject jNewDataCombined = new JObject();
+
+            // set old data
+            _activities.ForEach(x =>
+            {
+                JObject values = JObject.FromObject(x.OldData);
+                jOldDataCombined.Merge(values);
+            });
+
+            OldData = jOldDataCombined.ToObject<object>();
+
+            // set new data
+            _activities.ForEach(x =>
+            {
+                JObject values = JObject.FromObject(x.NewData);
+                jNewDataCombined.Merge(values);
+            });
+
+            NewData = jNewDataCombined.ToObject<object>();
         }
 
+        /// <summary>
+        /// Returns true if collection contains items
+        /// </summary>
+        /// <returns></returns>
         public bool Any()
         {
             return _activities.Any();
@@ -67,34 +77,49 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public object NewData { get; private set; }
 
-        public EntityActivity(string propertyName, object originalPropertyValue, NewEntityActivity<TActivityType> newPropertyValue)
-        {      
-            JObject jObjOld = new JObject();
-            jObjOld.Add(propertyName, JToken.FromObject(originalPropertyValue));
-
-            JObject jObjNewValue = new JObject();
-            jObjNewValue.Add(propertyName, JToken.FromObject(newPropertyValue.NewPropertyValue));
-
-            JObject jObjNew = new JObject();
-            jObjNew.Add(new JProperty("type", newPropertyValue.ActivityType));
-            jObjNew.Add(new JProperty("payload", jObjNewValue));
-
-            OldData = jObjOld.ToObject<object>();
-            NewData = jObjNew.ToObject<object>();
-        }
-    }
-
-    public class NewEntityActivity<T>
-        where T : Enum
-    {
-        public T ActivityType { get; private set; }
-
-        public object NewPropertyValue { get; private set; }
-
-        public NewEntityActivity(T activityType, object newPropertyValue)
+        public EntityActivity(TActivityType activityType)
         {
-            ActivityType = activityType;
-            NewPropertyValue = newPropertyValue;
+            SetOldData(null, null);
+            SetNewData(null, activityType, null);
+        }
+
+        public EntityActivity(TActivityType activityType, string propertyName,
+            object originalPropertyValue, object newPropertyValue)
+        {
+            SetOldData(propertyName, originalPropertyValue);
+            SetNewData(propertyName, activityType, newPropertyValue);
+        }
+
+        private void SetOldData(string propertyName, object originalPropertyValue)
+        {
+            // set old data
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                JObject jObjOld = new JObject();
+                jObjOld.Add(propertyName, originalPropertyValue == null ? null : JToken.FromObject(originalPropertyValue));
+                OldData = jObjOld.ToObject<object>();
+            }
+            else
+            {
+                OldData = null;
+            }
+        }
+
+        private void SetNewData(string propertyName, TActivityType activityType, object newPropertyValue)
+        {
+            // set activity type
+            JObject jObjNew = new JObject();
+            jObjNew.Add(new JProperty("type", activityType));
+
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                // set payload
+                JObject jObjNewValue = new JObject();
+                jObjNewValue.Add(propertyName, newPropertyValue == null ? null : JToken.FromObject(newPropertyValue));
+                jObjNew.Add(new JProperty("payload", jObjNewValue));
+            }
+
+            NewData = jObjNew.ToObject<object>();
         }
     }
 }

@@ -6,6 +6,7 @@ namespace HousingRegisterApi.V1.Gateways
 {
     public interface IActivityHistory
     {
-        void LogUpdate(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities);
+        void LogActivity(Guid applicationId, EntityActivity<ApplicationActivityType> activity);
+        void LogActivity(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities);
     }
 }

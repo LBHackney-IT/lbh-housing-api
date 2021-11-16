@@ -5,7 +5,6 @@ using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -31,16 +30,28 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void LogUpdate(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities)
+        public void LogActivity(Guid applicationId, EntityActivity<ApplicationActivityType> activity)
+        {
+            if (activity != null)
+            {
+                this.LogActivity(applicationId, activity.OldData, activity.NewData);
+            }
+        }
+
+        public void LogActivity(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities)
         {
             if (activities.Any())
             {
-                //TODO: we want to only after submission, but for now, test if it works
-                var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
-
-                var applicationSnsMessage = _snsFactory.Update(applicationId, activities.OldData(), activities.NewData(), token);
-                _snsGateway.Publish(applicationSnsMessage);
+                this.LogActivity(applicationId, activities.OldData, activities.NewData);
             }
+        }
+
+        private void LogActivity(Guid applicationId, object oldData, object newData)
+        {
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+
+            var applicationSnsMessage = _snsFactory.Update(applicationId, oldData, newData, token);
+            _snsGateway.Publish(applicationSnsMessage);
         }
     }
 }

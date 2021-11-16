@@ -13,6 +13,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class GetApplicationByIdUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
+        private Mock<IActivityHistory> _mockHistory;
         private GetApplicationByIdUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -20,7 +21,9 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _classUnderTest = new GetApplicationByIdUseCase(_mockGateway.Object);
+            _mockHistory = new Mock<IActivityHistory>();
+
+            _classUnderTest = new GetApplicationByIdUseCase(_mockGateway.Object, _mockHistory.Object);
             _fixture = new Fixture();
         }
 
