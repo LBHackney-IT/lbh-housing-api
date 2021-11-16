@@ -120,10 +120,42 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             AssertData(entityActivity.NewData, "{'type' : 4, 'payload' : {'SimplePropertyType' : null }}");
         }
 
+        [Test]
+        public void AddingASimpleCollectionOfActivitiesSetsTheCorrectOldDataPayload()
+        {
+            // Act
+            var collection = new EntityActivityCollection<ApplicationActivityType>();
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated, "SimplePropertyType", 5, null));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed, "SimplePropertyType2", 25, null));
+
+            // Assert
+            AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}, {'SimplePropertyType2' : 25}]");
+        }
+
+        [Test]
+        public void AddingASimpleCollectionOfActivitiesSetsTheCorrectNewDataPayload()
+        {
+            // Act
+            var collection = new EntityActivityCollection<ApplicationActivityType>();
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated, "SimplePropertyType", null, 40));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType2", null, 45));
+
+            // Assert
+            AssertArrayData(collection.NewData, "[{ 'type' : 4, 'payload' : {'SimplePropertyType' : 40}}, { 'type' : 2, 'payload' : {'SimplePropertyType2' : 45}}]");
+        }
+
         private static void AssertData(object input, string compareTo)
         {
             JObject jInput = JObject.FromObject(input);
             JObject jCompare = JObject.Parse(compareTo);
+
+            Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
+        }
+
+        private static void AssertArrayData(object input, string compareTo)
+        {
+            JArray jInput = JArray.FromObject(input);
+            JArray jCompare = JArray.Parse(compareTo);
 
             Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
         }

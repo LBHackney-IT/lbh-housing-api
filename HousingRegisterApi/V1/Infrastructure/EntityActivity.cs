@@ -38,14 +38,14 @@ namespace HousingRegisterApi.V1.Infrastructure
         {
             _activities.Add(activity);
 
-            JObject jOldDataCombined = new JObject();
-            JObject jNewDataCombined = new JObject();
+            JArray jOldDataCombined = new JArray();
+            JArray jNewDataCombined = new JArray();
 
             // set old data
             _activities.ForEach(x =>
             {
                 JObject values = JObject.FromObject(x.OldData);
-                jOldDataCombined.Merge(values);
+                jOldDataCombined.Add(values);
             });
 
             OldData = jOldDataCombined.ToObject<object>();
@@ -54,7 +54,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             _activities.ForEach(x =>
             {
                 JObject values = JObject.FromObject(x.NewData);
-                jNewDataCombined.Merge(values);
+                jNewDataCombined.Add(values);
             });
 
             NewData = jNewDataCombined.ToObject<object>();
