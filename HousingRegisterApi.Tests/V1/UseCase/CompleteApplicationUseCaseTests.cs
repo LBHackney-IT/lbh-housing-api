@@ -27,7 +27,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _classUnderTest = new CompleteApplicationUseCase(_mockGateway.Object, _mockHistory.Object);
             _fixture = new Fixture();
         }
-      
+
         [Test]
         public void CompleteApplicationUseCaseLogsCaseSubmittedActivity()
         {
