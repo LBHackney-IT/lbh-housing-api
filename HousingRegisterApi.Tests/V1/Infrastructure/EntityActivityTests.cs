@@ -13,7 +13,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimpleActivityDoesNotSetAnyOldData()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.DateChanged);
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged);
 
             // Assert
             Assert.IsNull(entityActivity.OldData);
@@ -24,7 +24,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimpleActivitySetsTheCorrectNewDataPayload()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.DateChanged);
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged);
 
             // Assert
             AssertData(entityActivity.NewData, "{'type' : 8}");

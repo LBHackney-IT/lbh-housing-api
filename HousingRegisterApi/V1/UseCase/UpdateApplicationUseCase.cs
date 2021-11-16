@@ -101,9 +101,15 @@ namespace HousingRegisterApi.V1.UseCase
 
                 if (request.Assessment?.EffectiveDate.HasValue == true)
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.DateChanged,
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged,
                         "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
-                }               
+                }
+
+                if (!string.IsNullOrEmpty(request.Assessment.Band))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
+                        "Assessment.Band", application.Assessment.Band, request.Assessment.Band));
+                }
             }
             return activities;
         }

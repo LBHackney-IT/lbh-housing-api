@@ -28,7 +28,7 @@ namespace HousingRegisterApi.V1.Domain
         [Description("BedroomNeedChanged")]
         BedroomNeedChanged = 7,
 
-        [Description("DateChanged")]
-        DateChanged = 8,
+        [Description("EffectiveDateChanged")]
+        EffectiveDateChanged = 8,
     }
 }
