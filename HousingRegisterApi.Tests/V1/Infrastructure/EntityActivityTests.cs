@@ -121,7 +121,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
-        public void AddingASimpleCollectionOfActivitiesSetsTheCorrectOldDataPayload()
+        public void AddingACollectionOfActivitiesSetsTheCorrectOldDataPayload()
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
@@ -133,7 +133,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
-        public void AddingASimpleCollectionOfActivitiesSetsTheCorrectNewDataPayload()
+        public void AddingACollectionOfActivitiesSetsTheCorrectNewDataPayload()
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
@@ -142,6 +142,30 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
 
             // Assert
             AssertArrayData(collection.NewData, "[{ 'type' : 4, 'payload' : {'SimplePropertyType' : 40}}, { 'type' : 2, 'payload' : {'SimplePropertyType2' : 45}}]");
+        }
+
+        [Test]
+        public void AddingACollectionOfActivitiesWithSomeSimpleActivitiesSetsTheCorrectOldDataPayload()
+        {
+            // Act
+            var collection = new EntityActivityCollection<ApplicationActivityType>();
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType", 5, null));
+
+            // Assert
+            AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}]");
+        }
+
+        [Test]
+        public void AddingACollectionOfActivitiesWithSomeSimpleActivitiesSetsTheCorrectNewDataPayload()
+        {
+            // Act
+            var collection = new EntityActivityCollection<ApplicationActivityType>();
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType", null, 45));
+
+            // Assert
+            AssertArrayData(collection.NewData, "[{ 'type' : 4}, { 'type' : 2, 'payload' : {'SimplePropertyType' : 45}}]");
         }
 
         private static void AssertData(object input, string compareTo)
