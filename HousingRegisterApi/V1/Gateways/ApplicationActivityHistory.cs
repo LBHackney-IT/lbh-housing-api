@@ -33,7 +33,7 @@ namespace HousingRegisterApi.V1.Gateways
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             if (activity != null)
-            {               
+            {
                 bool isResidentActivity = activity.ActivityType == ApplicationActivityType.SubmittedByResident;
                 this.LogActivity(application, activity.OldData, activity.NewData, isResidentActivity);
             }
@@ -66,7 +66,7 @@ namespace HousingRegisterApi.V1.Gateways
                 // residents will not have an auth token so
                 // generate a simple token to hold some user info
                 if (isResidentActivity == true && token == null)
-                {                   
+                {
                     token = new Token()
                     {
                         Name = application.MainApplicant.Person.FullName,
