@@ -1,6 +1,7 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Response.Exceptions;
+using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -18,11 +19,11 @@ namespace HousingRegisterApi.V1.UseCase
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
             IBiddingNumberGenerator biddingNumberGenerator,
-            IActivityHistory applicationAudit)
+            IActivityHistory applicationHistory)
         {
             _gateway = gateway;
             _biddingNumberGenerator = biddingNumberGenerator;
-            _applicationHistory = applicationAudit;
+            _applicationHistory = applicationHistory;
         }
 
         public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
@@ -48,14 +49,64 @@ namespace HousingRegisterApi.V1.UseCase
                 }
             }
 
+            // get list of all update activities prior to updating the application
+            var application = _gateway.GetApplicationById(id);
+            var activities = GetApplicationActivities(application, request);
+
             var result = _gateway.UpdateApplication(id, request).ToResponse();
             if (null != result)
             {
                 // audit the update
-                _applicationHistory.LogUpdate(id, request);
+                _applicationHistory.LogActivity(id, activities);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Get a collection of all update activites performed on an application
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private static EntityActivityCollection<ApplicationActivityType> GetApplicationActivities(Application application, UpdateApplicationRequest request)
+        {
+            var activities = new EntityActivityCollection<ApplicationActivityType>();
+
+            if (application != null && request != null)
+            {
+                if (request.SensitiveData.HasValue)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChanged,
+                        "SensitiveData", application.SensitiveData, request.SensitiveData));
+                }
+
+                if (!string.IsNullOrEmpty(request.Status))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged,
+                        "Status", application.Status, request.Status));
+                }
+
+                if (!string.IsNullOrEmpty(request.AssignedTo))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.AssignedTo,
+                        "AssignedTo", application.AssignedTo, request.AssignedTo));
+                }
+
+                if (request.Assessment?.BedroomNeed.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChanged,
+                        "Assessment.BedroomNeed", application.Assessment.BedroomNeed, request.Assessment.BedroomNeed));
+                }
+
+                if (request.Assessment?.EffectiveDate.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged,
+                        "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
+                }
+            }
+
+            return activities;
         }
     }
 }

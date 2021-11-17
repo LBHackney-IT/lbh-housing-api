@@ -17,7 +17,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IBiddingNumberGenerator> _biddingNumberGenerator;
-        private Mock<IActivityHistory> _mockAudit;
+        private Mock<IActivityHistory> _mockHistory;
         private UpdateApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -26,8 +26,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
             _biddingNumberGenerator = new Mock<IBiddingNumberGenerator>();
-            _mockAudit = new Mock<IActivityHistory>();
-            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockAudit.Object);
+            _mockHistory = new Mock<IActivityHistory>();
+            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockHistory.Object);
             _fixture = new Fixture();
         }
 
@@ -64,6 +64,23 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Assert
             func.Should().Throw<ApplicationException>().WithMessage(exception.Message);
+        }
+
+        [Test]
+        public void UpdateApplicationLogsActivites()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var application = _fixture.Create<Application>();
+            _mockGateway
+                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
+                .Returns(application);
+
+            // Act
+            var response = _classUnderTest.Execute(id, new UpdateApplicationRequest());
+
+            // Assert
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Guid>(), It.IsAny<EntityActivityCollection<ApplicationActivityType>>()));
         }
     }
 }
