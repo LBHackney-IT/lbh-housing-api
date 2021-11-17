@@ -54,7 +54,7 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         private void SetOldData()
         {
-            JArray jArray = new JArray();            
+            JArray jArray = new JArray();
 
             // set old data
             _activities.ForEach(x =>

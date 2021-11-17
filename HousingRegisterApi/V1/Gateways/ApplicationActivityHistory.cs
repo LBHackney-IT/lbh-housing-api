@@ -48,11 +48,11 @@ namespace HousingRegisterApi.V1.Gateways
 
         private void LogActivity(Application application, object oldData, object newData)
         {
-            // we only want to log activites when the application has been complete
+            // we only want to log activites after an application has been submitted
             if (application != null &&
                 (application.Status != ApplicationStatus.Verification
                 || application.Status != ApplicationStatus.New))
-            {               
+            {
                 var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
                 if (token != null)
