@@ -120,18 +120,32 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             AssertData(entityActivity.NewData, "{'type' : 4, 'payload' : {'SimplePropertyType' : null }}");
         }
 
+        [Test]
+        public void AnActivityWithTheSameOldAndNewDataHasNoChanges()
+        {
+            // Act
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
+                "SimplePropertyType", 5, 5);
+
+            // Assert
+            Assert.IsFalse(entityActivity.HasChanges());
+        }
+
+        [Test]
+        public void AnActivityWithDifferentOldAndNewDataHasChanges()
+        {
+            // Act
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
+                "SimplePropertyType", 5, 10);
+
+            // Assert
+            Assert.IsTrue(entityActivity.HasChanges());
+        }
+
         private static void AssertData(object input, string compareTo)
         {
             JObject jInput = JObject.FromObject(input);
             JObject jCompare = JObject.Parse(compareTo);
-
-            Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
-        }
-
-        private static void AssertArrayData(object input, string compareTo)
-        {
-            JArray jInput = JArray.FromObject(input);
-            JArray jCompare = JArray.Parse(compareTo);
 
             Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
         }

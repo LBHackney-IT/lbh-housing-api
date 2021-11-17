@@ -100,13 +100,13 @@ namespace HousingRegisterApi.V1.UseCase
                 if (request.Assessment?.BedroomNeed.HasValue == true)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChangedByUser,
-                        "Assessment.BedroomNeed", application.Assessment.BedroomNeed, request.Assessment.BedroomNeed));
+                        "Assessment.BedroomNeed", application.Assessment?.BedroomNeed, request.Assessment.BedroomNeed));
                 }
 
                 if (request.Assessment?.EffectiveDate.HasValue == true)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser,
-                        "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
+                        "Assessment.EffectiveDate", application.Assessment?.EffectiveDate, request.Assessment.EffectiveDate));
                 }
             }
 
