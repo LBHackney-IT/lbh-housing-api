@@ -33,8 +33,9 @@ namespace HousingRegisterApi.V1.Gateways
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             if (activity != null)
-            {
-                this.LogActivity(application, activity.OldData, activity.NewData);
+            {               
+                bool isResidentActivity = activity.ActivityType == ApplicationActivityType.SubmittedByResident;
+                this.LogActivity(application, activity.OldData, activity.NewData, isResidentActivity);
             }
         }
 
@@ -46,7 +47,14 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
-        private void LogActivity(Application application, object oldData, object newData)
+        /// <summary>
+        /// LogActivity
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="oldData"></param>
+        /// <param name="newData"></param>
+        /// <param name="isResidentActivity"></param>
+        private void LogActivity(Application application, object oldData, object newData, bool isResidentActivity = false)
         {
             // we only want to log activites after an application has been submitted
             if (application != null &&
@@ -54,6 +62,17 @@ namespace HousingRegisterApi.V1.Gateways
                 || application.Status != ApplicationStatus.New))
             {
                 var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+
+                // residents will not have an auth token so
+                // generate a simple token to hold some user info
+                if (isResidentActivity == true && token == null)
+                {                   
+                    token = new Token()
+                    {
+                        Name = application.MainApplicant.Person.FullName,
+                        Email = application.MainApplicant.ContactInformation.EmailAddress,
+                    };
+                }
 
                 if (token != null)
                 {

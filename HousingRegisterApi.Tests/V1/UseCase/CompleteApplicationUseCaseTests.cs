@@ -41,7 +41,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             // Assert
             _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
-                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.Submitted)));
+                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.SubmittedByResident)));
         }
 
         //TODO: Add extra tests here for extra functionality added to the use case

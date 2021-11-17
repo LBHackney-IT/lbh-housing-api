@@ -25,7 +25,7 @@ namespace HousingRegisterApi.V1.UseCase
         {
             var application = _gateway.GetApplicationById(id);
 
-            _applicationHistory.LogActivity(application, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed));
+            _applicationHistory.LogActivity(application, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser));
 
             return application.ToResponse();
         }
