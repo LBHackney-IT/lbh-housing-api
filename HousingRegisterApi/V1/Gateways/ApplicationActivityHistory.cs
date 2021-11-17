@@ -30,28 +30,37 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void LogActivity(Guid applicationId, EntityActivity<ApplicationActivityType> activity)
+        public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             if (activity != null)
             {
-                this.LogActivity(applicationId, activity.OldData, activity.NewData);
+                this.LogActivity(application, activity.OldData, activity.NewData);
             }
         }
 
-        public void LogActivity(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities)
+        public void LogActivity(Application application, EntityActivityCollection<ApplicationActivityType> activities)
         {
             if (activities.Any())
             {
-                this.LogActivity(applicationId, activities.OldData, activities.NewData);
+                this.LogActivity(application, activities.OldData, activities.NewData);
             }
         }
 
-        private void LogActivity(Guid applicationId, object oldData, object newData)
+        private void LogActivity(Application application, object oldData, object newData)
         {
-            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+            // we only want to log activites when the application has been complete
+            if (application != null &&
+                (application.Status != ApplicationStatus.Verification
+                || application.Status != ApplicationStatus.New))
+            {               
+                var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
-            var applicationSnsMessage = _snsFactory.Update(applicationId, oldData, newData, token);
-            _snsGateway.Publish(applicationSnsMessage);
+                if (token != null)
+                {
+                    var applicationSnsMessage = _snsFactory.Update(application.Id, oldData, newData, token);
+                    _snsGateway.Publish(applicationSnsMessage);
+                }
+            }
         }
     }
 }

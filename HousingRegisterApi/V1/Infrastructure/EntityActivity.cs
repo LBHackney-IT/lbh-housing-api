@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -38,32 +39,8 @@ namespace HousingRegisterApi.V1.Infrastructure
         {
             _activities.Add(activity);
 
-            JArray jOldDataCombined = new JArray();
-            JArray jNewDataCombined = new JArray();
-
-            // set old data
-            _activities.ForEach(x =>
-            {
-                if (x.OldData != null)
-                {
-                    JObject values = JObject.FromObject(x.OldData);
-                    jOldDataCombined.Add(values);
-                }
-            });
-
-            OldData = jOldDataCombined.ToObject<object>();
-
-            // set new data
-            _activities.ForEach(x =>
-            {
-                if (x.NewData != null)
-                {
-                    JObject values = JObject.FromObject(x.NewData);
-                    jNewDataCombined.Add(values);
-                }
-            });
-
-            NewData = jNewDataCombined.ToObject<object>();
+            SetOldData();
+            SetNewData();
         }
 
         /// <summary>
@@ -73,6 +50,40 @@ namespace HousingRegisterApi.V1.Infrastructure
         public bool Any()
         {
             return _activities.Any();
+        }
+
+        private void SetOldData()
+        {
+            JArray jArray = new JArray();            
+
+            // set old data
+            _activities.ForEach(x =>
+            {
+                if (x.OldData != null)
+                {
+                    JObject values = JObject.FromObject(x.OldData);
+                    jArray.Add(values);
+                }
+            });
+
+            OldData = JsonConvert.DeserializeObject(jArray.ToString());
+        }
+
+        private void SetNewData()
+        {
+            JArray jArray = new JArray();
+
+            // set new data
+            _activities.ForEach(x =>
+            {
+                if (x.NewData != null)
+                {
+                    JObject values = JObject.FromObject(x.NewData);
+                    jArray.Add(values);
+                }
+            });
+
+            NewData = JsonConvert.DeserializeObject(jArray.ToString());
         }
     }
 
@@ -107,7 +118,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             {
                 JObject jObjOld = new JObject();
                 jObjOld.Add(propertyName, originalPropertyValue == null ? null : JToken.FromObject(originalPropertyValue));
-                OldData = jObjOld.ToObject<object>();
+                OldData = JsonConvert.DeserializeObject(jObjOld.ToString());
             }
             else
             {
@@ -129,7 +140,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                 jObjNew.Add(new JProperty("payload", jObjNewValue));
             }
 
-            NewData = jObjNew.ToObject<object>();
+            NewData = JsonConvert.DeserializeObject(jObjNew.ToString());
         }
     }
 }

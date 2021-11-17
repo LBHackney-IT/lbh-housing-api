@@ -40,7 +40,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id);
 
             // Assert
-            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Guid>(),
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
                 It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.Submitted)));
         }
 

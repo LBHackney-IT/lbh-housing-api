@@ -50,17 +50,17 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             // get list of all update activities prior to updating the application
-            var application = _gateway.GetApplicationById(id);
-            var activities = GetApplicationActivities(application, request);
+            var origApplication = _gateway.GetApplicationById(id);
+            var activities = GetApplicationActivities(origApplication, request);
 
-            var result = _gateway.UpdateApplication(id, request).ToResponse();
-            if (null != result)
+            var application = _gateway.UpdateApplication(id, request);
+            if (null != application)
             {
                 // audit the update
-                _applicationHistory.LogActivity(id, activities);
+                _applicationHistory.LogActivity(application, activities);
             }
 
-            return result;
+            return application.ToResponse();
         }
 
         /// <summary>
