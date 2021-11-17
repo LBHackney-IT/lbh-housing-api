@@ -4,7 +4,6 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
-using System;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -36,14 +35,6 @@ namespace HousingRegisterApi.V1.Gateways
             {
                 bool isResidentActivity = activity.ActivityType == ApplicationActivityType.SubmittedByResident;
                 this.LogActivity(application, activity.OldData, activity.NewData, isResidentActivity);
-            }
-        }
-
-        public void LogActivity(Application application, EntityActivityCollection<ApplicationActivityType> activities)
-        {
-            if (activities.Any())
-            {
-                this.LogActivity(application, activities.OldData, activities.NewData);
             }
         }
 
