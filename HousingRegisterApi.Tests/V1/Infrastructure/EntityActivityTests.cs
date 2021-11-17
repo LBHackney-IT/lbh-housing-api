@@ -121,65 +121,31 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
-        public void AddingACollectionOfActivitiesSetsTheCorrectOldDataPayload()
+        public void AnActivityWithTheSameOldAndNewDataHasNoChanges()
         {
             // Act
-            var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser, "SimplePropertyType", 5, null));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser, "SimplePropertyType2", 25, null));
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
+                "SimplePropertyType", 5, 5);
 
             // Assert
-            AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}, {'SimplePropertyType2' : 25}]");
+            Assert.IsFalse(entityActivity.HasChanges());
         }
 
         [Test]
-        public void AddingACollectionOfActivitiesSetsTheCorrectNewDataPayload()
+        public void AnActivityWithDifferentOldAndNewDataHasChanges()
         {
             // Act
-            var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser, "SimplePropertyType", null, 40));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType2", null, 45));
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
+                "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertArrayData(collection.NewData, "[{ 'type' : 4, 'payload' : {'SimplePropertyType' : 40}}, { 'type' : 2, 'payload' : {'SimplePropertyType2' : 45}}]");
-        }
-
-        [Test]
-        public void AddingACollectionOfActivitiesWithSomeSimpleActivitiesSetsTheCorrectOldDataPayload()
-        {
-            // Act
-            var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType", 5, null));
-
-            // Assert
-            AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}]");
-        }
-
-        [Test]
-        public void AddingACollectionOfActivitiesWithSomeSimpleActivitiesSetsTheCorrectNewDataPayload()
-        {
-            // Act
-            var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType", null, 45));
-
-            // Assert
-            AssertArrayData(collection.NewData, "[{ 'type' : 4}, { 'type' : 2, 'payload' : {'SimplePropertyType' : 45}}]");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         private static void AssertData(object input, string compareTo)
         {
             JObject jInput = JObject.FromObject(input);
             JObject jCompare = JObject.Parse(compareTo);
-
-            Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
-        }
-
-        private static void AssertArrayData(object input, string compareTo)
-        {
-            JArray jInput = JArray.FromObject(input);
-            JArray jCompare = JArray.Parse(compareTo);
 
             Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
         }

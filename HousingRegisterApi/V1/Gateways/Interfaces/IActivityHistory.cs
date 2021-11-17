@@ -11,12 +11,5 @@ namespace HousingRegisterApi.V1.Gateways
         /// <param name="application"></param>
         /// <param name="activity"></param>
         void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity);
-
-        /// <summary>
-        /// Records application activity when status is not in draft and a valid auth token exists.
-        /// </summary>
-        /// <param name="application"></param>
-        /// <param name="activities"></param>
-        void LogActivity(Application application, EntityActivityCollection<ApplicationActivityType> activities);
     }
 }

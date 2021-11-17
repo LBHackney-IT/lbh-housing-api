@@ -72,15 +72,22 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
+
+            _mockGateway
+                .Setup(x => x.GetApplicationById(id))
+                .Returns(application);
+
             _mockGateway
                 .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
                 .Returns(application);
 
-            // Act
-            var response = _classUnderTest.Execute(id, new UpdateApplicationRequest());
+            var response = _classUnderTest.Execute(id, new UpdateApplicationRequest()
+            {
+                Status = ApplicationStatus.New
+            });
 
             // Assert
-            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(), It.IsAny<EntityActivityCollection<ApplicationActivityType>>()));
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()));
         }
     }
 }

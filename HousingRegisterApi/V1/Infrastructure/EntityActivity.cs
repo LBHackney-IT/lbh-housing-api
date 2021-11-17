@@ -1,104 +1,37 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
-    public class EntityActivityCollection<TActivityType>
-        where TActivityType : Enum
-    {
-        private List<EntityActivity<TActivityType>> _activities;
-
-        /// <summary>
-        /// Combines all original data, prior to updates, into a single object
-        /// </summary>
-        /// <returns></returns>
-        public object OldData { get; private set; }
-
-        /// <summary>
-        /// Combines all new data changes into a single object
-        /// </summary>
-        /// <returns></returns>
-        public object NewData { get; private set; }
-
-        /// <summary>
-        /// Initialises a new instance    
-        /// </summary>
-        public EntityActivityCollection()
-        {
-            _activities = new List<EntityActivity<TActivityType>>();
-        }
-
-        /// <summary>
-        /// Add new activity type to the in-memory collection
-        /// </summary>
-        /// <param name="activity"></param>
-        public void Add(EntityActivity<TActivityType> activity)
-        {
-            _activities.Add(activity);
-
-            SetOldData();
-            SetNewData();
-        }
-
-        /// <summary>
-        /// Returns true if collection contains items
-        /// </summary>
-        /// <returns></returns>
-        public bool Any()
-        {
-            return _activities.Any();
-        }
-
-        private void SetOldData()
-        {
-            JArray jArray = new JArray();
-
-            // set old data
-            _activities.ForEach(x =>
-            {
-                if (x.OldData != null)
-                {
-                    JObject values = JObject.FromObject(x.OldData);
-                    jArray.Add(values);
-                }
-            });
-
-            OldData = JsonConvert.DeserializeObject(jArray.ToString());
-        }
-
-        private void SetNewData()
-        {
-            JArray jArray = new JArray();
-
-            // set new data
-            _activities.ForEach(x =>
-            {
-                if (x.NewData != null)
-                {
-                    JObject values = JObject.FromObject(x.NewData);
-                    jArray.Add(values);
-                }
-            });
-
-            NewData = JsonConvert.DeserializeObject(jArray.ToString());
-        }
-    }
-
     public class EntityActivity<TActivityType>
         where TActivityType : Enum
     {
+        /// <summary>
+        /// Type of activity being logged
+        /// </summary>
         public TActivityType ActivityType { get; private set; }
 
+        /// <summary>
+        /// Stores the previous state, if needed.
+        /// </summary>
         public object OldData { get; private set; }
 
+        /// <summary>
+        /// Stores the new state
+        /// </summary>
         public object NewData { get; private set; }
+
+        /// <summary>
+        /// Signifies if activity requires to hold state information
+        /// </summary>
+        public bool StoreState { get; private set; }
+
 
         public EntityActivity(TActivityType activityType)
         {
             ActivityType = activityType;
+            StoreState = false;
             SetOldData(null, null);
             SetNewData(null, activityType, null);
         }
@@ -107,8 +40,27 @@ namespace HousingRegisterApi.V1.Infrastructure
             object originalPropertyValue, object newPropertyValue)
         {
             ActivityType = activityType;
+            StoreState = true;
             SetOldData(propertyName, originalPropertyValue);
             SetNewData(propertyName, activityType, newPropertyValue);
+        }
+
+        /// <summary>
+        /// Compares the old and new data for changes
+        /// </summary>
+        /// <returns></returns>
+        public bool HasChanges()
+        {
+            if (StoreState)
+            {
+                JToken obj1 = JObject.FromObject(OldData);
+                JToken obj2 = JObject.FromObject(NewData).SelectToken("payload");
+                return !JToken.DeepEquals(obj1, obj2);
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private void SetOldData(string propertyName, object originalPropertyValue)

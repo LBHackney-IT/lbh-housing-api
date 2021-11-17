@@ -4,7 +4,6 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
-using System;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -34,52 +33,45 @@ namespace HousingRegisterApi.V1.Gateways
         {
             if (activity != null)
             {
-                bool isResidentActivity = activity.ActivityType == ApplicationActivityType.SubmittedByResident;
-                this.LogActivity(application, activity.OldData, activity.NewData, isResidentActivity);
-            }
-        }
-
-        public void LogActivity(Application application, EntityActivityCollection<ApplicationActivityType> activities)
-        {
-            if (activities.Any())
-            {
-                this.LogActivity(application, activities.OldData, activities.NewData);
-            }
-        }
-
-        /// <summary>
-        /// LogActivity
-        /// </summary>
-        /// <param name="application"></param>
-        /// <param name="oldData"></param>
-        /// <param name="newData"></param>
-        /// <param name="isResidentActivity"></param>
-        private void LogActivity(Application application, object oldData, object newData, bool isResidentActivity = false)
-        {
-            // we only want to log activites after an application has been submitted
-            if (application != null &&
-                (application.Status != ApplicationStatus.Verification
-                || application.Status != ApplicationStatus.New))
-            {
-                var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
-
-                // residents will not have an auth token so
-                // generate a simple token to hold some user info
-                if (isResidentActivity == true && token == null)
+                // we only want to log activites after an application has been submitted
+                if (application != null &&
+                    (application.Status != ApplicationStatus.Verification
+                    || application.Status != ApplicationStatus.New))
                 {
-                    token = new Token()
+                    var token = GetToken(application, activity);
+
+                    if (token != null && activity.HasChanges())
                     {
-                        Name = application.MainApplicant.Person.FullName,
-                        Email = application.MainApplicant.ContactInformation.EmailAddress,
-                    };
-                }
+                        var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
+                        _snsGateway.Publish(applicationSnsMessage);
+                    }
 
-                if (token != null)
-                {
-                    var applicationSnsMessage = _snsFactory.Update(application.Id, oldData, newData, token);
-                    _snsGateway.Publish(applicationSnsMessage);
+                    //TODO: not sure if we should be throwing an exception if no token exists
                 }
             }
+        }
+
+        private Token GetToken(Application application, EntityActivity<ApplicationActivityType> activity)
+        {
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+
+            // residents will not have an auth token so
+            // generate a simple token to hold some user info
+            if (ActivityPerformedByResident(activity) == true && token == null)
+            {
+                token = new Token()
+                {
+                    Name = application.MainApplicant.Person.FullName,
+                    Email = application.MainApplicant.ContactInformation.EmailAddress,
+                };
+            }
+
+            return token;
+        }
+
+        private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
+        {
+            return activity.ActivityType == ApplicationActivityType.SubmittedByResident;
         }
     }
 }

@@ -7,6 +7,7 @@ using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -57,7 +58,10 @@ namespace HousingRegisterApi.V1.UseCase
             if (null != application)
             {
                 // audit the update
-                _applicationHistory.LogActivity(application, activities);
+                activities.ForEach(activity =>
+                {
+                    _applicationHistory.LogActivity(application, activity);
+                });
             }
 
             return application.ToResponse();
@@ -69,9 +73,9 @@ namespace HousingRegisterApi.V1.UseCase
         /// <param name="application"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        private static EntityActivityCollection<ApplicationActivityType> GetApplicationActivities(Application application, UpdateApplicationRequest request)
+        private static List<EntityActivity<ApplicationActivityType>> GetApplicationActivities(Application application, UpdateApplicationRequest request)
         {
-            var activities = new EntityActivityCollection<ApplicationActivityType>();
+            var activities = new List<EntityActivity<ApplicationActivityType>>();
 
             if (application != null && request != null)
             {
@@ -96,13 +100,13 @@ namespace HousingRegisterApi.V1.UseCase
                 if (request.Assessment?.BedroomNeed.HasValue == true)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChangedByUser,
-                        "Assessment.BedroomNeed", application.Assessment.BedroomNeed, request.Assessment.BedroomNeed));
+                        "Assessment.BedroomNeed", application.Assessment?.BedroomNeed, request.Assessment.BedroomNeed));
                 }
 
                 if (request.Assessment?.EffectiveDate.HasValue == true)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser,
-                        "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
+                        "Assessment.EffectiveDate", application.Assessment?.EffectiveDate, request.Assessment.EffectiveDate));
                 }
             }
 
