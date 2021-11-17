@@ -104,13 +104,8 @@ namespace HousingRegisterApi.V1.UseCase
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged,
                         "Assessment.EffectiveDate", application.Assessment.EffectiveDate, request.Assessment.EffectiveDate));
                 }
-
-                if (!string.IsNullOrEmpty(request.Assessment?.Band))
-                {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
-                        "Assessment.Band", application.Assessment.Band, request.Assessment.Band));
-                }
             }
+
             return activities;
         }
     }
