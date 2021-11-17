@@ -13,7 +13,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimpleActivityDoesNotSetAnyOldData()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged);
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
             Assert.IsNull(entityActivity.OldData);
@@ -24,17 +24,17 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimpleActivitySetsTheCorrectNewDataPayload()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChanged);
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type' : 8}");
+            AssertData(entityActivity.NewData, "{'type' : 6}");
         }
 
         [Test]
         public void AddingASimplePropertyChangeActivitySetsTheCorrectOldDataValue()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
                 "SimplePropertyType", 5, 10);
 
             // Assert
@@ -45,7 +45,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimplePropertyChangeActivitySetsTheCorrectNewDataValue()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
                 "SimplePropertyType", 5, 10);
 
             // Assert
@@ -68,7 +68,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             };
 
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser,
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
@@ -91,7 +91,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             };
 
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser,
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
@@ -102,7 +102,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimplePropertyChangeActivityWithANullOldDataSetsTheCorrectOldDataValue()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
                 "SimplePropertyType", null, 10);
 
             // Assert
@@ -113,7 +113,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void AddingASimplePropertyChangeActivityWithANullNewDataSetsTheCorrectNewDataValue()
         {
             // Act
-            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated,
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
                 "SimplePropertyType", 5, null);
 
             // Assert
@@ -125,8 +125,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated, "SimplePropertyType", 5, null));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed, "SimplePropertyType2", 25, null));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser, "SimplePropertyType", 5, null));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser, "SimplePropertyType2", 25, null));
 
             // Assert
             AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}, {'SimplePropertyType2' : 25}]");
@@ -137,8 +137,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated, "SimplePropertyType", null, 40));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType2", null, 45));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser, "SimplePropertyType", null, 40));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType2", null, 45));
 
             // Assert
             AssertArrayData(collection.NewData, "[{ 'type' : 4, 'payload' : {'SimplePropertyType' : 40}}, { 'type' : 2, 'payload' : {'SimplePropertyType2' : 45}}]");
@@ -149,8 +149,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType", 5, null));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType", 5, null));
 
             // Assert
             AssertArrayData(collection.OldData, "[{'SimplePropertyType' : 5}]");
@@ -161,8 +161,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         {
             // Act
             var collection = new EntityActivityCollection<ApplicationActivityType>();
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseActivated));
-            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChanged, "SimplePropertyType", null, 45));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser));
+            collection.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser, "SimplePropertyType", null, 45));
 
             // Assert
             AssertArrayData(collection.NewData, "[{ 'type' : 4}, { 'type' : 2, 'payload' : {'SimplePropertyType' : 45}}]");

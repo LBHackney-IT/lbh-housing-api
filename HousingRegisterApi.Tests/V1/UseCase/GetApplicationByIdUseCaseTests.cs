@@ -69,8 +69,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id);
 
             // Assert
-            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Guid>(),
-                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.CaseViewed)));
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
+                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.CaseViewedByUser)));
         }
 
         //TODO: Add extra tests here for extra functionality added to the use case

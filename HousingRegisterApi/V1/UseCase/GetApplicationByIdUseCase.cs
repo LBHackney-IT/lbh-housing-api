@@ -23,11 +23,11 @@ namespace HousingRegisterApi.V1.UseCase
 
         public ApplicationResponse Execute(Guid id)
         {
-            var applicationResponse = _gateway.GetApplicationById(id).ToResponse();
+            var application = _gateway.GetApplicationById(id);
 
-            _applicationHistory.LogActivity(id, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewed));
+            _applicationHistory.LogActivity(application, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser));
 
-            return applicationResponse;
+            return application.ToResponse();
         }
     }
 }

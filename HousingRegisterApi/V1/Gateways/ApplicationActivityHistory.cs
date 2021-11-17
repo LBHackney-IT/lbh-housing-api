@@ -30,28 +30,56 @@ namespace HousingRegisterApi.V1.Gateways
             _snsFactory = snsFactory;
         }
 
-        public void LogActivity(Guid applicationId, EntityActivity<ApplicationActivityType> activity)
+        public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             if (activity != null)
             {
-                this.LogActivity(applicationId, activity.OldData, activity.NewData);
+                bool isResidentActivity = activity.ActivityType == ApplicationActivityType.SubmittedByResident;
+                this.LogActivity(application, activity.OldData, activity.NewData, isResidentActivity);
             }
         }
 
-        public void LogActivity(Guid applicationId, EntityActivityCollection<ApplicationActivityType> activities)
+        public void LogActivity(Application application, EntityActivityCollection<ApplicationActivityType> activities)
         {
             if (activities.Any())
             {
-                this.LogActivity(applicationId, activities.OldData, activities.NewData);
+                this.LogActivity(application, activities.OldData, activities.NewData);
             }
         }
 
-        private void LogActivity(Guid applicationId, object oldData, object newData)
+        /// <summary>
+        /// LogActivity
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="oldData"></param>
+        /// <param name="newData"></param>
+        /// <param name="isResidentActivity"></param>
+        private void LogActivity(Application application, object oldData, object newData, bool isResidentActivity = false)
         {
-            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+            // we only want to log activites after an application has been submitted
+            if (application != null &&
+                (application.Status != ApplicationStatus.Verification
+                || application.Status != ApplicationStatus.New))
+            {
+                var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
 
-            var applicationSnsMessage = _snsFactory.Update(applicationId, oldData, newData, token);
-            _snsGateway.Publish(applicationSnsMessage);
+                // residents will not have an auth token so
+                // generate a simple token to hold some user info
+                if (isResidentActivity == true && token == null)
+                {
+                    token = new Token()
+                    {
+                        Name = application.MainApplicant.Person.FullName,
+                        Email = application.MainApplicant.ContactInformation.EmailAddress,
+                    };
+                }
+
+                if (token != null)
+                {
+                    var applicationSnsMessage = _snsFactory.Update(application.Id, oldData, newData, token);
+                    _snsGateway.Publish(applicationSnsMessage);
+                }
+            }
         }
     }
 }
