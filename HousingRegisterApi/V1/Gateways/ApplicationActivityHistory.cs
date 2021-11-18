@@ -63,7 +63,7 @@ namespace HousingRegisterApi.V1.Gateways
 
             // residents will not have an auth token so
             // generate a simple token to hold some user info
-            if (ActivityPerformedByResident(activity) == true && token == null)
+            if (ActivityPerformedByResident(activity) == true || token == null)
             {
                 token = new Token()
                 {
