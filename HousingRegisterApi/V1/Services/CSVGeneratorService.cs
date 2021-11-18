@@ -88,5 +88,4 @@ namespace HousingRegisterApi.V1.Services
             return values;
         }
     }
-
 }

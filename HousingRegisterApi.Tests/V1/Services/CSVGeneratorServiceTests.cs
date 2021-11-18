@@ -21,7 +21,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
-        public void DoesGenerateApplicationToken()
+        public void GivenAValidEntityTheCsvGeneratorReturnsAValidByteArray()
         {
             // Arrange
             var application = _fixture.Create<Application>();
@@ -37,7 +37,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
-        public void DoesGenerateApplicationTokenList()
+        public void GivenAValidListsOfEntitiesTheCsvGeneratorReturnsAValidByteArray()
         {
             // Arrange
             var applications = _fixture.Create<List<Application>>();
