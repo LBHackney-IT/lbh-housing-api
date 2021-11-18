@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.UseCase
@@ -34,11 +35,13 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public async Task GetNovaletExportForAValidApplicationReturnsAFile()
         {
             // Arrange
-            var application = _fixture.Create<Application>();
-            _mockGateway.Setup(x => x.GetApplicationById(application.Id)).Returns((application));
+            var applications = _fixture.Create<List<Application>>();
+            applications.ForEach(x => x.Status = ApplicationStatus.Active);
+
+            _mockGateway.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string>())).Returns((applications));
 
             // Act
-            var response = await _classUnderTest.Execute(application.Id).ConfigureAwait(false);
+            var response = await _classUnderTest.Execute().ConfigureAwait(false);
 
             // Assert
             DateTime runDate = DateTime.Now;
@@ -52,11 +55,10 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public async Task GetNovaletExportForAValidApplicationReturnsNull()
         {
             // Arrange
-            var id = Guid.NewGuid();
-            _mockGateway.Setup(x => x.GetApplicationById(It.IsAny<Guid>())).Returns<Application>(null);
+            _mockGateway.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string>())).Returns(new List<Application>());
 
             // Act
-            var response = await _classUnderTest.Execute(id).ConfigureAwait(false);
+            var response = await _classUnderTest.Execute().ConfigureAwait(false);
 
             // Assert
             response.Should().BeNull();

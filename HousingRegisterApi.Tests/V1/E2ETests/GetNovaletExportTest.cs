@@ -25,9 +25,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
-        private async Task<HttpResponseMessage> GetTestRequestAsync(Guid id)
+        private async Task<HttpResponseMessage> GetTestRequestAsync()
         {
-            var uri = new Uri($"api/v1/applications/{id}/novaletexport", UriKind.Relative);
+            var uri = new Uri($"api/v1/reporting/novaletexport", UriKind.Relative);
             return await Client.GetAsync(uri).ConfigureAwait(false);
         }
 
@@ -36,23 +36,14 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         {
             // Arrange
             var entity = _applicationFixture.ConstructTestEntity();
+            entity.Status = ApplicationStatus.Active;
             await SetupTestData(entity).ConfigureAwait(false);
 
             // Act            
-            var response = await GetTestRequestAsync(entity.Id).ConfigureAwait(false);
+            var response = await GetTestRequestAsync().ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
-
-        [Test]
-        public async Task GetNovaletExportForInvalidApplicationReturnsNotFound()
-        {
-            var id = Guid.NewGuid();
-            var response = await GetTestRequestAsync(id).ConfigureAwait(false);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
+        }    
     }
 }

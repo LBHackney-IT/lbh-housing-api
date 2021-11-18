@@ -10,56 +10,94 @@ namespace HousingRegisterApi.V1.Services
 {
     public class CSVGeneratorService : ICSVService
     {
-        public async Task<byte[]> Generate<T>(T source, CsvParameters csvParameters)
+        public async Task<byte[]> Generate(Array source, CsvParameters csvParameters)
         {
             var sourceType = source.GetType();
-            var array = new List<T>();
-
-            if (!sourceType.IsArray)
-            {
-                array.Add(source);
-            }
-            else
-            {
-                array = source as List<T>;
-            }
 
             return await Task.Run(() =>
             {
-                return GenerateBytes(array, csvParameters);
+                return GenerateBytes(source, csvParameters);
             }).ConfigureAwait(false);
         }
 
-        private static byte[] GenerateBytes<T>(IList<T> source, CsvParameters csvParameters)
+        private static byte[] GenerateBytes(Array source, CsvParameters csvParameters)
         {
+            var csvData = GetData(source);
+
+            // convert data to bytes
             MemoryStream ms = new MemoryStream();
             using (StreamWriter sw = new StreamWriter(ms))
             {
-                GetData<T>(source, out List<string> headers, out List<List<object>> rowsOfValues);
-
                 if (csvParameters.IncludeHeaders)
                 {
-                    sw.WriteLine(string.Join(",", headers));
+                    sw.WriteLine(string.Join(",", csvData.Headers));
                 }
 
-                foreach (var itemRow in rowsOfValues)
+                foreach (var dataRow in csvData.DataRows)
                 {
-                    sw.WriteLine(string.Join(",", itemRow.Select(x => ConvertToString(x))));
+                    sw.WriteLine(string.Join(",", dataRow));
                 }
             };
 
             return ms.ToArray();
         }
 
-        private static void GetData<T>(IList<T> array, out List<string> headers, out List<List<object>> rowsOfValues)
+        /// <summary>
+        /// Returns the CsvData object
+        /// </summary>
+        /// <param name="array"></param>
+        private static CsvData GetData(Array array)
         {
-            headers = GetHeaders(typeof(T));
-            rowsOfValues = new List<List<object>>();
+            var headers = GetHeaders(array.GetType().GetElementType());
+            var rowsOfValues = new List<List<string>>();
 
             foreach (var entity in array)
             {
                 rowsOfValues.Add(GetValues(entity));
             }
+
+            return new CsvData()
+            {
+                Headers = headers,
+                DataRows = rowsOfValues
+            };
+        }
+
+        /// <summary>
+        /// Returns the headers, based on the property names
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        private static List<string> GetHeaders(Type entityType)
+        {
+            PropertyInfo[] properties = entityType.GetProperties();
+            List<string> headers = new List<string>();
+
+            foreach (var property in properties)
+            {
+                headers.Add(property.Name);
+            }
+
+            return headers;
+        }
+
+        /// <summary>
+        /// Gets a row of values
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private static List<string> GetValues(object source)
+        {
+            Type sourceType = source.GetType();
+            PropertyInfo[] properties = sourceType.GetProperties();
+            List<string> values = new List<string>();
+
+            foreach (var property in properties)
+            {
+                values.Add(ConvertToString(property.GetValue(source)));
+            }
+
+            return values;
         }
 
         private static string ConvertToString(object dataItem)
@@ -82,34 +120,6 @@ namespace HousingRegisterApi.V1.Services
             }
 
             return dataItemString;
-        }
-
-
-        private static List<string> GetHeaders(Type entityType)
-        {
-            PropertyInfo[] properties = entityType.GetProperties();
-            List<string> headers = new List<string>();
-
-            foreach (var property in properties)
-            {
-                headers.Add(property.Name);
-            }
-
-            return headers;
-        }
-
-        private static List<object> GetValues<T>(T source)
-        {
-            Type sourceType = source.GetType();
-            PropertyInfo[] properties = sourceType.GetProperties();
-            List<object> values = new List<object>();
-
-            foreach (var property in properties)
-            {
-                values.Add(property.GetValue(source));
-            }
-
-            return values;
         }
     }
 }

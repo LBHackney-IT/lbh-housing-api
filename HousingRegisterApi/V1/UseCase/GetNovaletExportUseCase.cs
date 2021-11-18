@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.FileExport;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
@@ -5,6 +6,8 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -24,18 +27,18 @@ namespace HousingRegisterApi.V1.UseCase
             _csvService = csvService;
         }
 
-        public async Task<FileExportResult> Execute(Guid id)
+        public async Task<FileExportResult> Execute()
         {
-            var application = _gateway.GetApplicationById(id);
+            var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
             string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow.ToString("ddMMyyyy")}";
 
-            if (application == null)
+            if (!applications.Any())
             {
                 return null;
             }
 
-            var exportDataRow = new NovaletExportDataRow(application);
-            var bytes = await _csvService.Generate(exportDataRow, new CsvParameters()
+            var exportDataSet = applications.Select(x => new NovaletExportDataRow(x)).ToArray();
+            var bytes = await _csvService.Generate(exportDataSet, new CsvParameters
             {
                 IncludeHeaders = true
             }).ConfigureAwait(false);
