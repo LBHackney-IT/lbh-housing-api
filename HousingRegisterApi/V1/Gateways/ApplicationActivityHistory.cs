@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -14,19 +15,22 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly ITokenFactory _tokenFactory;
         private readonly ISnsGateway _snsGateway;
         private readonly ISnsFactory _snsFactory;
+        private readonly ILogger<ApplicationActivityHistory> _logger;
 
         public ApplicationActivityHistory(
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
             ISnsGateway snsGateway,
-            ISnsFactory snsFactory)
+            ISnsFactory snsFactory,
+            ILogger<ApplicationActivityHistory> logger)
         {
             _contextAccessor = contextAccessor;
             _contextWrapper = contextWrapper;
             _tokenFactory = tokenFactory;
             _snsGateway = snsGateway;
             _snsFactory = snsFactory;
+            _logger = logger;
         }
 
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
@@ -45,8 +49,10 @@ namespace HousingRegisterApi.V1.Gateways
                         var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
                         _snsGateway.Publish(applicationSnsMessage);
                     }
-
-                    //TODO: not sure if we should be throwing an exception if no token exists
+                    else if (token == null)
+                    {
+                        _logger.LogWarning("Unable to publish activity. No valid auth token has been found");
+                    }
                 }
             }
         }
