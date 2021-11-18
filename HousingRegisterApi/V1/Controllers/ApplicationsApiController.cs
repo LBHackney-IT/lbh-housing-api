@@ -23,6 +23,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
         private readonly ICreateEvidenceRequestUseCase _createEvidenceRequestUseCase;
         private readonly ICalculateBedroomsUseCase _calculateBedroomsUseCase;
+        private readonly IGetNovaletExportUseCase _getNovaletExportUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -31,7 +32,8 @@ namespace HousingRegisterApi.V1.Controllers
             IUpdateApplicationUseCase updateApplicationUseCase,
             ICompleteApplicationUseCase completeApplicationUseCase,
             ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
-            ICalculateBedroomsUseCase calculateBedroomsUseCase)
+            ICalculateBedroomsUseCase calculateBedroomsUseCase,
+            IGetNovaletExportUseCase getNovaletCsvUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
@@ -40,6 +42,7 @@ namespace HousingRegisterApi.V1.Controllers
             _completeApplicationUseCase = completeApplicationUseCase;
             _createEvidenceRequestUseCase = createEvidenceRequestUseCase;
             _calculateBedroomsUseCase = calculateBedroomsUseCase;
+            _getNovaletExportUseCase = getNovaletCsvUseCase;
         }
 
         /// <summary>
@@ -175,6 +178,25 @@ namespace HousingRegisterApi.V1.Controllers
             if (result == null) return NotFound(id);
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Returns the Novalet export file
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">No record found for the specified ID</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("{id}/novaletexport")]
+        public async Task<IActionResult> DownloadNovaletExport([FromRoute][Required] Guid id)
+        {
+            var result = await _getNovaletExportUseCase.Execute(id).ConfigureAwait(false);
+            if (result == null) return NotFound(id);
+
+            return File(result.Data, result.FileMimeType, result.FileName);
         }
     }
 }

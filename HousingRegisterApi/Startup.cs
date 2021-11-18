@@ -165,6 +165,7 @@ namespace HousingRegisterApi
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
             services.AddScoped<ICalculateBedroomsUseCase, CalculateBedroomsUseCase>();
+            services.AddScoped<IGetNovaletExportUseCase, GetNovaletExportUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
@@ -176,6 +177,7 @@ namespace HousingRegisterApi
         private static void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
+            services.AddScoped<ICSVService, CSVGeneratorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
