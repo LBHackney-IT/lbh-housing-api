@@ -37,6 +37,40 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         }
 
         [Test]
+        public void GivenAValidEntityThatContainsFieldsWithCommasTheCsvGeneratorReturnsAValidByteArray()
+        {
+            // Arrange
+            var application = _fixture.Create<Application>();
+            application.Status = "Some, Werid,, Status";
+
+            // Act
+            var bytes = _classUnderTest.Generate(application, new CsvParameters
+            {
+                IncludeHeaders = true
+            }); ;
+
+            // Assert
+            Assert.IsNotNull(bytes);
+        }
+
+        [Test]
+        public void GivenAValidEntityThatContainsFieldsWithCommasAndQuotesTheCsvGeneratorReturnsAValidByteArray()
+        {
+            // Arrange
+            var application = _fixture.Create<Application>();
+            application.Status = "Some, \"Werid,, \"Status";
+
+            // Act
+            var bytes = _classUnderTest.Generate(application, new CsvParameters
+            {
+                IncludeHeaders = true
+            }); ;
+
+            // Assert
+            Assert.IsNotNull(bytes);
+        }
+
+        [Test]
         public void GivenAValidListsOfEntitiesTheCsvGeneratorReturnsAValidByteArray()
         {
             // Arrange

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace HousingRegisterApi.V1.Services
 {
@@ -43,7 +44,7 @@ namespace HousingRegisterApi.V1.Services
 
                 foreach (var itemRow in rowsOfValues)
                 {
-                    sw.WriteLine(string.Join(",", itemRow));
+                    sw.WriteLine(string.Join(",", itemRow.Select(x => ConvertToString(x))));
                 }
             };
 
@@ -60,6 +61,29 @@ namespace HousingRegisterApi.V1.Services
                 rowsOfValues.Add(GetValues(entity));
             }
         }
+
+        private static string ConvertToString(object dataItem)
+        {
+            if (dataItem == null)
+            {
+                return "";
+            }
+
+            string dataItemString = dataItem.ToString();
+
+            if (dataItemString.Contains(","))
+            {
+                if (dataItemString.Contains("\""))
+                {
+                    dataItemString = dataItemString.Replace("\"", "\"\"");
+                }
+
+                dataItemString = $"\"{dataItemString}\"";
+            }
+
+            return dataItemString;
+        }
+
 
         private static List<string> GetHeaders(Type entityType)
         {
