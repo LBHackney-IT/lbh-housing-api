@@ -177,7 +177,7 @@ namespace HousingRegisterApi
         private static void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
-            services.AddScoped<ICSVService, CSVGeneratorService>();
+            services.AddScoped<ICsvService, CsvGeneratorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

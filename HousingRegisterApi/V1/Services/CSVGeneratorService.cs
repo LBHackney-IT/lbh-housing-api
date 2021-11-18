@@ -4,12 +4,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace HousingRegisterApi.V1.Services
 {
-    public class CSVGeneratorService : ICSVService
+    public class CsvGeneratorService : ICsvService
     {
+        /// <summary>
+        /// Generate CSV using default configuration
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<byte[]> Generate(Array source)
+        {
+            return await Generate(source, new CsvParameters()).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Generate CSV with custom configuration
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="csvParameters"></param>
+        /// <returns></returns>
         public async Task<byte[]> Generate(Array source, CsvParameters csvParameters)
         {
             var sourceType = source.GetType();
@@ -23,23 +38,27 @@ namespace HousingRegisterApi.V1.Services
         private static byte[] GenerateBytes(Array source, CsvParameters csvParameters)
         {
             var csvData = GetData(source);
+            byte[] output = null;
 
             // convert data to bytes
-            MemoryStream ms = new MemoryStream();
-            using (StreamWriter sw = new StreamWriter(ms))
+            using (MemoryStream ms = new MemoryStream())
             {
-                if (csvParameters.IncludeHeaders)
+                using (StreamWriter sw = new StreamWriter(ms))
                 {
-                    sw.WriteLine(string.Join(",", csvData.Headers));
-                }
+                    if (csvParameters.IncludeHeaders)
+                    {
+                        sw.WriteLine(string.Join(",", csvData.Headers));
+                    }
 
-                foreach (var dataRow in csvData.DataRows)
-                {
-                    sw.WriteLine(string.Join(",", dataRow));
-                }
-            };
+                    foreach (var dataRow in csvData.DataRows)
+                    {
+                        sw.WriteLine(string.Join(",", dataRow));
+                    }
+                };
 
-            return ms.ToArray();
+                output = ms.ToArray();
+            }
+            return output;
         }
 
         /// <summary>

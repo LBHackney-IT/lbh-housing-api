@@ -11,13 +11,13 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
     [TestFixture]
     public class CSVGeneratorServiceTests
     {
-        private ICSVService _classUnderTest;
+        private ICsvService _classUnderTest;
         private Fixture _fixture;
 
         [SetUp]
         public void Init()
         {
-            _classUnderTest = new CSVGeneratorService();
+            _classUnderTest = new CsvGeneratorService();
             _fixture = new Fixture();
         }
 
@@ -28,10 +28,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var applications = _fixture.Create<IList<NovaletExportDataRow>>().ToArray();
 
             // Act
-            var bytes = _classUnderTest.Generate(applications, new CsvParameters
-            {
-                IncludeHeaders = true
-            }); ;
+            var bytes = _classUnderTest.Generate(applications);
 
             // Assert
             Assert.IsNotNull(bytes);
@@ -45,10 +42,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             applications.ForEach(x => x.Address2 = "Some, Where, Here");
 
             // Act
-            var bytes = _classUnderTest.Generate(applications.ToArray(), new CsvParameters
-            {
-                IncludeHeaders = true
-            }); ;
+            var bytes = _classUnderTest.Generate(applications.ToArray());
 
             // Assert
             Assert.IsNotNull(bytes);
@@ -62,10 +56,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             applications.ForEach(x => x.Address2 = "Some, \"Werid,, \"Location");
 
             // Act
-            var bytes = _classUnderTest.Generate(applications.ToArray(), new CsvParameters
-            {
-                IncludeHeaders = true
-            }); ;
+            var bytes = _classUnderTest.Generate(applications.ToArray());
 
             // Assert
             Assert.IsNotNull(bytes);
@@ -78,10 +69,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var applications = _fixture.Create<List<NovaletExportDataRow>>();
 
             // Act
-            var bytes = _classUnderTest.Generate(applications.ToArray(), new CsvParameters
-            {
-                IncludeHeaders = true
-            }); ;
+            var bytes = _classUnderTest.Generate(applications.ToArray());
 
             // Assert
             Assert.IsNotNull(bytes);

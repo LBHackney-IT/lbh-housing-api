@@ -17,7 +17,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<ILogger<GetNovaletExportUseCase>> _loggerMock;
         private Mock<IApplicationApiGateway> _mockGateway;
-        private CSVGeneratorService _csvService;
+        private CsvGeneratorService _csvService;
         private GetNovaletExportUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -26,7 +26,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _loggerMock = new Mock<ILogger<GetNovaletExportUseCase>>();
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _csvService = new CSVGeneratorService();
+            _csvService = new CsvGeneratorService();
             _classUnderTest = new GetNovaletExportUseCase(_loggerMock.Object, _mockGateway.Object, _csvService);
             _fixture = new Fixture();
         }

@@ -15,12 +15,12 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly ILogger _logger;
         private readonly IApplicationApiGateway _gateway;
-        private readonly ICSVService _csvService;
+        private readonly ICsvService _csvService;
 
         public GetNovaletExportUseCase(
             ILogger<GetNovaletExportUseCase> logger,
             IApplicationApiGateway gateway,
-            ICSVService csvService)
+            ICsvService csvService)
         {
             _logger = logger;
             _gateway = gateway;
@@ -38,10 +38,7 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             var exportDataSet = applications.Select(x => new NovaletExportDataRow(x)).ToArray();
-            var bytes = await _csvService.Generate(exportDataSet, new CsvParameters
-            {
-                IncludeHeaders = true
-            }).ConfigureAwait(false);
+            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
 
             return new FileExportResult(fileName, "text/csv", bytes); ;
         }
