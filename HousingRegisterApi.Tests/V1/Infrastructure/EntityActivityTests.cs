@@ -142,9 +142,9 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
-        private static void AssertData(object input, string compareTo)
+        private static void AssertData(string input, string compareTo)
         {
-            JObject jInput = JObject.FromObject(input);
+            JObject jInput = JObject.Parse(input);
             JObject jCompare = JObject.Parse(compareTo);
 
             Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
