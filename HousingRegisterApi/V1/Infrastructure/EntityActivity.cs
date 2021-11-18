@@ -15,12 +15,12 @@ namespace HousingRegisterApi.V1.Infrastructure
         /// <summary>
         /// Stores the previous state, if needed.
         /// </summary>
-        public object OldData { get; private set; }
+        public string OldData { get; private set; }
 
         /// <summary>
         /// Stores the new state
         /// </summary>
-        public object NewData { get; private set; }
+        public string NewData { get; private set; }
 
         /// <summary>
         /// Signifies if activity requires to hold state information
@@ -53,8 +53,8 @@ namespace HousingRegisterApi.V1.Infrastructure
         {
             if (StoreState)
             {
-                JToken obj1 = JObject.FromObject(OldData);
-                JToken obj2 = JObject.FromObject(NewData).SelectToken("payload");
+                JToken obj1 = JObject.Parse(OldData);
+                JToken obj2 = JObject.Parse(NewData).SelectToken("payload");
                 return !JToken.DeepEquals(obj1, obj2);
             }
             else
@@ -70,7 +70,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             {
                 JObject jObjOld = new JObject();
                 jObjOld.Add(propertyName, originalPropertyValue == null ? null : JToken.FromObject(originalPropertyValue));
-                OldData = JsonConvert.DeserializeObject(jObjOld.ToString());
+                OldData = jObjOld.ToString(Formatting.None);
             }
             else
             {
@@ -92,7 +92,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                 jObjNew.Add(new JProperty("payload", jObjNewValue));
             }
 
-            NewData = JsonConvert.DeserializeObject(jObjNew.ToString());
+            NewData = jObjNew.ToString(Formatting.None);
         }
     }
 }
