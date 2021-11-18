@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.Domain.FileExport
 {
@@ -58,7 +59,7 @@ namespace HousingRegisterApi.V1.Domain.FileExport
             Sex = application.MainApplicant?.Person?.Gender ?? null;
             RegistrationDate = application.SubmittedAt?.ToString();
             EffectiveDate = application.Assessment?.EffectiveDate.ToString();
-            ApplicantType = null;
+            ApplicantType = GetApplicantType(application);
             MinimumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value - 1).ToString() : null;
             MaximumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value).ToString() : null;
             DateOfBirth = application.MainApplicant?.Person?.DateOfBirth.ToString();
@@ -73,6 +74,17 @@ namespace HousingRegisterApi.V1.Domain.FileExport
             AutoBidPref_MobilityStandard = null;
             AutoBidPref_WheelChairStandard = null;
             AutoBidPref_AdaptedStandard = null;
+        }
+
+        private static string GetApplicantType(Application application)
+        {
+            switch (application.Assessment?.Band)
+            {
+                case AssessmentBand.BandA: return "EMG";
+                case AssessmentBand.BandB: return "SHN";
+                case AssessmentBand.BandC: return "SCH";
+                default: return null;
+            }
         }
     }
 }

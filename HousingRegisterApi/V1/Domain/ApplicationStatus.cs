@@ -2,18 +2,18 @@ namespace HousingRegisterApi.V1.Domain
 {
     public static class ApplicationStatus
     {
-        public static readonly string Verification = "Verification";
-        public static readonly string New = "New";
-        public static readonly string Submitted = "Submitted";
-        public static readonly string Active = "Active";
-        public static readonly string Pending = "Pending";
-        public static readonly string Referred = "Referred";
-        public static readonly string Rejected = "Rejected";
-        public static readonly string Disqualified = "Disqualified";
-        public static readonly string Cancelled = "Cancelled";
-        public static readonly string Suspended = "Suspended";
-        public static readonly string Housed = "Housed";
-        public static readonly string ActiveUnderAppeal = "ActiveUnderAppeal";
-        public static readonly string InactiveUnderAppeal = "InactiveUnderAppeal";
+        public const string Verification = "Verification";
+        public const string New = "New";
+        public const string Submitted = "Submitted";
+        public const string Active = "Active";
+        public const string Pending = "Pending";
+        public const string Referred = "Referred";
+        public const string Rejected = "Rejected";
+        public const string Disqualified = "Disqualified";
+        public const string Cancelled = "Cancelled";
+        public const string Suspended = "Suspended";
+        public const string Housed = "Housed";
+        public const string ActiveUnderAppeal = "ActiveUnderAppeal";
+        public const string InactiveUnderAppeal = "InactiveUnderAppeal";
     }
 }
