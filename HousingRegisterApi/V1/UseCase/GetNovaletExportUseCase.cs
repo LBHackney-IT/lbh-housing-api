@@ -27,7 +27,7 @@ namespace HousingRegisterApi.V1.UseCase
         public async Task<FileExportResult> Execute(Guid id)
         {
             var application = _gateway.GetApplicationById(id);
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow.ToString("yyyyMMdd")}";
+            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow.ToString("ddMMyyyy")}";
 
             if (application == null)
             {
