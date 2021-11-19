@@ -1,8 +1,9 @@
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Infrastructure;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HousingRegisterApi.Tests.V1.Infrastructure
 {
@@ -16,8 +17,9 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            Assert.IsNull(entityActivity.OldData);
-            Assert.IsNotNull(entityActivity.NewData);
+            Assert.IsTrue(entityActivity.OldData.Count == 0);
+            Assert.IsTrue(entityActivity.NewData.Count == 1);
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -27,7 +29,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type' : 6}");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"EffectiveDateChangedByUser\"}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -38,7 +41,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{SimplePropertyType : 5}");
+            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : 5}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -49,7 +53,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type': 4, 'payload' : {'SimplePropertyType' : 10}}");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\": \"SensitivityChangedByUser\", \"SimplePropertyType\" : 10}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -72,7 +77,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{'Assessment.BedroomNeed' : 5 }");
+            AssertIsEqual(entityActivity.OldData, "{\"Assessment.BedroomNeed\" : 5 }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -95,7 +101,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{ 'type' : 1, 'payload' : {'Assessment.BedroomNeed' : 10 }}");
+            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 10 }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -106,7 +113,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", null, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{'SimplePropertyType' : null}");
+            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : null}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -117,7 +125,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, null);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type' : 4, 'payload' : {'SimplePropertyType' : null }}");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"SensitivityChangedByUser\", \"SimplePropertyType\" : null }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -142,12 +151,52 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
-        private static void AssertData(string input, string compareTo)
+        [Test]
+        public void AddingAComplexPropertyWithSameOldAndNewDataHasChanges()
         {
-            JObject jInput = JObject.Parse(input);
-            JObject jCompare = JObject.Parse(compareTo);
+            // Arrange
+            var origApplication = new Application
+            {
+                Reference = "12354",
+                Assessment = new Assessment()
+                {
+                    BedroomNeed = 5,
+                    InformationReceivedDate = DateTime.Now,
+                    GenerateBiddingNumber = true,
+                }
+            };
 
-            Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
+            // Act
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser,
+                "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 5);
+
+            entityActivity.AddChange("Assessment.GenerateBiddingNumber",
+                origApplication.Assessment.GenerateBiddingNumber, true);
+
+            // Assert
+            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 5, \"Assessment.GenerateBiddingNumber\" : true}");
+            Assert.IsFalse(entityActivity.HasChanges());
+        }
+
+        private void AssertIsEqual(object input, string compareTo)
+        {
+            var options = CreateJsonOptions();
+
+            var inputAsString = JsonSerializer.Serialize(input, options);
+            var compareToAsString = JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(compareTo, options), options);
+
+            Assert.IsTrue(inputAsString.Equals(compareToAsString));
+        }
+
+        private static JsonSerializerOptions CreateJsonOptions()
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
         }
     }
 }
