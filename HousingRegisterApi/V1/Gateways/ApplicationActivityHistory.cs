@@ -35,25 +35,25 @@ namespace HousingRegisterApi.V1.Gateways
 
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
-            if (activity != null)
+            // we only want to log activites after an application has been submitted
+            if (activity == null
+                || application == null
+                || application.Status == ApplicationStatus.Verification
+                || application.Status == ApplicationStatus.New)
             {
-                // we only want to log activites after an application has been submitted
-                if (application != null &&
-                    (application.Status != ApplicationStatus.Verification
-                    || application.Status != ApplicationStatus.New))
-                {
-                    var token = GetToken(application, activity);
+                return;
+            }
 
-                    if (token != null && activity.HasChanges())
-                    {
-                        var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
-                        _snsGateway.Publish(applicationSnsMessage);
-                    }
-                    else if (token == null)
-                    {
-                        _logger.LogWarning("Unable to publish activity. No valid auth token has been found");
-                    }
-                }
+            var token = GetToken(application, activity);
+
+            if (token != null && activity.HasChanges())
+            {
+                var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
+                _snsGateway.Publish(applicationSnsMessage);
+            }
+            else if (token == null)
+            {
+                _logger.LogWarning("Unable to publish activity. No valid auth token has been found");
             }
         }
 
