@@ -5,9 +5,8 @@ using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 using System.Linq;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -30,7 +29,7 @@ namespace HousingRegisterApi.V1.UseCase
         public async Task<FileExportResult> Execute()
         {
             var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow.ToString("ddMMyyyy")}";
+            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow.ToString("ddMMyyyy")}.csv";
 
             if (!applications.Any())
             {
