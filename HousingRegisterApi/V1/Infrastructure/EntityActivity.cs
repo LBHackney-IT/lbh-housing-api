@@ -35,8 +35,10 @@ namespace HousingRegisterApi.V1.Infrastructure
             StoreState = false;
             OldData = new Dictionary<string, object>();
             NewData = new Dictionary<string, object>();
-            SetOldData(null, null);
-            SetNewData(null, activityType, null);
+            AddOldState(null, null);
+
+            // always initialise with an activity type
+            AddNewState(null, activityType, null);
         }
 
         public EntityActivity(TActivityType activityType, string propertyName,
@@ -46,8 +48,10 @@ namespace HousingRegisterApi.V1.Infrastructure
             StoreState = true;
             OldData = new Dictionary<string, object>();
             NewData = new Dictionary<string, object>();
-            SetOldData(propertyName, originalPropertyValue);
-            SetNewData(propertyName, activityType, newPropertyValue);
+            AddOldState(propertyName, originalPropertyValue);
+
+            // always initialise with an activity type
+            AddNewState(propertyName, activityType, newPropertyValue);
         }
 
         /// <summary>
@@ -70,8 +74,7 @@ namespace HousingRegisterApi.V1.Infrastructure
 
                 foreach (var oldValue in OldData)
                 {
-                    object newValue;
-                    if (newData.TryGetValue(oldValue.Key, out newValue))
+                    if (newData.TryGetValue(oldValue.Key, out object newValue))
                     {
                         if (newValue?.ToString() != oldValue.Value?.ToString())
                         {
@@ -94,7 +97,19 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
         }
 
-        private void SetOldData(string propertyName, object originalPropertyValue)
+        /// <summary>
+        /// Adds a new state change
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="originalPropertyValue"></param>
+        /// <param name="newPropertyValue"></param>
+        public void AddChange(string propertyName, object originalPropertyValue, object newPropertyValue)
+        {
+            AddOldState(propertyName, originalPropertyValue);
+            AddNewState(propertyName, newPropertyValue);
+        }
+
+        private void AddOldState(string propertyName, object originalPropertyValue)
         {
             // set old data
             if (!string.IsNullOrWhiteSpace(propertyName))
@@ -103,16 +118,22 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
         }
 
-        private void SetNewData(string propertyName, TActivityType activityType, object newPropertyValue)
+        private void AddNewState(string propertyName, object newPropertyValue)
         {
-            // set activity type
-            NewData.Add("_ActivityType", activityType);
-
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
                 // set new state              
                 NewData.Add(propertyName, Clone(newPropertyValue));
             }
+        }
+
+        private void AddNewState(string propertyName, TActivityType activityType, object newPropertyValue)
+        {
+            // set activity type
+            NewData.Add("_ActivityType", activityType);
+
+            // set new state              
+            AddNewState(propertyName, Clone(newPropertyValue));
         }
 
         private static object Clone(object source)

@@ -1,8 +1,9 @@
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Infrastructure;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HousingRegisterApi.Tests.V1.Infrastructure
 {
@@ -28,7 +29,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'_ActivityType' : 6}");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"EffectiveDateChangedByUser\"}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -40,7 +41,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{SimplePropertyType : 5}");
+            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : 5}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -52,7 +53,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'_ActivityType': 4, 'SimplePropertyType' : 10}");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\": \"SensitivityChangedByUser\", \"SimplePropertyType\" : 10}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -76,7 +77,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{'Assessment.BedroomNeed' : 5 }");
+            AssertIsEqual(entityActivity.OldData, "{\"Assessment.BedroomNeed\" : 5 }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -100,7 +101,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{ '_ActivityType' : 1, 'Assessment.BedroomNeed' : 10 }");
+            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 10 }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -112,7 +113,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", null, 10);
 
             // Assert
-            AssertData(entityActivity.OldData, "{'SimplePropertyType' : null}");
+            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : null}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -124,7 +125,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, null);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'_ActivityType' : 4, 'SimplePropertyType' : null }");
+            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"SensitivityChangedByUser\", \"SimplePropertyType\" : null }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -169,17 +170,33 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser,
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 5);
 
+            entityActivity.AddChange("Assessment.GenerateBiddingNumber",
+                origApplication.Assessment.GenerateBiddingNumber, true);
+
             // Assert
-            AssertData(entityActivity.NewData, "{ '_ActivityType' : 1, 'Assessment.BedroomNeed' : 5}");
+            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 5, \"Assessment.GenerateBiddingNumber\" : true}");
             Assert.IsFalse(entityActivity.HasChanges());
         }
 
-        private static void AssertData(object input, string compareTo)
+        private void AssertIsEqual(object input, string compareTo)
         {
-            JObject jInput = JObject.FromObject(input);
-            JObject jCompare = JObject.Parse(compareTo);
+            var options = CreateJsonOptions();
 
-            Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
+            var inputAsString = JsonSerializer.Serialize(input, options);
+            var compareToAsString = JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(compareTo, options), options);
+
+            Assert.IsTrue(inputAsString.Equals(compareToAsString));
+        }
+
+        private static JsonSerializerOptions CreateJsonOptions()
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
         }
     }
 }
