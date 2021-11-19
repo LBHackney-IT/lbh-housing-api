@@ -16,8 +16,9 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            Assert.IsNull(entityActivity.OldData);
-            Assert.IsNotNull(entityActivity.NewData);
+            Assert.IsTrue(entityActivity.OldData.Count == 0);
+            Assert.IsTrue(entityActivity.NewData.Count == 1);
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -27,7 +28,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type' : 6}");
+            AssertData(entityActivity.NewData, "{'_ActivityType' : 6}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -39,6 +41,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
 
             // Assert
             AssertData(entityActivity.OldData, "{SimplePropertyType : 5}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -49,7 +52,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type': 4, 'payload' : {'SimplePropertyType' : 10}}");
+            AssertData(entityActivity.NewData, "{'_ActivityType': 4, 'SimplePropertyType' : 10}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -73,6 +77,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
 
             // Assert
             AssertData(entityActivity.OldData, "{'Assessment.BedroomNeed' : 5 }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -95,7 +100,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertData(entityActivity.NewData, "{ 'type' : 1, 'payload' : {'Assessment.BedroomNeed' : 10 }}");
+            AssertData(entityActivity.NewData, "{ '_ActivityType' : 1, 'Assessment.BedroomNeed' : 10 }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -107,6 +113,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
 
             // Assert
             AssertData(entityActivity.OldData, "{'SimplePropertyType' : null}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -117,7 +124,8 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, null);
 
             // Assert
-            AssertData(entityActivity.NewData, "{'type' : 4, 'payload' : {'SimplePropertyType' : null }}");
+            AssertData(entityActivity.NewData, "{'_ActivityType' : 4, 'SimplePropertyType' : null }");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         [Test]
@@ -142,9 +150,33 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
-        private static void AssertData(string input, string compareTo)
+        [Test]
+        public void AddingAComplexPropertyWithSameOldAndNewDataHasChanges()
         {
-            JObject jInput = JObject.Parse(input);
+            // Arrange
+            var origApplication = new Application
+            {
+                Reference = "12354",
+                Assessment = new Assessment()
+                {
+                    BedroomNeed = 5,
+                    InformationReceivedDate = DateTime.Now,
+                    GenerateBiddingNumber = true,
+                }
+            };
+
+            // Act
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser,
+                "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 5);
+
+            // Assert
+            AssertData(entityActivity.NewData, "{ '_ActivityType' : 1, 'Assessment.BedroomNeed' : 5}");
+            Assert.IsFalse(entityActivity.HasChanges());
+        }
+
+        private static void AssertData(object input, string compareTo)
+        {
+            JObject jInput = JObject.FromObject(input);
             JObject jCompare = JObject.Parse(compareTo);
 
             Assert.IsTrue(JToken.DeepEquals(jInput, jCompare));
