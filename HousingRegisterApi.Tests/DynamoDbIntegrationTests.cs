@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using HousingRegisterApi.V1.Infrastructure;
 
 namespace HousingRegisterApi.Tests
 {
@@ -43,7 +44,7 @@ namespace HousingRegisterApi.Tests
             Client = _factory.CreateClient();
         }
 
-        public async Task CreateTestFile(string fileName, string fileTag = null)
+        public async Task CreateTestFile(string fileName, Dictionary<string, string> metadata = null)
         {
             string bucket = Environment.GetEnvironmentVariable("HOUSINGREGISTER_EXPORT_BUCKET_NAME");
 
@@ -55,12 +56,8 @@ namespace HousingRegisterApi.Tests
                 BucketName = bucket,
                 Key = fileName,
                 InputStream = ms,
+                TagSet = metadata.ToTagList()
             };
-
-            if (fileTag != null)
-            {
-                file.TagSet.Add(new Tag() { Key = "status", Value = fileTag });
-            }
 
             await AmazonStorage.PutObjectAsync(file).ConfigureAwait(false);
         }
