@@ -4,7 +4,6 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -15,7 +14,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 {
     public class GetNovaletExportUseCaseTests
     {
-        private Mock<ILogger<GetNovaletExportUseCase>> _loggerMock;
         private Mock<IApplicationApiGateway> _mockGateway;
         private CsvGeneratorService _csvService;
         private GetNovaletExportUseCase _classUnderTest;
@@ -24,10 +22,9 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILogger<GetNovaletExportUseCase>>();
             _mockGateway = new Mock<IApplicationApiGateway>();
             _csvService = new CsvGeneratorService();
-            _classUnderTest = new GetNovaletExportUseCase(_loggerMock.Object, _mockGateway.Object, _csvService);
+            _classUnderTest = new GetNovaletExportUseCase(_mockGateway.Object, _csvService);
             _fixture = new Fixture();
         }
 
@@ -38,7 +35,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var applications = _fixture.Create<List<Application>>();
             applications.ForEach(x => x.Status = ApplicationStatus.Active);
 
-            _mockGateway.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string>())).Returns((applications));
+            _mockGateway.Setup(x => x.GetApplicationsAtStatus(ApplicationStatus.Active)).Returns((applications));
 
             // Act
             var response = await _classUnderTest.Execute().ConfigureAwait(false);

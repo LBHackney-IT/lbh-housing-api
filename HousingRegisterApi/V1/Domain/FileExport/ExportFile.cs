@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Domain.FileExport
 {
-    public class FileExportResult
+    public class ExportFile
     {
         public string FileName { get; set; }
 
@@ -13,11 +10,14 @@ namespace HousingRegisterApi.V1.Domain.FileExport
 
         public byte[] Data { get; set; }
 
-        public FileExportResult(string fileName, string fileMime, byte[] data)
+        public Dictionary<string, string> Metadata { get; set; }
+
+        public ExportFile(string fileName, string fileMime, byte[] data)
         {
             FileName = fileName;
             FileMimeType = fileMime;
             Data = data;
+            Metadata = new Dictionary<string, string>();
         }
     }
 }

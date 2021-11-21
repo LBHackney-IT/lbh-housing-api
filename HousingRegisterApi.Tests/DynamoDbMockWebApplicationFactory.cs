@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
+using Amazon.S3;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
@@ -27,6 +28,7 @@ namespace HousingRegisterApi.Tests
         public IDynamoDBContext DynamoDbContext { get; private set; }
         public IAmazonSimpleNotificationService SimpleNotificationService { get; private set; }
         public IAmazonSQS AmazonSQS { get; private set; }
+        public IAmazonS3 AmazonS3 { get; private set; }
         public SnsEventVerifier<ApplicationSns> SnsVerifer { get; private set; }
 
         public DynamoDbMockWebApplicationFactory(List<TableDef> tables)
@@ -38,22 +40,25 @@ namespace HousingRegisterApi.Tests
         {
             builder.ConfigureAppConfiguration(b => b.AddEnvironmentVariables())
                 .UseStartup<Startup>();
+
             builder.ConfigureServices(services =>
             {
                 services.ConfigureDynamoDB();
                 services.ConfigureSns();
+                services.ConfigureS3();
 
                 var serviceProvider = services.BuildServiceProvider();
                 DynamoDb = serviceProvider.GetRequiredService<IAmazonDynamoDB>();
                 DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
                 SimpleNotificationService = serviceProvider.GetRequiredService<IAmazonSimpleNotificationService>();
+                AmazonS3 = serviceProvider.GetRequiredService<IAmazonS3>();
 
                 var localstackUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
-                AmazonSQS = new AmazonSQSClient(new AmazonSQSConfig() { ServiceURL = localstackUrl });
+                AmazonSQS = new AmazonSQSClient(new AmazonSQSConfig() { ServiceURL = localstackUrl, AuthenticationRegion = "eu-west-2" });
 
                 CreateSnsTopic();
-
-                EnsureTablesExist(DynamoDb, _tables);
+                CreateS3Bucket();
+                CreateDynamoDbTable();
             });
 
             // lets not send emails, but mock them
@@ -63,9 +68,9 @@ namespace HousingRegisterApi.Tests
             });
         }
 
-        private static void EnsureTablesExist(IAmazonDynamoDB dynamoDb, List<TableDef> tables)
+        private void CreateDynamoDbTable()
         {
-            foreach (var table in tables)
+            foreach (var table in _tables)
             {
                 try
                 {
@@ -73,7 +78,7 @@ namespace HousingRegisterApi.Tests
                         new List<KeySchemaElement> { new KeySchemaElement(table.KeyName, KeyType.HASH) },
                         new List<AttributeDefinition> { new AttributeDefinition(table.KeyName, table.KeyType) },
                         new ProvisionedThroughput(3, 3));
-                    _ = dynamoDb.CreateTableAsync(request).GetAwaiter().GetResult();
+                    _ = DynamoDb.CreateTableAsync(request).GetAwaiter().GetResult();
                 }
                 catch (ResourceInUseException)
                 {
@@ -84,19 +89,29 @@ namespace HousingRegisterApi.Tests
 
         private void CreateSnsTopic()
         {
-            var snsAttrs = new Dictionary<string, string>();
-            snsAttrs.Add("fifo_topic", "true");
-            snsAttrs.Add("content_based_deduplication", "true");
+            var snsAttrs = new Dictionary<string, string>
+            {
+                { "fifo_topic", "true" },
+                { "content_based_deduplication", "true" }
+            };
 
             var response = SimpleNotificationService.CreateTopicAsync(new CreateTopicRequest
             {
-                Name = "equalityInformation",
-                Attributes = snsAttrs
+                Name = "housingRegisterTopic",
+                Attributes = snsAttrs,
             }).Result;
 
             Environment.SetEnvironmentVariable("HOUSINGREGISTER_SNS_ARN", response.TopicArn);
-
             SnsVerifer = new SnsEventVerifier<ApplicationSns>(AmazonSQS, SimpleNotificationService, response.TopicArn);
+        }
+
+        private void CreateS3Bucket()
+        {
+            string bucketName = "housing-export-bucket";
+
+            AmazonS3.EnsureBucketExistsAsync(bucketName).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Environment.SetEnvironmentVariable("HOUSINGREGISTER_EXPORT_BUCKET_NAME", bucketName);
         }
     }
 }

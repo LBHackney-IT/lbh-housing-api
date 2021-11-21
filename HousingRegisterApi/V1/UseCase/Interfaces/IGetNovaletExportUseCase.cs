@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface IGetNovaletExportUseCase
     {
-        Task<FileExportResult> Execute();
+        Task<ExportFile> Execute();
     }
 }
