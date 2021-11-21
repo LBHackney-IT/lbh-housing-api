@@ -1,11 +1,13 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Response.Exceptions;
+using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -18,11 +20,11 @@ namespace HousingRegisterApi.V1.UseCase
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
             IBiddingNumberGenerator biddingNumberGenerator,
-            IActivityHistory applicationAudit)
+            IActivityHistory applicationHistory)
         {
             _gateway = gateway;
             _biddingNumberGenerator = biddingNumberGenerator;
-            _applicationHistory = applicationAudit;
+            _applicationHistory = applicationHistory;
         }
 
         public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
@@ -48,14 +50,67 @@ namespace HousingRegisterApi.V1.UseCase
                 }
             }
 
-            var result = _gateway.UpdateApplication(id, request).ToResponse();
-            if (null != result)
+            // get list of all update activities prior to updating the application
+            var origApplication = _gateway.GetApplicationById(id);
+            var activities = GetApplicationActivities(origApplication, request);
+
+            var application = _gateway.UpdateApplication(id, request);
+            if (null != application)
             {
                 // audit the update
-                _applicationHistory.LogUpdate(id, request);
+                activities.ForEach(activity =>
+                {
+                    _applicationHistory.LogActivity(application, activity);
+                });
             }
 
-            return result;
+            return application.ToResponse();
+        }
+
+        /// <summary>
+        /// Get a collection of all update activites performed on an application
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private static List<EntityActivity<ApplicationActivityType>> GetApplicationActivities(Application application, UpdateApplicationRequest request)
+        {
+            var activities = new List<EntityActivity<ApplicationActivityType>>();
+
+            if (application != null && request != null)
+            {
+                if (request.SensitiveData.HasValue)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.SensitivityChangedByUser,
+                        "SensitiveData", application.SensitiveData, request.SensitiveData));
+                }
+
+                if (!string.IsNullOrEmpty(request.Status))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser,
+                        "Status", application.Status, request.Status));
+                }
+
+                if (!string.IsNullOrEmpty(request.AssignedTo))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.AssignedToChangedByUser,
+                        "AssignedTo", application.AssignedTo, request.AssignedTo));
+                }
+
+                if (request.Assessment?.BedroomNeed.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BedroomNeedChangedByUser,
+                        "Assessment.BedroomNeed", application.Assessment?.BedroomNeed, request.Assessment.BedroomNeed));
+                }
+
+                if (request.Assessment?.EffectiveDate.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser,
+                        "Assessment.EffectiveDate", application.Assessment?.EffectiveDate, request.Assessment.EffectiveDate));
+                }
+            }
+
+            return activities;
         }
     }
 }

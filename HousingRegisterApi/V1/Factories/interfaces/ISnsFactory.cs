@@ -10,6 +10,6 @@ namespace HousingRegisterApi.V1.Factories
     {
         ApplicationSns Create(Application application, Token token);
 
-        ApplicationSns Update(Guid id, UpdateApplicationRequest application, Token token);
+        ApplicationSns Update(Guid id, object oldValue, object newValues, Token token);
     }
 }

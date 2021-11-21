@@ -33,7 +33,7 @@ namespace HousingRegisterApi.V1.Factories
             };
         }
 
-        public ApplicationSns Update(Guid id, UpdateApplicationRequest application, Token token)
+        public ApplicationSns Update(Guid id, object oldData, object newData, Token token)
         {
             return new ApplicationSns
             {
@@ -47,14 +47,13 @@ namespace HousingRegisterApi.V1.Factories
                 SourceSystem = UpdateApplicationConstants.SOURCESYSTEM,
                 User = new UserSns
                 {
-                    Name = token?.Name ?? "",
-                    Email = token?.Email ?? ""
+                    Name = token.Name,
+                    Email = token.Email
                 },
                 EventData = new EventData
                 {
-                    OldData = "",
-                    NewData = application,
-                    //NewData = updateResult.NewValues
+                    OldData = oldData,
+                    NewData = newData,
                 }
             };
         }
