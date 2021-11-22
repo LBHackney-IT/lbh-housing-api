@@ -32,7 +32,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             await _classUnderTest.Execute(fileName).ConfigureAwait(false);
 
-            _fileGatewayMock.Verify(x => x.UpdateMetadata(fileName, expectedMetadata));
+            _fileGatewayMock.Verify(x => x.UpdateAttributes(fileName, expectedMetadata));
         }
     }
 }

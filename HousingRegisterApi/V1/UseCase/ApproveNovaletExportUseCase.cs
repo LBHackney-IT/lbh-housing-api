@@ -21,7 +21,7 @@ namespace HousingRegisterApi.V1.UseCase
                 {"ApprovedForExport", "true"}
             };
 
-            await _fileGateway.UpdateMetadata(fileName, fileMeta).ConfigureAwait(false);
+            await _fileGateway.UpdateAttributes(fileName, fileMeta).ConfigureAwait(false);
         }
     }
 }

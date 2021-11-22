@@ -33,8 +33,10 @@ namespace HousingRegisterApi.V1.Gateways
                 data = ms.ToArray();
             };
 
-            var file = new ExportFile(response.Key, response.ContentRange, data);
-            file.Metadata = tags.Tagging.ToDictionary();
+            var file = new ExportFile(response.Key, response.ContentRange, data)
+            {
+                Attributes = tags.Tagging.ToDictionary()
+            };
 
             return file;
         }
@@ -48,15 +50,15 @@ namespace HousingRegisterApi.V1.Gateways
                 FilePath = "",
                 ContentType = file.FileMimeType,
                 InputStream = new MemoryStream(file.Data),
-                TagSet = file.Metadata.ToTagList()
+                TagSet = file.Attributes.ToTagList()
             };
 
             await _amazonS3.PutObjectAsync(request).ConfigureAwait(false);
         }
 
-        public async Task UpdateMetadata(string fileName, Dictionary<string, string> metadata)
+        public async Task UpdateAttributes(string fileName, Dictionary<string, string> attributes)
         {
-            if (metadata?.Any() == true)
+            if (attributes?.Any() == true)
             {
                 var currentTagsResponse = await GetAwsFileTags(fileName).ConfigureAwait(false);
 
@@ -66,7 +68,7 @@ namespace HousingRegisterApi.V1.Gateways
                     Key = fileName,
                     Tagging = new Tagging()
                     {
-                        TagSet = metadata.AppendTags(currentTagsResponse.Tagging)
+                        TagSet = attributes.AppendTags(currentTagsResponse.Tagging)
                     }
                 };
 

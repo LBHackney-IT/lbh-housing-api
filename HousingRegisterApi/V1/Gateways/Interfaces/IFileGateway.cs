@@ -24,8 +24,8 @@ namespace HousingRegisterApi.V1.Gateways
         /// Appends or updates a file's metadata
         /// </summary>
         /// <param name="fileName"></param>
-        /// <param name="metadata"></param>
+        /// <param name="attributes"></param>
         /// <returns></returns>
-        Task UpdateMetadata(string fileName, Dictionary<string, string> metadata);
+        Task UpdateAttributes(string fileName, Dictionary<string, string> attributes);
     }
 }
