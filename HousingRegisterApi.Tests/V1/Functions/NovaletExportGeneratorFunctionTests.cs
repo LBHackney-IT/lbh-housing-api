@@ -7,16 +7,16 @@ using System;
 
 namespace HousingRegisterApi.Tests
 {
-    public class NovaletApprovalFunctionTests : DynamoDbIntegrationTests<Startup>
+    public class NovaletExportGeneratorFunctionTests : DynamoDbIntegrationTests<Startup>
     {
         [Test]
-        public void NovaletApprovalFunction()
+        public void NovaletExportGeneratorFunctionShouldNotThrowAnException()
         {
             // Arrange
             var lamdaContextMock = new Mock<ILambdaContext>();
             lamdaContextMock.Setup(x => x.Logger.Log(It.IsAny<string>()));
 
-            var lamdaFunction = new NovaletApprovalFunction();
+            var lamdaFunction = new NovaletExportGeneratorFunction();
 
             Action function = () => lamdaFunction.Handle(lamdaContextMock.Object);
 
