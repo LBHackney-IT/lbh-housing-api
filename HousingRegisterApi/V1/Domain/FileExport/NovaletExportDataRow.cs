@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace HousingRegisterApi.V1.Domain.FileExport
 {
@@ -57,18 +56,18 @@ namespace HousingRegisterApi.V1.Domain.FileExport
             Email = application.MainApplicant?.ContactInformation?.EmailAddress ?? null;
             NINumber = application.MainApplicant?.Person?.NationalInsuranceNumber ?? null;
             Sex = application.MainApplicant?.Person?.Gender ?? null;
-            RegistrationDate = application.SubmittedAt?.ToString();
-            EffectiveDate = application.Assessment?.EffectiveDate.ToString();
-            ApplicantType = GetApplicantType(application);
+            RegistrationDate = FormatDate(application.SubmittedAt);
+            EffectiveDate = FormatDate(application.Assessment?.EffectiveDate);
+            ApplicantType = application.Assessment?.Band;
             MinimumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value - 1).ToString() : null;
             MaximumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value).ToString() : null;
-            DateOfBirth = application.MainApplicant?.Person?.DateOfBirth.ToString();
+            DateOfBirth = FormatDate(application.MainApplicant?.Person?.DateOfBirth);
             OlderPersonsAssessement = null;
             MobilityAssessment = null;
             AdditionalBandingInfo = null;
             MedicalRequirements = null;
             Offered = null;
-            EthnicOrigin = null;
+            EthnicOrigin = GetEthnicity(application);
             Decant = null;
             AHRCode = null;
             AutoBidPref_MobilityStandard = null;
@@ -76,15 +75,107 @@ namespace HousingRegisterApi.V1.Domain.FileExport
             AutoBidPref_AdaptedStandard = null;
         }
 
-        private static string GetApplicantType(Application application)
+        private static string FormatDate(DateTime? dateTime)
         {
-            switch (application.Assessment?.Band)
+            if (dateTime.HasValue)
             {
-                case AssessmentBand.BandA: return "EMG";
-                case AssessmentBand.BandB: return "SHN";
-                case AssessmentBand.BandC: return "SCH";
-                default: return null;
+                return dateTime.Value.ToString("ddMMyyyy");
             }
+
+            return null;
+        }
+
+        private static string GetEthnicity(Application application)
+        {
+            var ethnicityCategoryKey = "ethnicity-questions/ethnicity-main-category";
+            var extended = "ethnicity-extended-category";
+
+            var ethnicityKey = (application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey)) switch
+            {
+                PersonEthnicityCategory.AsianOrAsianBritish => $"ethnicity-extended-category-asian-asian-british/{extended}",
+                PersonEthnicityCategory.BlackOrBlackBritish => $"ethnicity-extended-category-black-black-british/{extended}",
+                PersonEthnicityCategory.MixedOrMultipleBackground => $"ethnicity-extended-category-mixed-multiple-background/{extended}",
+                PersonEthnicityCategory.OtherEthnicGroup => $"ethnicity-extended-category-white/{extended}",
+                PersonEthnicityCategory.White => $"ethnicity-extended-category-other-ethnic-group/{extended}",
+                PersonEthnicityCategory.PreferNotToSay => null,
+                _ => null,
+            };
+
+            if (ethnicityKey == null)
+            {
+                return "PRE";
+            }
+
+            var ethnicity = application.MainApplicant.Questions.GetAnswer(ethnicityKey);
+
+            return ethnicity switch
+            {
+                PersonEthnicity.AsianIndian => "IND",
+                PersonEthnicity.AsianPakistani => "PAK",
+                PersonEthnicity.AsianBangladeshi => "BAN",
+                PersonEthnicity.AsianChinese => "CHI",
+                PersonEthnicity.AsianVietnamese => "VIE",
+                PersonEthnicity.AsianOther => "AOA",
+                PersonEthnicity.AsianNepali => "AOA",
+                PersonEthnicity.AsianSriLankanOther => "AOA",
+                PersonEthnicity.AsianSriLankanTamil => "AOA",
+                PersonEthnicity.AsianSriLankanSinhalese => "AOA",
+
+                PersonEthnicity.BlackCaribbean => "CAR",
+                PersonEthnicity.BlackBritish => "EWS",
+                PersonEthnicity.BlackCongolese => "CON",
+                PersonEthnicity.BlackGhanaian => "GHA",
+                PersonEthnicity.BlackNigerian => "KUR",
+                PersonEthnicity.BlackSomali => "SOM",
+                PersonEthnicity.BlackAngolan => "AOB",
+                PersonEthnicity.BlackSudanese => "AOB",
+                PersonEthnicity.BlackAfricanOther => "AOB",
+                PersonEthnicity.BlackSierraLeonean => "AOB",
+
+                PersonEthnicity.WhiteAndBlackCaribbean => "WBC",
+                PersonEthnicity.WhiteAndBlackAfrican => "WBA",
+                PersonEthnicity.WhiteAndAsian => "WAS",
+                PersonEthnicity.OtherMixedBackground => "AOM",
+
+                PersonEthnicity.WhiteBritish => "EWS",
+                PersonEthnicity.WhiteCharediJew => "JEW",
+                PersonEthnicity.WhiteOrthodoxJew => "OJE",
+                PersonEthnicity.WhiteGreekCypriot => "GCY",
+                PersonEthnicity.WhiteIrish => "IRI",
+                PersonEthnicity.WhiteTurkishCypriot => "TCY",
+                PersonEthnicity.WhiteOtherEasternEuropean => "EEU",
+                PersonEthnicity.WhiteOtherWesternEuropean => "OEU",
+                PersonEthnicity.WhiteGypsyOrIrishTraveller => "IRT",
+                PersonEthnicity.WhiteOther => "AOW",
+                PersonEthnicity.WhitePolish => "AOW",
+                PersonEthnicity.WhiteTurkish => "AOW",
+                PersonEthnicity.WhiteItalian => "AOW",
+                PersonEthnicity.WhiteNorthAmerican => "AOW",
+                PersonEthnicity.WhiteAustralianNewZealander => "AOW",
+
+                PersonEthnicity.OtherKurdish => "KUR",
+                PersonEthnicity.OtherEuropean => "OEU",
+                PersonEthnicity.OtherGypsyRoma => "GRO",
+                PersonEthnicity.OtherVietnamese => "VIE",
+                PersonEthnicity.OtherThai => "ARA",
+                PersonEthnicity.OtherArab => "ARA",
+                PersonEthnicity.OtherMalay => "ARA",
+                PersonEthnicity.OtherIraqi => "ARA",
+                PersonEthnicity.OtherKorean => "ARA",
+                PersonEthnicity.OtherAfghan => "ARA",
+                PersonEthnicity.OtherLibyan => "ARA",
+                PersonEthnicity.OtherYemeni => "ARA",
+                PersonEthnicity.OtherIranian => "ARA",
+                PersonEthnicity.OtherTurkish => "ARA",
+                PersonEthnicity.OtherEgyptian => "ARA",
+                PersonEthnicity.OtherFilipino => "ARA",
+                PersonEthnicity.OtherJapanese => "ARA",
+                PersonEthnicity.OtherLebanese => "ARA",
+                PersonEthnicity.OtherMoroccan => "ARA",
+                PersonEthnicity.OtherPolynesian => "ARA",
+                PersonEthnicity.OtherLatinSouthCentralAmerican => "ARA",
+                _ => "AOO",
+            };
         }
     }
 }
