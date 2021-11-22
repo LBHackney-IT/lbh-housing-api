@@ -95,5 +95,5 @@ namespace HousingRegisterApi.V1.Gateways
 
             return await _amazonS3.GetObjectTaggingAsync(request).ConfigureAwait(false);
         }
-    }   
+    }
 }

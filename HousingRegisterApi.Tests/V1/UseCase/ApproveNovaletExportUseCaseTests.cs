@@ -17,7 +17,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _fileGatewayMock = new Mock<IFileGateway>();
-            _classUnderTest = new ApproveNovaletExportUseCase(_fileGatewayMock.Object);        }
+            _classUnderTest = new ApproveNovaletExportUseCase(_fileGatewayMock.Object);
+        }
 
         [Test]
         public async Task AppovingANovaletExportSetsTheFileStateAsApproved()
