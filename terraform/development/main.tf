@@ -60,7 +60,6 @@ module "housingregister_api_cloudwatch_dashboard" {
 
 resource "aws_s3_bucket" "b" {
   bucket = "housingregister-exports"
-  region  = "eu-west-2"
   acl    = "private"
 
   tags = {
