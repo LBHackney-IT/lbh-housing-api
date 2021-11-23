@@ -59,11 +59,11 @@ module "housingregister_api_cloudwatch_dashboard" {
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "housingregister-exports"
+  bucket = "housingregister-exports-${var.environment_name}-bucket"
   acl    = "private"
 
   tags = {
-    Name = "housingregister-exports-${var.environment_name}"
+    Name = "housingregister-exports-${var.environment_name}-bucket"
     Environment = var.environment_name
   }
 }
