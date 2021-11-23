@@ -31,7 +31,7 @@ functions:
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
       NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register/${self:provider.stage}/notify-template-verify-code}
       HOUSINGREGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
-      HOUSINGREGISTER_EXPORT_BUCKET_NAME: ${housing-export-bucket-${self:provider.stage}}
+      HOUSINGREGISTER_EXPORT_BUCKET_NAME: ${housingregister-exports-${self:provider.stage}-bucket}
       EVIDENCE_API_URL: ${ssm:/housing-register/${self:provider.stage}/evidence-api/base-url}
       EVIDENCE_API_REQUESTED_BY: ${ssm:/housing-register/${self:provider.stage}/evidence-api/requested-by}
       EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/get/evidence-requests/token}
