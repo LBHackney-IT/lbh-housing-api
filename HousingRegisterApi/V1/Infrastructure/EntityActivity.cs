@@ -35,10 +35,9 @@ namespace HousingRegisterApi.V1.Infrastructure
             StoreState = false;
             OldData = new Dictionary<string, object>();
             NewData = new Dictionary<string, object>();
-            AddOldState(null, null);
 
-            // always initialise with an activity type
-            AddNewState(null, activityType, null);
+            // set activity type
+            NewData.Add("_activityType", activityType);
         }
 
         public EntityActivity(TActivityType activityType, string propertyName,
@@ -50,8 +49,10 @@ namespace HousingRegisterApi.V1.Infrastructure
             NewData = new Dictionary<string, object>();
             AddOldState(propertyName, originalPropertyValue);
 
-            // always initialise with an activity type
-            AddNewState(propertyName, activityType, newPropertyValue);
+            // set activity type
+            NewData.Add("_activityType", activityType);
+
+            AddNewState(propertyName, newPropertyValue);
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         {
             if (StoreState)
             {
-                var newData = new Dictionary<string, object>(NewData.Where(x => x.Key != "_ActivityType"));
+                var newData = new Dictionary<string, object>(NewData.Where(x => x.Key != "_activityType"));
 
                 // compare the old and new values
                 if (OldData.Count != newData.Count)
@@ -114,7 +115,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             // set old data
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
-                OldData.Add(propertyName, Clone(originalPropertyValue));
+                OldData.Add(CamelCase(propertyName), Clone(originalPropertyValue));
             }
         }
 
@@ -123,22 +124,26 @@ namespace HousingRegisterApi.V1.Infrastructure
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
                 // set new state              
-                NewData.Add(propertyName, Clone(newPropertyValue));
+                NewData.Add(CamelCase(propertyName), Clone(newPropertyValue));
             }
-        }
-
-        private void AddNewState(string propertyName, TActivityType activityType, object newPropertyValue)
-        {
-            // set activity type
-            NewData.Add("_ActivityType", activityType);
-
-            // set new state              
-            AddNewState(propertyName, Clone(newPropertyValue));
         }
 
         private static object Clone(object source)
         {
             return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(source));
+        }
+
+        private static string CamelCase(string propertyName)
+        {
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                List<string> propertyNames = propertyName.Split(".")
+                    .Select(x => char.ToLowerInvariant(x[0]) + x.Substring(1))
+                    .ToList();
+
+                return string.Join(".", propertyNames);
+            }
+            return propertyName;
         }
     }
 }
