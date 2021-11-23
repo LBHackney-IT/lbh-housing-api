@@ -464,6 +464,27 @@ namespace HousingRegisterApi.Tests.V1.Services
             // assert
             AssertBedrooms(3, application);
         }
+
+        [Test(Description = "Single parent with 3 boys under 21 and 3 girls under 21 and 1 Girl at 21yrs returns 5 bedrooms")]
+        public void SingleParentWith3BoysUnder21And3GirlsUnder21And1GirlAt21yrsReturns5Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+              new Tuple<int, string, string>(50, Female, MainApplicant),
+              new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(10, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(21, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent),
+              new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent),
+            });
+
+            // assert
+            AssertBedrooms(5, application);
+        }
+
         private static void AssertBedrooms(int expected, Application application)
         {
             // act
