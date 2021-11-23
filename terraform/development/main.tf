@@ -57,3 +57,14 @@ module "housingregister_api_cloudwatch_dashboard" {
   sns_topic_name      = aws_sns_topic.housingregister_topic.name
   dynamodb_table_name = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
 }
+
+resource "aws_s3_bucket" "b" {
+  bucket = "housing-export-bucket"
+  region  = "eu-west-2"
+  acl    = "private"
+
+  tags = {
+    Name = "housing-export-bucket-${var.environment_name}"
+    Environment = var.environment_name
+  }
+}
