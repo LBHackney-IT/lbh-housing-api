@@ -29,7 +29,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"EffectiveDateChangedByUser\"}");
+            AssertIsEqual(entityActivity.NewData, "{\"_activityType\" : \"EffectiveDateChangedByUser\"}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -41,7 +41,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : 5}");
+            AssertIsEqual(entityActivity.OldData, "{\"simplePropertyType\" : 5}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -53,7 +53,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, 10);
 
             // Assert
-            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\": \"SensitivityChangedByUser\", \"SimplePropertyType\" : 10}");
+            AssertIsEqual(entityActivity.NewData, "{\"_activityType\": \"SensitivityChangedByUser\", \"simplePropertyType\" : 10}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -77,7 +77,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertIsEqual(entityActivity.OldData, "{\"Assessment.BedroomNeed\" : 5 }");
+            AssertIsEqual(entityActivity.OldData, "{\"assessment.bedroomNeed\" : 5 }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -101,7 +101,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "Assessment.BedroomNeed", origApplication.Assessment.BedroomNeed, 10);
 
             // Assert
-            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 10 }");
+            AssertIsEqual(entityActivity.NewData, "{ \"_activityType\" : \"CaseViewedByUser\", \"assessment.bedroomNeed\" : 10 }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -113,7 +113,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", null, 10);
 
             // Assert
-            AssertIsEqual(entityActivity.OldData, "{\"SimplePropertyType\" : null}");
+            AssertIsEqual(entityActivity.OldData, "{\"simplePropertyType\" : null}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -125,7 +125,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 "SimplePropertyType", 5, null);
 
             // Assert
-            AssertIsEqual(entityActivity.NewData, "{\"_ActivityType\" : \"SensitivityChangedByUser\", \"SimplePropertyType\" : null }");
+            AssertIsEqual(entityActivity.NewData, "{\"_activityType\" : \"SensitivityChangedByUser\", \"simplePropertyType\" : null }");
             Assert.IsTrue(entityActivity.HasChanges());
         }
 
@@ -174,7 +174,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
                 origApplication.Assessment.GenerateBiddingNumber, true);
 
             // Assert
-            AssertIsEqual(entityActivity.NewData, "{ \"_ActivityType\" : \"CaseViewedByUser\", \"Assessment.BedroomNeed\" : 5, \"Assessment.GenerateBiddingNumber\" : true}");
+            AssertIsEqual(entityActivity.NewData, "{ \"_activityType\" : \"CaseViewedByUser\", \"assessment.bedroomNeed\" : 5, \"assessment.generateBiddingNumber\" : true}");
             Assert.IsFalse(entityActivity.HasChanges());
         }
 
