@@ -1,4 +1,4 @@
-using Amazon.SimpleNotificationService;
+using Amazon.S3;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
@@ -6,10 +6,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace HousingRegisterApi.V1.Infrastructure
 {
+    /// <summary>
+    /// Initialise the Simple Storage Service 
+    /// </summary>
     [ExcludeFromCodeCoverage]
-    public static class SnsInitilisationExtensions
+    public static class S3InitilisationExtensions
     {
-        public static void ConfigureSns(this IServiceCollection services)
+        public static void ConfigureS3(this IServiceCollection services)
         {
             _ = bool.TryParse(Environment.GetEnvironmentVariable("DynamoDb_LocalMode"), out var localMode);
 
@@ -17,20 +20,22 @@ namespace HousingRegisterApi.V1.Infrastructure
             {
                 var snsUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
 
-                services.TryAddSingleton<IAmazonSimpleNotificationService>(sp =>
+                services.TryAddSingleton<IAmazonS3>(sp =>
                 {
-                    var clientConfig = new AmazonSimpleNotificationServiceConfig
+                    var clientConfig = new AmazonS3Config
                     {
                         ServiceURL = snsUrl,
-                        AuthenticationRegion = "eu-west-2"
+                        AuthenticationRegion = "eu-west-2",
+                        UseHttp = true,
+                        ForcePathStyle = true,
                     };
 
-                    return new AmazonSimpleNotificationServiceClient(clientConfig);
+                    return new AmazonS3Client(clientConfig);
                 });
             }
             else
             {
-                services.TryAddScoped<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();
+                services.TryAddScoped<IAmazonS3, AmazonS3Client>();
             }
         }
     }

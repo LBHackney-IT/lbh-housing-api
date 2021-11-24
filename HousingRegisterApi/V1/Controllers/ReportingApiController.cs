@@ -14,8 +14,7 @@ namespace HousingRegisterApi.V1.Controllers
     {
         private readonly IGetNovaletExportUseCase _getNovaletExportUseCase;
 
-        public ReportingApiController(
-            IGetNovaletExportUseCase getNovaletCsvUseCase)
+        public ReportingApiController(IGetNovaletExportUseCase getNovaletCsvUseCase)
         {
             _getNovaletExportUseCase = getNovaletCsvUseCase;
         }

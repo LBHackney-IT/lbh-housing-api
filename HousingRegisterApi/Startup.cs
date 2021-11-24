@@ -102,7 +102,7 @@ namespace HousingRegisterApi
                 //Get every ApiVersion attribute specified and create swagger docs for them
                 foreach (var apiVersion in _apiVersions)
                 {
-                    var version = $"v{apiVersion.ApiVersion.ToString()}";
+                    var version = $"v{apiVersion.ApiVersion}";
                     c.SwaggerDoc(version, new OpenApiInfo
                     {
                         Title = $"{ApiName}-api {version}",
@@ -133,6 +133,7 @@ namespace HousingRegisterApi
 
             services.ConfigureDynamoDB();
             services.ConfigureSns();
+            services.ConfigureS3();
             services.AddTokenFactory();
             services.AddHttpContextWrapper();
             services.AddHttpContextAccessor();
@@ -149,6 +150,8 @@ namespace HousingRegisterApi
             services.AddScoped<IActivityHistory, ApplicationActivityHistory>();
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
+            services.AddScoped<IFileGateway, FileExportGateway>();
+
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
         }
