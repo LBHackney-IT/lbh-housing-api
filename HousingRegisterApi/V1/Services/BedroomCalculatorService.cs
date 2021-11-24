@@ -114,12 +114,13 @@ namespace HousingRegisterApi.V1.Services
 
             foreach (var under21ByGenderGroup in under21ByGender)
             {
-                var peopleInGroup = under21ByGenderGroup.ToList();
+                // sort by age first
+                var peopleInGroup = under21ByGenderGroup.OrderBy(x => x.Age).ToList();
 
                 // loop though while only pairs exist
                 while (CanPair(peopleInGroup))
                 {
-                    // take top 2
+                    // take top 2 eldest
                     var occupant1 = peopleInGroup.Last();
                     peopleInGroup.RemoveAt(peopleInGroup.Count - 1);
                     unoccupants.RemoveAll(x => x.Id == occupant1.Id);
