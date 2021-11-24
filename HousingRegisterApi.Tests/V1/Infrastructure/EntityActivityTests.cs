@@ -29,7 +29,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
-            Assert.IsNull(entityActivity.OldData);
+            Assert.IsTrue(entityActivity.OldData.Count == 0);
             AssertIsEqual(entityActivity.NewData, "{\"_activityType\" : \"EffectiveDateChangedByUser\"}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
