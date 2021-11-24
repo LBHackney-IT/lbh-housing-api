@@ -10,7 +10,7 @@ namespace HousingRegisterApi.V1.Infrastructure
     /// Initialise the Simple Storage Service 
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public static class SssInitilisationExtensions
+    public static class S3InitilisationExtensions
     {
         public static void ConfigureS3(this IServiceCollection services)
         {
