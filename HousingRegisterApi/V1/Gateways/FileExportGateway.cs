@@ -33,12 +33,24 @@ namespace HousingRegisterApi.V1.Gateways
                 data = ms.ToArray();
             };
 
-            var file = new ExportFile(response.Key, response.ContentRange, data)
+            var file = new ExportFile(response.Key, response.Headers.ContentType, data)
             {
                 Attributes = tags.Tagging.ToDictionary()
             };
 
             return file;
+        }
+
+        public async Task<List<string>> ListFiles()
+        {
+            ListObjectsRequest request = new ListObjectsRequest
+            {
+                BucketName = _bucketName
+            };
+
+            var response = await _amazonS3.ListObjectsAsync(request).ConfigureAwait(false);
+
+            return response.S3Objects.Select(x => x.Key).ToList();
         }
 
         public async Task SaveFile(ExportFile file)

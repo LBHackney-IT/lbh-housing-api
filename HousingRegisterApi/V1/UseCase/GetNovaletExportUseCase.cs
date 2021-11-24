@@ -11,32 +11,17 @@ namespace HousingRegisterApi.V1.UseCase
 {
     public class GetNovaletExportUseCase : IGetNovaletExportUseCase
     {
-        private readonly IApplicationApiGateway _gateway;
-        private readonly ICsvService _csvService;
+        private readonly IFileGateway _fileGateway;
 
-        public GetNovaletExportUseCase(
-            IApplicationApiGateway gateway,
-            ICsvService csvService)
+        public GetNovaletExportUseCase(IFileGateway fileGateway)
         {
-            _gateway = gateway;
-            _csvService = csvService;
+            _fileGateway = fileGateway;
         }
 
-        public async Task<ExportFile> Execute()
+        public async Task<ExportFile> Execute(string fileName)
         {
-            var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
-
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:ddMMyyyy}.csv";
-
-            if (!applications.Any())
-            {
-                return null;
-            }
-
-            var exportDataSet = applications.Select(x => new NovaletExportDataRow(x)).ToArray();
-            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
-
-            return new ExportFile(fileName, "text/csv", bytes); ;
+            var file = await _fileGateway.GetFile(fileName).ConfigureAwait(false);
+            return file;
         }
     }
 }

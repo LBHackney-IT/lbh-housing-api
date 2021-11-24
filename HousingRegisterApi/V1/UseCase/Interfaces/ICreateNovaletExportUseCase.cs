@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
-    public interface IGetNovaletExportUseCase
+    public interface ICreateNovaletExportUseCase
     {
-        Task<ExportFile> Execute(string fileName);
+        Task<ExportFile> Execute();
     }
 }

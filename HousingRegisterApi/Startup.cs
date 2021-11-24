@@ -168,7 +168,9 @@ namespace HousingRegisterApi
             services.AddScoped<ICreateAuthUseCase, CreateAuthUseCase>();
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
             services.AddScoped<ICalculateBedroomsUseCase, CalculateBedroomsUseCase>();
+            services.AddScoped<ICreateNovaletExportUseCase, CreateNovaletExportUseCase>();
             services.AddScoped<IGetNovaletExportUseCase, GetNovaletExportUseCase>();
+            services.AddScoped<IListNovaletExportFilesUseCase, ListNovaletExportFilesUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();

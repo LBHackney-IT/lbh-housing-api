@@ -23,22 +23,18 @@ namespace HousingRegisterApi.V1.Functions
         public void Handle(ILambdaContext context)
         {
             context.Logger.LogLine("Generating Novalet export for approval");
-            var getExportFileUseCase = ServiceProvider.GetService<IGetNovaletExportUseCase>();
-            var fileGateway = ServiceProvider.GetService<IFileGateway>();
+            var createExportFileUseCase = ServiceProvider.GetService<ICreateNovaletExportUseCase>();
 
-            var file = getExportFileUseCase.Execute().ConfigureAwait(false).GetAwaiter().GetResult();
+            var file = createExportFileUseCase.Execute().ConfigureAwait(false).GetAwaiter().GetResult();
 
             if (file != null)
             {
-                fileGateway.SaveFile(file).ConfigureAwait(false).GetAwaiter().GetResult();
-                context.Logger.LogLine($"File {file.FileName} was succesfully generated");
+                context.Logger.LogLine($"Success");
             }
             else
             {
-                context.Logger.LogLine($"No export file was generated this time");
+                context.Logger.LogLine($"File was not generated");
             }
-
-            context.Logger.LogLine($"Complete");
         }
 
         protected override void ConfigureServices(IServiceCollection services)
@@ -54,7 +50,7 @@ namespace HousingRegisterApi.V1.Functions
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
             services.AddScoped<ICsvService, CsvGeneratorService>();
             services.AddScoped<IFileGateway, FileExportGateway>();
-            services.AddScoped<IGetNovaletExportUseCase, GetNovaletExportUseCase>();
+            services.AddScoped<ICreateNovaletExportUseCase, CreateNovaletExportUseCase>();
 
             base.ConfigureServices(services);
         }

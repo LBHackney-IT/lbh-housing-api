@@ -21,6 +21,12 @@ namespace HousingRegisterApi.V1.Gateways
         Task<ExportFile> GetFile(string fileName);
 
         /// <summary>
+        /// Returns a list of files that have been generated
+        /// </summary>
+        /// <returns></returns>
+        Task<List<string>> ListFiles();
+
+        /// <summary>
         /// Appends or updates a file's metadata
         /// </summary>
         /// <param name="fileName"></param>
