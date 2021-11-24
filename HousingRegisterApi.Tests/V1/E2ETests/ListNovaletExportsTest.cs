@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
-    public class GetNovaletExportTest : DynamoDbIntegrationTests<Startup>
+    public class ListNovaletExportsTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
 
-        public GetNovaletExportTest()
+        public ListNovaletExportsTest()
         {
             _applicationFixture = new ApplicationFixture();
         }
@@ -25,20 +25,20 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
-        private async Task<HttpResponseMessage> GetTestRequestAsync(string fileName)
+        private async Task<HttpResponseMessage> GetTestRequestAsync()
         {
-            var uri = new Uri($"api/v1/reporting/novaletexport/" + fileName, UriKind.Relative);
+            var uri = new Uri($"api/v1/reporting/listnovaletfiles", UriKind.Relative);
             return await Client.GetAsync(uri).ConfigureAwait(false);
         }
 
         [Test]
-        public async Task GetNovaletExportForApplicationReturnsResponse()
+        public async Task ListNovaletExportsReturnsResponse()
         {
             // Arrange
             await CreateTestFile("samplefile.csv").ConfigureAwait(false);
 
             // Act            
-            var response = await GetTestRequestAsync("samplefile.csv").ConfigureAwait(false);
+            var response = await GetTestRequestAsync().ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);

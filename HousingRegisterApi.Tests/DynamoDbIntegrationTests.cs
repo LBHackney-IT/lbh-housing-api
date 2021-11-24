@@ -56,6 +56,7 @@ namespace HousingRegisterApi.Tests
                 BucketName = bucket,
                 Key = fileName,
                 InputStream = ms,
+                ContentType = "text/csv",
                 TagSet = metadata.ToTagList()
             };
 
