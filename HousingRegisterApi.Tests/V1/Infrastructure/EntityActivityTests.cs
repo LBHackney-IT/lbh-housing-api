@@ -29,6 +29,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser);
 
             // Assert
+            Assert.IsTrue(entityActivity.OldData.Count == 0);
             AssertIsEqual(entityActivity.NewData, "{\"_activityType\" : \"EffectiveDateChangedByUser\"}");
             Assert.IsTrue(entityActivity.HasChanges());
         }
@@ -176,6 +177,21 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             // Assert
             AssertIsEqual(entityActivity.NewData, "{ \"_activityType\" : \"CaseViewedByUser\", \"assessment.bedroomNeed\" : 5, \"assessment.generateBiddingNumber\" : true}");
             Assert.IsFalse(entityActivity.HasChanges());
+        }
+
+        [Test]
+        public void ChangingStateFromActiveToPendingWithReasonSetsTheCorrectNewDataValue()
+        {
+            // Act
+            var entityActivity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser,
+                "Status", ApplicationStatus.ActiveUnderAppeal, ApplicationStatus.Pending);
+
+            entityActivity.AddChange("Assessment.Reason", null, "Needs investigation");
+
+            // Assert
+            AssertIsEqual(entityActivity.OldData, "{\"status\" : \"ActiveUnderAppeal\", \"assessment.reason\" : null}");
+            AssertIsEqual(entityActivity.NewData, "{\"_activityType\" : \"StatusChangedByUser\", \"status\" : \"Pending\", \"assessment.reason\" : \"Needs investigation\"}");
+            Assert.IsTrue(entityActivity.HasChanges());
         }
 
         private void AssertIsEqual(object input, string compareTo)

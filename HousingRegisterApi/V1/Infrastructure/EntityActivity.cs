@@ -29,6 +29,12 @@ namespace HousingRegisterApi.V1.Infrastructure
         /// </summary>
         public bool StoreState { get; private set; }
 
+        /// <summary>
+        /// Creates a new EntityActivity object.
+        /// Make sure the property name is in the dot notation format, so that the ui can pick up the field from the entity object
+        /// ie. MainApplicant.Person.Title
+        /// </summary>
+        /// <param name="activityType"></param>
         public EntityActivity(TActivityType activityType)
         {
             ActivityType = activityType;
@@ -40,6 +46,15 @@ namespace HousingRegisterApi.V1.Infrastructure
             NewData.Add("_activityType", activityType);
         }
 
+        /// <summary>
+        /// Creates a new EntityActivity object.
+        /// Make sure the property name is in the dot notation format, so that the ui can pick up the field from the entity object
+        /// ie. MainApplicant.Person.Title
+        /// </summary>
+        /// <param name="activityType"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="originalPropertyValue"></param>
+        /// <param name="newPropertyValue"></param>
         public EntityActivity(TActivityType activityType, string propertyName,
             object originalPropertyValue, object newPropertyValue)
         {
@@ -99,7 +114,9 @@ namespace HousingRegisterApi.V1.Infrastructure
         }
 
         /// <summary>
-        /// Adds a new state change
+        /// Adds a new state change.
+        /// Make sure the property name is in the dot notation format, so that the ui can pick up the field from the entity object
+        /// ie. MainApplicant.Person.Title
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="originalPropertyValue"></param>
