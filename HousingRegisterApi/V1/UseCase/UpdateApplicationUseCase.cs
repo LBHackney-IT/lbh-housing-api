@@ -87,8 +87,12 @@ namespace HousingRegisterApi.V1.UseCase
 
                 if (!string.IsNullOrEmpty(request.Status))
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser,
-                        "Status", application.Status, request.Status));
+                    var activity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.StatusChangedByUser,
+                        "Status", application.Status, request.Status);
+
+                    activity.AddChange("Assessment.Reason", application.Assessment?.Reason, request.Assessment?.Reason);
+
+                    activities.Add(activity);
                 }
 
                 if (!string.IsNullOrEmpty(request.AssignedTo))
