@@ -2,6 +2,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using HousingRegisterApi.V1.Domain.FileExport;
 using HousingRegisterApi.V1.Infrastructure;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,17 +13,23 @@ namespace HousingRegisterApi.V1.Gateways
 {
     public class FileExportGateway : IFileGateway
     {
+        private readonly ILogger<FileExportGateway> _logger;
         private readonly IAmazonS3 _amazonS3;
         private readonly string _bucketName;
 
-        public FileExportGateway(IAmazonS3 amazonS3)
+        public FileExportGateway(
+            ILogger<FileExportGateway> logger,
+            IAmazonS3 amazonS3)
         {
+            _logger = logger;
             _amazonS3 = amazonS3;
             _bucketName = Environment.GetEnvironmentVariable("HOUSINGREGISTER_EXPORT_BUCKET_NAME");
         }
 
         public async Task<ExportFile> GetFile(string fileName)
         {
+            _logger.LogInformation($"Attempting to retrieve {fileName} from bucket {_bucketName}");
+
             var response = await GetAwsFile(fileName).ConfigureAwait(false);
             var tags = await GetAwsFileTags(fileName).ConfigureAwait(false);
 
@@ -43,6 +50,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<List<string>> ListFiles()
         {
+            _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
+
             ListObjectsRequest request = new ListObjectsRequest
             {
                 BucketName = _bucketName
@@ -55,6 +64,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task SaveFile(ExportFile file)
         {
+            _logger.LogInformation($"Attempting to save {file.FileName} to bucket {_bucketName}");
+
             PutObjectRequest request = new PutObjectRequest
             {
                 BucketName = _bucketName,
@@ -70,6 +81,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task UpdateAttributes(string fileName, Dictionary<string, string> attributes)
         {
+            _logger.LogInformation($"Attempting to set {fileName} attributes");
+
             if (attributes?.Any() == true)
             {
                 var currentTagsResponse = await GetAwsFileTags(fileName).ConfigureAwait(false);
