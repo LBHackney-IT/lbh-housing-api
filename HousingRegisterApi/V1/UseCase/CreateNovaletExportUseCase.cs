@@ -40,6 +40,8 @@ namespace HousingRegisterApi.V1.UseCase
                 return null;
             }
 
+            _logger.LogInformation($"Attempting to generate {fileName}");
+
             var exportDataSet = applications.Select(x => new NovaletExportDataRow(x)).ToArray();
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
