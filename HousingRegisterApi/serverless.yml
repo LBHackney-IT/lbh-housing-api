@@ -157,16 +157,16 @@ resources:
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
-                Action:
+                - Effect: "Allow"
+                  Action:
                   - s3:ListObjects
                   - s3:GetObject
                   - s3:GetObjectTagging
                   - s3:PutObject
                   - s3:PutObjectTagging
                   - s3:DeleteObject
-                Effect: "Allow"
-                Resource:
-                  - "arn:aws:s3:::${self:provider.environment.HOUSINGREGISTER_EXPORT_BUCKET_NAME}/*"
+                  Resource:
+                    - "arn:aws:s3:::${self:provider.environment.HOUSINGREGISTER_EXPORT_BUCKET_NAME}/*"
 custom:
   vpcId:
     development: vpc-0d15f152935c8716f

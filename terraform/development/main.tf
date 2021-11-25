@@ -58,7 +58,7 @@ module "housingregister_api_cloudwatch_dashboard" {
   dynamodb_table_name = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
 }
 
-resource "aws_s3_bucket" "b" {
+resource "aws_s3_bucket" "housingregister_bucket" {
   bucket = "housingregister-exports-${var.environment_name}-bucket"
   acl    = "private"
 
