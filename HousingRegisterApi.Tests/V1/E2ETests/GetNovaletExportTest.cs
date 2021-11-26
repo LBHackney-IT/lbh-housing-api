@@ -13,18 +13,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
     public class GetNovaletExportTest : DynamoDbIntegrationTests<Startup>
     {
-        private readonly ApplicationFixture _applicationFixture;
-
-        public GetNovaletExportTest()
-        {
-            _applicationFixture = new ApplicationFixture();
-        }
-
-        private async Task SetupTestData(Application entity)
-        {
-            await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
-        }
-
         private async Task<HttpResponseMessage> GetTestRequestAsync(string fileName)
         {
             var uri = new Uri($"api/v1/reporting/novaletexport/" + fileName, UriKind.Relative);

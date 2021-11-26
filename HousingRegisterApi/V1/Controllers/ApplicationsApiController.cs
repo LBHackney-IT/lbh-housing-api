@@ -23,6 +23,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICompleteApplicationUseCase _completeApplicationUseCase;
         private readonly ICreateEvidenceRequestUseCase _createEvidenceRequestUseCase;
         private readonly ICalculateBedroomsUseCase _calculateBedroomsUseCase;
+        private readonly IAddApplicationNoteUseCase _addApplicationNoteUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -31,7 +32,8 @@ namespace HousingRegisterApi.V1.Controllers
             IUpdateApplicationUseCase updateApplicationUseCase,
             ICompleteApplicationUseCase completeApplicationUseCase,
             ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
-            ICalculateBedroomsUseCase calculateBedroomsUseCase)
+            ICalculateBedroomsUseCase calculateBedroomsUseCase,
+            IAddApplicationNoteUseCase addApplicationNoteUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
@@ -40,6 +42,7 @@ namespace HousingRegisterApi.V1.Controllers
             _completeApplicationUseCase = completeApplicationUseCase;
             _createEvidenceRequestUseCase = createEvidenceRequestUseCase;
             _calculateBedroomsUseCase = calculateBedroomsUseCase;
+            _addApplicationNoteUseCase = addApplicationNoteUseCase;
         }
 
         /// <summary>
@@ -172,6 +175,25 @@ namespace HousingRegisterApi.V1.Controllers
         public async Task<IActionResult> CreateEvidenceRequestAsync([FromRoute][Required] Guid id, [FromBody] CreateEvidenceRequestBase request)
         {
             var result = await _createEvidenceRequestUseCase.ExecuteAsync(id, request).ConfigureAwait(false);
+            if (result == null) return NotFound(id);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Adds note to an applications activity history
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">No record found for the specified ID</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("{id}/note")]
+        public IActionResult AddApplicationNote([FromRoute][Required] Guid id, [FromBody] AddApplicationNoteRequest request)
+        {
+            var result = _addApplicationNoteUseCase.Execute(id, request);
             if (result == null) return NotFound(id);
 
             return Ok(result);

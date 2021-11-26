@@ -30,9 +30,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         public bool StoreState { get; private set; }
 
         /// <summary>
-        /// Creates a new EntityActivity object.
-        /// Make sure the property name is in the dot notation format, so that the ui can pick up the field from the entity object
-        /// ie. MainApplicant.Person.Title
+        /// Creates a new EntityActivity object to record an event     
         /// </summary>
         /// <param name="activityType"></param>
         public EntityActivity(TActivityType activityType)
@@ -40,14 +38,35 @@ namespace HousingRegisterApi.V1.Infrastructure
             ActivityType = activityType;
             StoreState = false;
             OldData = new Dictionary<string, object>();
-            NewData = new Dictionary<string, object>();
-
-            // set activity type
-            NewData.Add("_activityType", activityType);
+            NewData = new Dictionary<string, object>
+            {
+                // set activity type
+                { "_activityType", activityType }
+            };
         }
 
         /// <summary>
-        /// Creates a new EntityActivity object.
+        /// Creates a new EntityActivity object to record an event with data
+        /// ie. MainApplicant.Person.Title
+        /// </summary>
+        /// <param name="activityType"></param>
+        /// <param name="data"></param>
+        public EntityActivity(TActivityType activityType, string data)
+        {
+            ActivityType = activityType;
+            StoreState = false;
+            OldData = new Dictionary<string, object>();
+            NewData = new Dictionary<string, object>
+            {
+                // set activity type
+                { "_activityType", activityType }
+            };
+
+            AddNewState("activityData", data);
+        }
+
+        /// <summary>
+        /// Creates a new EntityActivity object to record status changes for an entity
         /// Make sure the property name is in the dot notation format, so that the ui can pick up the field from the entity object
         /// ie. MainApplicant.Person.Title
         /// </summary>
@@ -61,12 +80,13 @@ namespace HousingRegisterApi.V1.Infrastructure
             ActivityType = activityType;
             StoreState = true;
             OldData = new Dictionary<string, object>();
-            NewData = new Dictionary<string, object>();
+            NewData = new Dictionary<string, object>
+            {
+                // set activity type
+                { "_activityType", activityType }
+            };
+
             AddOldState(propertyName, originalPropertyValue);
-
-            // set activity type
-            NewData.Add("_activityType", activityType);
-
             AddNewState(propertyName, newPropertyValue);
         }
 
@@ -155,7 +175,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
                 List<string> propertyNames = propertyName.Split(".")
-                    .Select(x => char.ToLowerInvariant(x[0]) + x.Substring(1))
+                    .Select(x => char.ToLowerInvariant(x[0]) + x[1..])
                     .ToList();
 
                 return string.Join(".", propertyNames);
