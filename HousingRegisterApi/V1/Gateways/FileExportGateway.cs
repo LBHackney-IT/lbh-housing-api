@@ -54,7 +54,7 @@ namespace HousingRegisterApi.V1.Gateways
 
             ListObjectsV2Request request = new ListObjectsV2Request
             {
-                BucketName = _bucketName,                 
+                BucketName = _bucketName,
             };
 
             var response = await _amazonS3.ListObjectsV2Async(request).ConfigureAwait(false);
