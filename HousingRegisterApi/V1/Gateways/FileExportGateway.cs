@@ -52,12 +52,12 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
 
-            ListObjectsRequest request = new ListObjectsRequest
+            ListObjectsV2Request request = new ListObjectsV2Request
             {
-                BucketName = _bucketName
+                BucketName = _bucketName,                 
             };
 
-            var response = await _amazonS3.ListObjectsAsync(request).ConfigureAwait(false);
+            var response = await _amazonS3.ListObjectsV2Async(request).ConfigureAwait(false);
 
             return response.S3Objects.Select(x => x.Key).ToList();
         }
