@@ -166,10 +166,8 @@ resources:
                     - "s3:PutObjectTagging"
                     - "s3:DeleteObject"
                   Resource:
-                    Fn::Join:
-                      - ""
-                      - - "arn:aws:s3:::"
-                        - "${self:provider.environment.HOUSINGREGISTER_EXPORT_BUCKET_NAME}/*"
+                    - "arn:aws:s3:::${self:provider.environment.HOUSINGREGISTER_EXPORT_BUCKET_NAME}"
+                    - "arn:aws:s3:::${self:provider.environment.HOUSINGREGISTER_EXPORT_BUCKET_NAME}/*"
 custom:
   vpcId:
     development: vpc-0d15f152935c8716f
