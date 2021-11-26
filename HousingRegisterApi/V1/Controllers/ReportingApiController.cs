@@ -77,7 +77,7 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("generatenovaletexport")]
         public async Task<IActionResult> GenerateNovaletExport()
         {
-            var result = await _createNovaletExportUseCase.Execute().ConfigureAwait(false);
+            var result = await _createNovaletExportUseCase.Execute().ConfigureAwait(true);
             if (result == null) return BadRequest();
 
             return Ok();
