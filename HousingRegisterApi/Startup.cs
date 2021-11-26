@@ -171,7 +171,8 @@ namespace HousingRegisterApi
             services.AddScoped<ICreateNovaletExportUseCase, CreateNovaletExportUseCase>();
             services.AddScoped<IGetNovaletExportUseCase, GetNovaletExportUseCase>();
             services.AddScoped<IListNovaletExportFilesUseCase, ListNovaletExportFilesUseCase>();
-            services.AddScoped<IApproveNovaletExportUseCase, ApproveNovaletExportUseCase>();
+            services.AddScoped<IApproveNovaletExportUseCase, ApproveNovaletExportUseCase>();            
+            services.AddScoped<IViewingApplicationUseCase, ViewingApplicationUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();

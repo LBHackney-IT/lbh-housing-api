@@ -1,5 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
+using HousingRegisterApi.V1.Boundary.Request;
+using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -11,37 +13,25 @@ using System;
 
 namespace HousingRegisterApi.Tests.V1.UseCase
 {
-    public class GetApplicationByIdUseCaseTests
+    public class ViewingApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private GetApplicationByIdUseCase _classUnderTest;
+        private Mock<IActivityHistory> _mockHistory;
+        private ViewingApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
         [SetUp]
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
+            _mockHistory = new Mock<IActivityHistory>();
 
-            _classUnderTest = new GetApplicationByIdUseCase(_mockGateway.Object);
+            _classUnderTest = new ViewingApplicationUseCase(_mockGateway.Object, _mockHistory.Object);
             _fixture = new Fixture();
         }
 
         [Test]
-        public void GetApplicationByIdNullReturnsNull()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
-            _mockGateway.Setup(x => x.GetApplicationById(id)).Returns((Application) null);
-
-            // Act
-            var response = _classUnderTest.Execute(id);
-
-            // Assert
-            response.Should().BeNull();
-        }
-
-        [Test]
-        public void GetApplicationByIdFoundReturnsResponse()
+        public void ViewingApplicationUseCaseLogsCaseViewedByUserActivity()
         {
             // Arrange
             var id = Guid.NewGuid();
@@ -52,9 +42,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id);
 
             // Assert
-            response.Should().BeEquivalentTo(application.ToResponse());
+            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
+                It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.CaseViewedByUser)));
         }
-
-        //TODO: Add extra tests here for extra functionality added to the use case
     }
 }
