@@ -1,4 +1,4 @@
-using HousingRegisterApi.V1.Domain.FileExport;
+using HousingRegisterApi.V1.Domain.Report;
 using System;
 using System.Collections.Generic;
 using System.IO;

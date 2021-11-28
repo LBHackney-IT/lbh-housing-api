@@ -1,8 +1,8 @@
 using System;
 
-namespace HousingRegisterApi.V1.Domain.FileExport
+namespace HousingRegisterApi.V1.Domain.Report
 {
-    public class NovaletExportDataRow
+    public class CasesReportDataRow
     {
         public string HousingRegisterRef { get; set; }
         public string Title { get; set; }
@@ -33,11 +33,8 @@ namespace HousingRegisterApi.V1.Domain.FileExport
         public string EthnicOrigin { get; set; }
         public string Decant { get; set; }
         public string AHRCode { get; set; }
-        public string AutoBidPref_MobilityStandard { get; set; }
-        public string AutoBidPref_WheelChairStandard { get; set; }
-        public string AutoBidPref_AdaptedStandard { get; set; }
 
-        public NovaletExportDataRow(Application application)
+        public CasesReportDataRow(Application application)
         {
             var bedroomNeed = application.Assessment?.BedroomNeed ?? application.CalculatedBedroomNeed!;
 
@@ -62,17 +59,7 @@ namespace HousingRegisterApi.V1.Domain.FileExport
             MinimumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value - 1).ToString() : null;
             MaximumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value).ToString() : null;
             DateOfBirth = FormatDate(application.MainApplicant?.Person?.DateOfBirth);
-            OlderPersonsAssessement = null;
-            MobilityAssessment = null;
-            AdditionalBandingInfo = null;
-            MedicalRequirements = null;
-            Offered = null;
             EthnicOrigin = GetEthnicity(application);
-            Decant = null;
-            AHRCode = null;
-            AutoBidPref_MobilityStandard = null;
-            AutoBidPref_WheelChairStandard = null;
-            AutoBidPref_AdaptedStandard = null;
         }
 
         private static string FormatDate(DateTime? dateTime)
