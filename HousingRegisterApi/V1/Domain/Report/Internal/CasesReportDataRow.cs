@@ -48,7 +48,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         [Description("Bidding number")]
         public string BiddingNumber { get; set; }
 
-        [Description("Tenure (current accomidation)")]
+        [Description("Tenure (current accommodation)")]
         public string Tenure { get; set; }
 
         [Description("Count of household members")]
