@@ -92,7 +92,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
             if (dateTime.HasValue)
             {
-                return dateTime.Value.ToString("ddMMyyyy");
+                return dateTime.Value.ToString("dd/MM/yyyy");
             }
 
             return null;
