@@ -24,5 +24,8 @@ namespace HousingRegisterApi.V1.Domain
 
         [Description("EffectiveDateChangedByUser")]
         EffectiveDateChangedByUser = 6,
+
+        [Description("NoteAddedByUser")]
+        NoteAddedByUser = 7,
     }
 }
