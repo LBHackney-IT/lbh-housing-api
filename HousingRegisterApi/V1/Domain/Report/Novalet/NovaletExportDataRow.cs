@@ -1,6 +1,6 @@
 using System;
 
-namespace HousingRegisterApi.V1.Domain.FileExport
+namespace HousingRegisterApi.V1.Domain.Report
 {
     public class NovaletExportDataRow
     {

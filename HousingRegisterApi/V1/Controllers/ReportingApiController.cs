@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,17 +18,39 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IGetNovaletExportUseCase _getNovaletExportUseCase;
         private readonly ICreateNovaletExportUseCase _createNovaletExportUseCase;
         private readonly IApproveNovaletExportUseCase _approveNovaletExportUseCase;
+        private readonly IGetInternalReportUseCase _getInternalReportUseCase;
 
         public ReportingApiController(
             IListNovaletExportFilesUseCase listNovaletExportFilesUseCase,
             IGetNovaletExportUseCase getNovaletCsvUseCase,
             ICreateNovaletExportUseCase createNovaletCsvUseCase,
-            IApproveNovaletExportUseCase approveNovaletExportUseCase)
+            IApproveNovaletExportUseCase approveNovaletExportUseCase,
+            IGetInternalReportUseCase getInternalReportUseCase)
         {
             _listNovaletExportFilesUseCase = listNovaletExportFilesUseCase;
             _getNovaletExportUseCase = getNovaletCsvUseCase;
             _createNovaletExportUseCase = createNovaletCsvUseCase;
             _approveNovaletExportUseCase = approveNovaletExportUseCase;
+            _getInternalReportUseCase = getInternalReportUseCase;
+        }
+
+        /// <summary>
+        /// Returns the specified export file
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">No file found for the specified filename</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("export")]
+        public async Task<IActionResult> DownloadReport([FromQuery][Required] InternalReportRequest request)
+        {
+            var result = await _getInternalReportUseCase.Execute(request).ConfigureAwait(false);
+            if (result == null) return NotFound();
+
+            return File(result.Data, result.FileMimeType, result.FileName);
         }
 
         /// <summary>

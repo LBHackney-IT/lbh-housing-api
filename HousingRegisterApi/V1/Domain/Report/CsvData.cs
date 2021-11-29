@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HousingRegisterApi.V1.Domain.FileExport
+namespace HousingRegisterApi.V1.Domain.Report
 {
     public class CsvData
     {

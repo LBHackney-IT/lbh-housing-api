@@ -1,6 +1,6 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using HousingRegisterApi.V1.Domain.FileExport;
+using HousingRegisterApi.V1.Domain.Report;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;

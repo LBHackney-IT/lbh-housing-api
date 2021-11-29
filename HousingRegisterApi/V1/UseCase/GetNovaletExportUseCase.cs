@@ -1,5 +1,5 @@
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Domain.FileExport;
+using HousingRegisterApi.V1.Domain.Report;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;

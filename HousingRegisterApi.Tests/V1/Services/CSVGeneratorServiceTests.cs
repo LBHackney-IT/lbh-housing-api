@@ -1,6 +1,6 @@
 using AutoFixture;
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Domain.FileExport;
+using HousingRegisterApi.V1.Domain.Report;
 using HousingRegisterApi.V1.Services;
 using NUnit.Framework;
 using System.Collections.Generic;
