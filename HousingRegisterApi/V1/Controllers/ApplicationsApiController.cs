@@ -34,7 +34,7 @@ namespace HousingRegisterApi.V1.Controllers
             ICompleteApplicationUseCase completeApplicationUseCase,
             ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
             ICalculateBedroomsUseCase calculateBedroomsUseCase,
-            IAddApplicationNoteUseCase addApplicationNoteUseCase,           
+            IAddApplicationNoteUseCase addApplicationNoteUseCase,
             IViewingApplicationUseCase viewingApplicationUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
