@@ -22,13 +22,13 @@ namespace HousingRegisterApi.V1.Domain.Report
         public string DateOfBirth { get; set; }
 
         [Description("Gender")]
-        public string Gender { get; set; }       
+        public string Gender { get; set; }
 
         [Description("Age")]
         public string Age { get; set; }
 
         [Description("Medical")]
-        public string Medical { get; set; }       
+        public string Medical { get; set; }
 
         [Description("Health")]
         public string Health { get; set; }
@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             Age = applicant.Person?.Age.ToString();
             Medical = applicant.RequiresMedical.ToString();
             Health = applicant.MedicalNeed?.Outcome;
-            Tenure = applicant.Questions.GetAnswer("current-accommodation");         
+            Tenure = applicant.Questions.GetAnswer("current-accommodation");
 
             CreatedAt = FormatDate(application.CreatedAt);
             SubmittedOn = FormatDate(application.SubmittedAt);
