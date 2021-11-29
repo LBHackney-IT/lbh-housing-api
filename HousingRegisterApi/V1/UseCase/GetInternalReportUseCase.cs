@@ -55,11 +55,11 @@ namespace HousingRegisterApi.V1.UseCase
 
         private async Task<ExportFile> GetCaseReport(DateTime startDate, DateTime endDate)
         {
-            var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
+            var applications = _gateway.GetApplications(new SearchQueryParameter());
             
             var applicationsInRange = applications
-                .Where(x => x.SubmittedAt >= startDate
-                        && x.SubmittedAt <= endDate).ToList();
+                .Where(x => x.CreatedAt >= startDate
+                        && x.CreatedAt <= endDate).ToList();
 
             string fileName = $"LBH-CASES REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
 

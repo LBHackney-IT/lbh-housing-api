@@ -1,6 +1,7 @@
 using HousingRegisterApi.V1.Domain.Report;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -94,7 +95,16 @@ namespace HousingRegisterApi.V1.Services
 
             foreach (var property in properties)
             {
-                headers.Add(property.Name);
+                var description = property.GetCustomAttribute<DescriptionAttribute>();
+
+                if (description != null)
+                {
+                    headers.Add(description.Description);
+                }
+                else
+                {
+                    headers.Add(property.Name);
+                }
             }
 
             return headers;
