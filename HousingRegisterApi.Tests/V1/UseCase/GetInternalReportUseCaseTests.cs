@@ -59,6 +59,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.FileMimeType.Should().Be("text/csv");
             response.FileName.Should().Be($"LBH-CASES REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
             response.Data.Should().NotBeEmpty();
-        }       
+        }
     }
 }

@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GetCaseReport(DateTime startDate, DateTime endDate)
         {
             var applications = _gateway.GetApplications(new SearchQueryParameter());
-            
+
             var applicationsInRange = applications
                 .Where(x => x.CreatedAt >= startDate
                         && x.CreatedAt <= endDate).ToList();
@@ -67,6 +67,6 @@ namespace HousingRegisterApi.V1.UseCase
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
             return file;
-        }        
+        }
     }
 }

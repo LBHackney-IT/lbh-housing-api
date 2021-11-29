@@ -61,7 +61,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         public string Money { get; set; }
 
         [Description("Health")]
-        public string Health { get; set; }      
+        public string Health { get; set; }
 
         public CasesReportDataRow(Application application)
         {
@@ -79,7 +79,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             CalculatedBedroomNeed = application.CalculatedBedroomNeed.ToString();
             BedroomNeed = application.Assessment?.BedroomNeed.ToString();
             Band = application.Assessment?.Band;
-          
+
             BiddingNumber = application.Assessment?.BiddingNumber;
             Tenure = application.MainApplicant.Questions.GetAnswer("current-accommodation");
             HouseholdCount = (1 + application.OtherMembers.Count()).ToString();
@@ -96,6 +96,6 @@ namespace HousingRegisterApi.V1.Domain.Report
             }
 
             return null;
-        }       
+        }
     }
 }
