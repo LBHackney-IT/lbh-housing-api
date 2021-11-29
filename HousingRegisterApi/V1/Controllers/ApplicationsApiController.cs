@@ -24,6 +24,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICreateEvidenceRequestUseCase _createEvidenceRequestUseCase;
         private readonly ICalculateBedroomsUseCase _calculateBedroomsUseCase;
         private readonly IAddApplicationNoteUseCase _addApplicationNoteUseCase;
+        private readonly IViewingApplicationUseCase _viewingApplicationUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -33,7 +34,8 @@ namespace HousingRegisterApi.V1.Controllers
             ICompleteApplicationUseCase completeApplicationUseCase,
             ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
             ICalculateBedroomsUseCase calculateBedroomsUseCase,
-            IAddApplicationNoteUseCase addApplicationNoteUseCase)
+            IAddApplicationNoteUseCase addApplicationNoteUseCase,
+            IViewingApplicationUseCase viewingApplicationUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
@@ -43,6 +45,7 @@ namespace HousingRegisterApi.V1.Controllers
             _createEvidenceRequestUseCase = createEvidenceRequestUseCase;
             _calculateBedroomsUseCase = calculateBedroomsUseCase;
             _addApplicationNoteUseCase = addApplicationNoteUseCase;
+            _viewingApplicationUseCase = viewingApplicationUseCase;
         }
 
         /// <summary>
@@ -83,6 +86,26 @@ namespace HousingRegisterApi.V1.Controllers
             var entity = _getByIdUseCase.Execute(id);
             if (entity == null) return NotFound(id);
 
+            return Ok(entity);
+        }
+
+        /// <summary>
+        /// Logs an activity that the user has open an application to view
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid id value supplied</response>
+        /// <response code="404">No record found for the specified ID</response>
+        /// <response code="500">Something went wrong</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("{id}/viewing")]
+        public IActionResult ViewingApplication(Guid id)
+        {
+            var entity = _viewingApplicationUseCase.Execute(id);
+            if (entity == null) return NotFound(id);
             return Ok(entity);
         }
 
