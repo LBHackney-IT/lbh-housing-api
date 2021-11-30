@@ -16,7 +16,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class ViewingApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private Mock<IActivityHistory> _mockHistory;
+        private Mock<IActivityGateway> _mockActivityGateway;
         private ViewingApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -24,9 +24,9 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _mockHistory = new Mock<IActivityHistory>();
+            _mockActivityGateway = new Mock<IActivityGateway>();
 
-            _classUnderTest = new ViewingApplicationUseCase(_mockGateway.Object, _mockHistory.Object);
+            _classUnderTest = new ViewingApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object);
             _fixture = new Fixture();
         }
 
@@ -42,7 +42,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id);
 
             // Assert
-            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
+            _mockActivityGateway.Verify(x => x.LogActivity(It.IsAny<Application>(),
                 It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.CaseViewedByUser)));
         }
     }

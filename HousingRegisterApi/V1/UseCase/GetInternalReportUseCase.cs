@@ -18,14 +18,14 @@ namespace HousingRegisterApi.V1.UseCase
         private readonly ILogger<GetInternalReportUseCase> _logger;
         private readonly IFileGateway _fileGateway;
         private readonly IApplicationApiGateway _gateway;
-        private readonly IActivityHistory _activityGateway;
+        private readonly IActivityGateway _activityGateway;
         private readonly ICsvService _csvService;
 
         public GetInternalReportUseCase(
             ILogger<GetInternalReportUseCase> logger,
             IApplicationApiGateway gateway,
             IFileGateway fileGateway,
-            IActivityHistory activityGateway,
+            IActivityGateway activityGateway,
             ICsvService csvService)
         {
             _logger = logger;
@@ -130,7 +130,7 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    var activities = await _activityGateway.GetActivites(application.Id).ConfigureAwait(false);
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
 
                     activities?.ToList().ForEach(a =>
                     {

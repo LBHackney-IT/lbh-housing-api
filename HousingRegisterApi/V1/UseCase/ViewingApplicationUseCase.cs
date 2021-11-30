@@ -12,14 +12,14 @@ namespace HousingRegisterApi.V1.UseCase
     public class ViewingApplicationUseCase : IViewingApplicationUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        private readonly IActivityHistory _applicationHistory;
+        private readonly IActivityGateway _activityGateway;
 
         public ViewingApplicationUseCase(
             IApplicationApiGateway gateway,
-            IActivityHistory applicationHistory)
+            IActivityGateway applicationHistory)
         {
             _gateway = gateway;
-            _applicationHistory = applicationHistory;
+            _activityGateway = applicationHistory;
         }
 
         public ApplicationResponse Execute(Guid id)
@@ -28,7 +28,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (application != null)
             {
-                _applicationHistory.LogActivity(application, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser));
+                _activityGateway.LogActivity(application, new EntityActivity<ApplicationActivityType>(ApplicationActivityType.CaseViewedByUser));
                 return application.ToResponse();
             }
 

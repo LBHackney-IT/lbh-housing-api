@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
-    public interface IActivityHistory
+    public interface IActivityGateway
     {
         /// <summary>
         /// Records application activity when status is not in draft and a valid auth token exists.
@@ -21,6 +21,6 @@ namespace HousingRegisterApi.V1.Gateways
         /// </summary>
         /// <param name="applicationId"></param>
         /// <returns></returns>
-        Task<IList<ActivityHistoryResponseObject>> GetActivites(Guid applicationId);
+        Task<IList<ActivityHistoryResponseObject>> GetActivities(Guid applicationId);
     }
 }

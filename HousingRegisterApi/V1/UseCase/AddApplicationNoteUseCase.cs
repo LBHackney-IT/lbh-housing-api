@@ -12,14 +12,14 @@ namespace HousingRegisterApi.V1.UseCase
     public class AddApplicationNoteUseCase : IAddApplicationNoteUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        private readonly IActivityHistory _applicationHistory;
+        private readonly IActivityGateway _activityGateway;
 
         public AddApplicationNoteUseCase(
             IApplicationApiGateway gateway,
-            IActivityHistory applicationHistory)
+            IActivityGateway applicationHistory)
         {
             _gateway = gateway;
-            _applicationHistory = applicationHistory;
+            _activityGateway = applicationHistory;
         }
 
         public ApplicationResponse Execute(Guid id, AddApplicationNoteRequest request)
@@ -30,7 +30,7 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 if (!String.IsNullOrWhiteSpace(request?.Note))
                 {
-                    _applicationHistory.LogActivity(application,
+                    _activityGateway.LogActivity(application,
                         new EntityActivity<ApplicationActivityType>(ApplicationActivityType.NoteAddedByUser, request.Note));
                 }
 

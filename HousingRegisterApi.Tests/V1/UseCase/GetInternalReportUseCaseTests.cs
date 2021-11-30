@@ -20,7 +20,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         private Mock<ILogger<GetInternalReportUseCase>> _mockLogger;
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IFileGateway> _mockFileGateway;
-        private Mock<IActivityHistory> _mockActivityGateway;
+        private Mock<IActivityGateway> _mockActivityGateway;
         private CsvGeneratorService _csvService;
         private GetInternalReportUseCase _classUnderTest;
         private Fixture _fixture;
@@ -31,7 +31,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockLogger = new Mock<ILogger<GetInternalReportUseCase>>();
             _mockGateway = new Mock<IApplicationApiGateway>();
             _mockFileGateway = new Mock<IFileGateway>();
-            _mockActivityGateway = new Mock<IActivityHistory>();
+            _mockActivityGateway = new Mock<IActivityGateway>();
 
             _csvService = new CsvGeneratorService();
             _classUnderTest = new GetInternalReportUseCase(_mockLogger.Object,

@@ -8,28 +8,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
-    public class ApplicationActivityHistory : IActivityHistory
+    public class ApplicationActivityGateway : IActivityGateway
     {
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IHttpContextWrapper _contextWrapper;
         private readonly ITokenFactory _tokenFactory;
         private readonly ISnsGateway _snsGateway;
         private readonly ISnsFactory _snsFactory;
-        private readonly ILogger<ApplicationActivityHistory> _logger;
+        private readonly ILogger<ApplicationActivityGateway> _logger;
 
-        public ApplicationActivityHistory(
+        public ApplicationActivityGateway(
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
             ISnsGateway snsGateway,
             ISnsFactory snsFactory,
-            ILogger<ApplicationActivityHistory> logger)
+            ILogger<ApplicationActivityGateway> logger)
         {
             _contextAccessor = contextAccessor;
             _contextWrapper = contextWrapper;
@@ -63,7 +62,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
-        public async Task<IList<ActivityHistoryResponseObject>> GetActivites(Guid applicationId)
+        public async Task<IList<ActivityHistoryResponseObject>> GetActivities(Guid applicationId)
         {
             var result = new List<ActivityHistoryResponseObject>();
 
