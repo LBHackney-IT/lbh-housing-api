@@ -1,29 +1,34 @@
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
+using Hackney.Shared.ActivityHistory.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
-    public class ApplicationActivityHistory : IActivityHistory
+    public class ApplicationActivityGateway : IActivityGateway
     {
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IHttpContextWrapper _contextWrapper;
         private readonly ITokenFactory _tokenFactory;
         private readonly ISnsGateway _snsGateway;
         private readonly ISnsFactory _snsFactory;
-        private readonly ILogger<ApplicationActivityHistory> _logger;
+        private readonly ILogger<ApplicationActivityGateway> _logger;
 
-        public ApplicationActivityHistory(
+        public ApplicationActivityGateway(
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
             ISnsGateway snsGateway,
             ISnsFactory snsFactory,
-            ILogger<ApplicationActivityHistory> logger)
+            ILogger<ApplicationActivityGateway> logger)
         {
             _contextAccessor = contextAccessor;
             _contextWrapper = contextWrapper;
@@ -57,6 +62,32 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
+        public async Task<IList<ActivityHistoryResponseObject>> GetActivities(Guid applicationId)
+        {
+            var result = new List<ActivityHistoryResponseObject>();
+
+            try
+            {
+                var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
+                var uri = new Uri($"{baseUrl}activityhistory?targetId=${applicationId}&pageSize=500");
+                var token = GetAuthorizationHeader();
+
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", token);
+                var response = await client.GetAsync(uri).ConfigureAwait(true);
+
+                result = await response.Content
+                    .ReadAsAsync<List<ActivityHistoryResponseObject>>()
+                    .ConfigureAwait(true);
+            }
+            catch (Exception exp)
+            {
+                _logger.LogError($"Error retrieving history for application {applicationId}: {exp.Message}");
+            }
+
+            return result;
+        }
+
         private Token GetToken(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
@@ -73,6 +104,11 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             return token;
+        }
+
+        private string GetAuthorizationHeader()
+        {
+            return _contextAccessor.HttpContext.Request.Headers["Authorization"];
         }
 
         private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)

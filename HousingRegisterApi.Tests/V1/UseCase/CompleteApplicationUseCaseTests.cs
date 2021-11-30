@@ -1,7 +1,5 @@
 using AutoFixture;
-using FluentAssertions;
 using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
@@ -14,7 +12,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class CompleteApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private Mock<IActivityHistory> _mockHistory;
+        private Mock<IActivityGateway> _mockActivityGateway;
         private CompleteApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -22,9 +20,9 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _mockHistory = new Mock<IActivityHistory>();
+            _mockActivityGateway = new Mock<IActivityGateway>();
 
-            _classUnderTest = new CompleteApplicationUseCase(_mockGateway.Object, _mockHistory.Object);
+            _classUnderTest = new CompleteApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object);
             _fixture = new Fixture();
         }
 
@@ -40,7 +38,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(id);
 
             // Assert
-            _mockHistory.Verify(x => x.LogActivity(It.IsAny<Application>(),
+            _mockActivityGateway.Verify(x => x.LogActivity(It.IsAny<Application>(),
                 It.Is<EntityActivity<ApplicationActivityType>>(x => x.ActivityType == ApplicationActivityType.SubmittedByResident)));
         }
 

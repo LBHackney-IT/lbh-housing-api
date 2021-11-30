@@ -147,7 +147,7 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
-            services.AddScoped<IActivityHistory, ApplicationActivityHistory>();
+            services.AddScoped<IActivityGateway, ApplicationActivityGateway>();
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddScoped<IFileGateway, FileExportGateway>();
