@@ -60,5 +60,31 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.FileName.Should().Be($"LBH-CASES REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
             response.Data.Should().NotBeEmpty();
         }
+
+        [Test]
+        public async Task GetPeopleInternalReportReturnsAFile()
+        {
+            // Arrange
+            var applications = _fixture.Create<List<Application>>();
+            applications.ForEach(x => x.Status = ApplicationStatus.Active);
+            var request = new InternalReportRequest
+            {
+                ReportType = InternalReportType.PeopleReport,
+                StartDate = DateTime.Now.AddDays(-7),
+                EndDate = DateTime.Now.AddDays(7)
+            };
+
+            _mockGateway.Setup(x => x.GetApplicationsAtStatus(ApplicationStatus.Active)).Returns((applications));
+
+            // Act
+            var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
+
+            // Assert
+            DateTime runDate = DateTime.Now;
+            response.Should().NotBeNull();
+            response.FileMimeType.Should().Be("text/csv");
+            response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.Data.Should().NotBeEmpty();
+        }
     }
 }

@@ -70,7 +70,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             Email = application.MainApplicant?.ContactInformation?.EmailAddress;
             ContactTelephone = application.MainApplicant?.ContactInformation?.PhoneNumber;
             CreatedAt = FormatDate(application.CreatedAt);
-            SubmittedOn = FormatDate(application.Assessment?.EffectiveDate);
+            SubmittedOn = FormatDate(application.SubmittedAt);
 
             Status = application.Status;
             Reason = application.Assessment?.Reason;

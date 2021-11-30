@@ -1,11 +1,13 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Report;
+using HousingRegisterApi.V1.Domain.Report.Internal;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,7 +39,12 @@ namespace HousingRegisterApi.V1.UseCase
             var periodStart = new DateTime(request.StartDate.Year, request.StartDate.Month, request.StartDate.Day, 23, 59, 59);
             var periodEnd = new DateTime(request.EndDate.Year, request.EndDate.Month, request.EndDate.Day, 0, 0, 0);
 
-            var file = await GetCaseReport(periodStart, periodEnd).ConfigureAwait(false);
+            var file = (request.ReportType) switch
+            {
+                InternalReportType.CasesReport => await GetCaseReport(periodStart, periodEnd).ConfigureAwait(false),
+                InternalReportType.PeopleReport => await GetPeopleReport(periodStart, periodEnd).ConfigureAwait(false),
+                _ => null
+            };
 
             if (file != null)
             {
@@ -65,6 +72,37 @@ namespace HousingRegisterApi.V1.UseCase
 
             var exportDataSet = applicationsInRange.Select(x => new CasesReportDataRow(x)).ToArray();
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
+            var file = new ExportFile(fileName, "text/csv", bytes);
+            return file;
+        }
+
+        private async Task<ExportFile> GetPeopleReport(DateTime startDate, DateTime endDate)
+        {
+            var applications = _gateway.GetApplications(new SearchQueryParameter());
+
+            var applicationsInRange = applications
+                .Where(x => x.CreatedAt >= startDate
+                        && x.CreatedAt <= endDate).ToList();
+
+            string fileName = $"LBH-PEOPLE REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+
+            var exportDataSet = new List<PeopleReportDataRow>();
+
+            applicationsInRange.ForEach(x =>
+            {
+                var allApplicants = new List<Applicant>();
+                allApplicants.Add(x.MainApplicant);
+                allApplicants.AddRange(x.OtherMembers);
+                allApplicants.ForEach(a =>
+                {
+                    if (a.Person != null)
+                    {
+                        exportDataSet.Add(new PeopleReportDataRow(a, x));
+                    }
+                });
+            });
+
+            var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
             return file;
         }
