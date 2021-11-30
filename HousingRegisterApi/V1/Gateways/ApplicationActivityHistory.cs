@@ -5,6 +5,11 @@ using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -57,6 +62,34 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
+        public async Task<IList<EntityActivity<ApplicationActivityType>>> GetHistory(Guid applicationId)
+        {
+            var result = new List<EntityActivity<ApplicationActivityType>>();
+
+            var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
+
+            var uri = new Uri($"{baseUrl}activityhistory?targetId=${applicationId}&pageSize=100");
+
+            var token = GetAuthCookie();
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Authorization", token);
+                var response = await client.GetAsync(uri).ConfigureAwait(true);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception($"Incorrect status code returned: {response.StatusCode}");
+                }
+
+                result = await response.Content
+                    .ReadAsAsync<List<EntityActivity<ApplicationActivityType>>>()
+                    .ConfigureAwait(true);
+            }
+
+            return result;
+        }
+
         private Token GetToken(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
@@ -73,6 +106,11 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             return token;
+        }
+
+        private string GetAuthCookie()
+        {
+            return _contextAccessor.HttpContext.Request.Headers["Authorization"];
         }
 
         private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
