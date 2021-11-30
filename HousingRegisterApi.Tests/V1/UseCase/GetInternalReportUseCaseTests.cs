@@ -20,6 +20,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         private Mock<ILogger<GetInternalReportUseCase>> _mockLogger;
         private Mock<IApplicationApiGateway> _mockGateway;
         private Mock<IFileGateway> _mockFileGateway;
+        private Mock<IActivityHistory> _mockActivityGateway;
         private CsvGeneratorService _csvService;
         private GetInternalReportUseCase _classUnderTest;
         private Fixture _fixture;
@@ -30,8 +31,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockLogger = new Mock<ILogger<GetInternalReportUseCase>>();
             _mockGateway = new Mock<IApplicationApiGateway>();
             _mockFileGateway = new Mock<IFileGateway>();
+            _mockActivityGateway = new Mock<IActivityHistory>();
+
             _csvService = new CsvGeneratorService();
-            _classUnderTest = new GetInternalReportUseCase(_mockLogger.Object, _mockGateway.Object, _mockFileGateway.Object, _csvService);
+            _classUnderTest = new GetInternalReportUseCase(_mockLogger.Object,
+                _mockGateway.Object, _mockFileGateway.Object, _mockActivityGateway.Object, _csvService);
+
             _fixture = new Fixture();
         }
 
@@ -39,16 +44,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public async Task GetCasesInternalReportReturnsAFile()
         {
             // Arrange
-            var applications = _fixture.Create<List<Application>>();
-            applications.ForEach(x => x.Status = ApplicationStatus.Active);
-            var request = new InternalReportRequest
-            {
-                ReportType = InternalReportType.CasesReport,
-                StartDate = DateTime.Now.AddDays(-7),
-                EndDate = DateTime.Now.AddDays(7)
-            };
-
-            _mockGateway.Setup(x => x.GetApplicationsAtStatus(ApplicationStatus.Active)).Returns((applications));
+            SetupDataAndRequest(InternalReportType.CasesReport, out InternalReportRequest request);
 
             // Act
             var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
@@ -65,16 +61,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public async Task GetPeopleInternalReportReturnsAFile()
         {
             // Arrange
-            var applications = _fixture.Create<List<Application>>();
-            applications.ForEach(x => x.Status = ApplicationStatus.Active);
-            var request = new InternalReportRequest
-            {
-                ReportType = InternalReportType.PeopleReport,
-                StartDate = DateTime.Now.AddDays(-7),
-                EndDate = DateTime.Now.AddDays(7)
-            };
-
-            _mockGateway.Setup(x => x.GetApplicationsAtStatus(ApplicationStatus.Active)).Returns((applications));
+            SetupDataAndRequest(InternalReportType.PeopleReport, out InternalReportRequest request);
 
             // Act
             var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
@@ -85,6 +72,41 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.FileMimeType.Should().Be("text/csv");
             response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
             response.Data.Should().NotBeEmpty();
+        }
+
+        [Test]
+        public async Task GetCaseActivityInternalReportReturnsAFile()
+        {
+            // Arrange
+            SetupDataAndRequest(InternalReportType.CaseActivityReport, out InternalReportRequest request);
+
+            // Act
+            var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
+
+            // Assert
+            DateTime runDate = DateTime.Now;
+            response.Should().NotBeNull();
+            response.FileMimeType.Should().Be("text/csv");
+            response.FileName.Should().Be($"LBH-CASE-ACTIVITY REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.Data.Should().NotBeEmpty();
+        }
+
+        private void SetupDataAndRequest(InternalReportType reportType, out InternalReportRequest request)
+        {
+            List<Application> applications = _fixture.Create<List<Application>>();
+            applications.ForEach(x =>
+            {
+                x.CreatedAt = DateTime.UtcNow;
+            });
+
+            _mockGateway.Setup(x => x.GetApplications(It.IsAny<SearchQueryParameter>())).Returns(applications);
+
+            request = new InternalReportRequest
+            {
+                ReportType = reportType,
+                StartDate = DateTime.Now.AddDays(-7),
+                EndDate = DateTime.Now.AddDays(7)
+            };
         }
     }
 }

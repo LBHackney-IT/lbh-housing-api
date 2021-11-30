@@ -1,3 +1,4 @@
+using Hackney.Shared.ActivityHistory.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Infrastructure;
 using System;
@@ -16,8 +17,10 @@ namespace HousingRegisterApi.V1.Gateways
         void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity);
 
         /// <summary>
-        /// Gets the activity history for an application
+        ///  Gets the activity history for an application
         /// </summary>
-        Task<IList<EntityActivity<ApplicationActivityType>>> GetHistory(Guid applicationId);
+        /// <param name="applicationId"></param>
+        /// <returns></returns>
+        Task<IList<ActivityHistoryResponseObject>> GetActivites(Guid applicationId);
     }
 }

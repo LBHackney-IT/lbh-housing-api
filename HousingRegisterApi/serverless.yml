@@ -37,6 +37,7 @@ functions:
       EVIDENCE_API_REQUESTED_BY: ${ssm:/housing-register/${self:provider.stage}/evidence-api/requested-by}
       EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/get/evidence-requests/token}
       EVIDENCE_API_POST_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/post/evidence-requests/token}
+      ACTIVITYHISTORY_API_URL: ${ssm:/housing-register/${self:provider.stage}/activityhistory-api/base-url}
     events:
       - http:
           path: /{proxy+}

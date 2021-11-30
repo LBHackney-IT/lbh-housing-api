@@ -1,5 +1,6 @@
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
+using Hackney.Shared.ActivityHistory.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
@@ -62,29 +63,27 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
-        public async Task<IList<EntityActivity<ApplicationActivityType>>> GetHistory(Guid applicationId)
+        public async Task<IList<ActivityHistoryResponseObject>> GetActivites(Guid applicationId)
         {
-            var result = new List<EntityActivity<ApplicationActivityType>>();
+            var result = new List<ActivityHistoryResponseObject>();
 
-            var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
-
-            var uri = new Uri($"{baseUrl}activityhistory?targetId=${applicationId}&pageSize=100");
-
-            var token = GetAuthCookie();
-
-            using (var client = new HttpClient())
+            try
             {
+                var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
+                var uri = new Uri($"{baseUrl}activityhistory?targetId=${applicationId}&pageSize=500");
+                var token = GetAuthorizationHeader();
+
+                using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var response = await client.GetAsync(uri).ConfigureAwait(true);
 
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new Exception($"Incorrect status code returned: {response.StatusCode}");
-                }
-
                 result = await response.Content
-                    .ReadAsAsync<List<EntityActivity<ApplicationActivityType>>>()
+                    .ReadAsAsync<List<ActivityHistoryResponseObject>>()
                     .ConfigureAwait(true);
+            }
+            catch (Exception exp)
+            {
+                _logger.LogError($"Error retrieving history for application {applicationId}: {exp.Message}");
             }
 
             return result;
@@ -108,7 +107,7 @@ namespace HousingRegisterApi.V1.Gateways
             return token;
         }
 
-        private string GetAuthCookie()
+        private string GetAuthorizationHeader()
         {
             return _contextAccessor.HttpContext.Request.Headers["Authorization"];
         }
