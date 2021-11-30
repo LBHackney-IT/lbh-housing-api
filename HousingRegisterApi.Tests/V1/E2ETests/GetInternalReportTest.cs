@@ -100,5 +100,26 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
+        [Test]
+        public async Task GetOfficerActivityReportReturnsResponse()
+        {
+            // Arrange
+            var entity = _applicationFixture.ConstructTestEntity();
+            await SetupTestData(entity).ConfigureAwait(false);
+
+            var request = new InternalReportRequest
+            {
+                ReportType = InternalReportType.OfficerActivityReport,
+                StartDate = DateTime.Now.AddDays(-7).Date,
+                EndDate = DateTime.Now.AddDays(7).Date
+            };
+
+            // Act            
+            var response = await GetTestRequestAsync(request).ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
     }
 }
