@@ -64,6 +64,7 @@ namespace HousingRegisterApi.V1.UseCase
                 InternalReportType.CasesReport => await GetCaseReport(periodStart, periodEnd).ConfigureAwait(false),
                 InternalReportType.PeopleReport => await GetPeopleReport(periodStart, periodEnd).ConfigureAwait(false),
                 InternalReportType.CaseActivityReport => await GetCaseActivityReport(periodStart, periodEnd).ConfigureAwait(false),
+                InternalReportType.OfficerActivityReport => await GetOfficerActivityReport(periodStart, periodEnd).ConfigureAwait(false),
                 _ => null
             };
         }
@@ -138,6 +139,39 @@ namespace HousingRegisterApi.V1.UseCase
                     });
                 }
             }
+
+            var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
+            var file = new ExportFile(fileName, "text/csv", bytes);
+            return file;
+        }
+
+        private async Task<ExportFile> GetOfficerActivityReport(DateTime startDate, DateTime endDate)
+        {
+            var applications = _gateway.GetApplications(new SearchQueryParameter());
+
+            var applicationsInRange = applications
+                .Where(x => x.CreatedAt >= startDate
+                        && x.CreatedAt <= endDate).ToList();
+
+            string fileName = $"LBH-OFFICER-ACTIVITY REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+
+            var exportDataSet = new List<OfficerActivityReportDataRow>();
+
+            if (applicationsInRange.Any())
+            {
+                foreach (var application in applicationsInRange)
+                {
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
+
+                    activities?.ToList().ForEach(a =>
+                    {
+                        exportDataSet.Add(new OfficerActivityReportDataRow(a));
+                    });
+                }
+            }
+
+            // order by officer then date
+            exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
 
             var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);

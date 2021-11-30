@@ -91,6 +91,23 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.Data.Should().NotBeEmpty();
         }
 
+        [Test]
+        public async Task GetOfficerActivityInternalReportReturnsAFile()
+        {
+            // Arrange
+            SetupDataAndRequest(InternalReportType.OfficerActivityReport, out InternalReportRequest request);
+
+            // Act
+            var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
+
+            // Assert
+            DateTime runDate = DateTime.Now;
+            response.Should().NotBeNull();
+            response.FileMimeType.Should().Be("text/csv");
+            response.FileName.Should().Be($"LBH-OFFICER-ACTIVITY REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.Data.Should().NotBeEmpty();
+        }
+
         private void SetupDataAndRequest(InternalReportType reportType, out InternalReportRequest request)
         {
             List<Application> applications = _fixture.Create<List<Application>>();
