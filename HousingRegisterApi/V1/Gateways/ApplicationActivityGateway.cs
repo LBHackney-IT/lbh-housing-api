@@ -1,3 +1,4 @@
+using Hackney.Core.DynamoDb;
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
 using Hackney.Shared.ActivityHistory.Boundary.Response;
@@ -69,16 +70,16 @@ namespace HousingRegisterApi.V1.Gateways
             try
             {
                 var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
-                var uri = new Uri($"{baseUrl}activityhistory?targetId=${applicationId}&pageSize=500");
+                var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
                 var token = GetAuthorizationHeader();
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var response = await client.GetAsync(uri).ConfigureAwait(true);
-
-                result = await response.Content
-                    .ReadAsAsync<List<ActivityHistoryResponseObject>>()
+                var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
                     .ConfigureAwait(true);
+
+                result = pagedResult.Results;
             }
             catch (Exception exp)
             {
