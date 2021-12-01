@@ -18,7 +18,15 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
             Officer = activity.AuthorDetails?.FullName;
             ActivityDate = activity.CreatedAt.ToString();
-            activity.NewData.TryGetValue("_activityType", out object activityType);
+
+            string activityTypeKey = "_activityType";
+            string activityType = null;
+
+            if (activity.NewData?.ContainsKey(activityTypeKey) == true)
+            {
+                activityType = activity.NewData[activityTypeKey].ToString();
+            }
+
             ActivityType = activityType?.ToString();
         }
     }

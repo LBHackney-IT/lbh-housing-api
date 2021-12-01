@@ -109,7 +109,37 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.Data.Should().NotBeEmpty();
         }
 
-        private void SetupDataAndRequest(InternalReportType reportType, out InternalReportRequest request)
+        [Test]
+        public async Task GetCaseActivityInternalReportWithNullOldAndNewDataReturnsAFile()
+        {
+            // Arrange
+            SetupDataAndRequest(InternalReportType.CaseActivityReport, out InternalReportRequest request, true);
+
+            // Act
+            var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.FileMimeType.Should().Be("text/csv");
+            response.Data.Should().NotBeEmpty();
+        }
+
+        [Test]
+        public async Task GetOfficerActivityInternalReportWithNullOldAndNewDataReturnsAFile()
+        {
+            // Arrange
+            SetupDataAndRequest(InternalReportType.OfficerActivityReport, out InternalReportRequest request, true);
+
+            // Act
+            var response = await _classUnderTest.Execute(request).ConfigureAwait(false);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.FileMimeType.Should().Be("text/csv");
+            response.Data.Should().NotBeEmpty();
+        }
+
+        private void SetupDataAndRequest(InternalReportType reportType, out InternalReportRequest request, bool nullifyData = false)
         {
             var applications = _fixture.Create<List<Application>>();
             applications.ForEach(x =>
@@ -122,7 +152,15 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var activities = _fixture.Create<List<ActivityHistoryResponseObject>>();
             activities.ForEach(x =>
             {
-                x.NewData.Add("_activityType", "CaseViewedByUser");
+                if (nullifyData)
+                {
+                    x.NewData = null;
+                    x.OldData = null;
+                }
+                else
+                {
+                    x.NewData.Add("_activityType", "CaseViewedByUser");
+                }
             });
 
             _mockGateway.Setup(x => x.GetApplications(It.IsAny<SearchQueryParameter>())).Returns(applications);
