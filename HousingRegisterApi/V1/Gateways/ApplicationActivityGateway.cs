@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -76,10 +77,14 @@ namespace HousingRegisterApi.V1.Gateways
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var response = await client.GetAsync(uri).ConfigureAwait(true);
-                var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                    .ConfigureAwait(true);
 
-                result = pagedResult.Results;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
+                        .ConfigureAwait(true);
+
+                    result = pagedResult.Results;
+                }
             }
             catch (Exception exp)
             {
