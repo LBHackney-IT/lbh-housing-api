@@ -62,7 +62,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
         }
 
-        public async Task<IList<ActivityHistoryResponseObject>> GetActivities(Guid applicationId)
+        public async Task<List<ActivityHistoryResponseObject>> GetActivities(Guid applicationId)
         {
             var result = new List<ActivityHistoryResponseObject>();
 

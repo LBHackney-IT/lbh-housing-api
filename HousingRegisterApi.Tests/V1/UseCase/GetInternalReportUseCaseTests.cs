@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.ActivityHistory.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Report.Internal;
@@ -53,7 +54,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-CASES REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.FileName.Should().Be($"LBH-CASES REPORT-{runDate:ddMMyyyy}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -70,7 +71,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate:ddMMyyyy}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -87,7 +88,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-CASE-ACTIVITY REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.FileName.Should().Be($"LBH-CASE-ACTIVITY REPORT-{runDate:ddMMyyyy}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -104,19 +105,28 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-OFFICER-ACTIVITY REPORT-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.FileName.Should().Be($"LBH-OFFICER-ACTIVITY REPORT-{runDate:ddMMyyyy}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
         private void SetupDataAndRequest(InternalReportType reportType, out InternalReportRequest request)
         {
-            List<Application> applications = _fixture.Create<List<Application>>();
+            var applications = _fixture.Create<List<Application>>();
             applications.ForEach(x =>
             {
                 x.CreatedAt = DateTime.UtcNow;
             });
 
+            IList<ActivityHistoryResponseObject> a = new List<ActivityHistoryResponseObject>();
+
+            var activities = _fixture.Create<List<ActivityHistoryResponseObject>>();
+            activities.ForEach(x =>
+            {
+                x.NewData.Add("_activityType", "CaseViewedByUser");
+            });
+
             _mockGateway.Setup(x => x.GetApplications(It.IsAny<SearchQueryParameter>())).Returns(applications);
+            _mockActivityGateway.Setup(x => x.GetActivities(It.IsAny<Guid>())).Returns(Task.FromResult(activities));
 
             request = new InternalReportRequest
             {

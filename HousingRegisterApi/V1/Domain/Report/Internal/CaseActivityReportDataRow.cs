@@ -49,9 +49,9 @@ namespace HousingRegisterApi.V1.Domain.Report
         public CaseActivityReportDataRow(ActivityHistoryResponseObject activity, Application application)
         {
             CaseNumber = application.Reference;
-            OldData = string.Join(",", activity.OldData.Select(x => $"{x.Key} : {x.Value}"));
-            Change = string.Join(",", activity.NewData.Select(x => $"{x.Key} : {x.Value}"));
-            Officer = activity.AuthorDetails.FullName;
+            OldData = string.Join(",", activity.OldData?.Select(x => $"{x.Key} : {x.Value}"));
+            Change = string.Join(",", activity.NewData?.Select(x => $"{x.Key} : {x.Value}"));
+            Officer = activity.AuthorDetails?.FullName;
             ActivityDateTime = activity.CreatedAt.ToString();
 
             Status = application.Status;

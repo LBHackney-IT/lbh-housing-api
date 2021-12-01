@@ -21,6 +21,6 @@ namespace HousingRegisterApi.V1.Gateways
         /// </summary>
         /// <param name="applicationId"></param>
         /// <returns></returns>
-        Task<IList<ActivityHistoryResponseObject>> GetActivities(Guid applicationId);
+        Task<List<ActivityHistoryResponseObject>> GetActivities(Guid applicationId);
     }
 }

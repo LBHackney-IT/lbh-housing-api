@@ -49,7 +49,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-APPLICANT FEED-{runDate.Day}{runDate.Month}{runDate.Year}.csv");
+            response.FileName.Should().Be($"LBH-APPLICANT FEED-{runDate:ddMMyyyy}.csv");
             response.Data.Should().NotBeEmpty();
         }
 

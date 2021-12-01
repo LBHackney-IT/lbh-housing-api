@@ -16,9 +16,10 @@ namespace HousingRegisterApi.V1.Domain.Report
 
         public OfficerActivityReportDataRow(ActivityHistoryResponseObject activity)
         {
-            Officer = activity.AuthorDetails.FullName;
-            ActivityType = activity.NewData["_activityType"].ToString();
+            Officer = activity.AuthorDetails?.FullName;
             ActivityDate = activity.CreatedAt.ToString();
+            activity.NewData.TryGetValue("_activityType", out object activityType);
+            ActivityType = activityType?.ToString();
         }
     }
 }
