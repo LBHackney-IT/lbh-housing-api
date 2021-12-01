@@ -76,14 +76,19 @@ namespace HousingRegisterApi.V1.Gateways
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
-                var response = await client.GetAsync(uri).ConfigureAwait(true);
+                var response = await client.GetAsync(uri).ConfigureAwait(false);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                        .ConfigureAwait(true);
+                    var pagedResult = await response.Content
+                        .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
+                        .ConfigureAwait(false);
 
                     result = pagedResult.Results;
+                }
+                else
+                {
+                    throw new Exception("Invalid response from gateway :" + response.StatusCode);
                 }
             }
             catch (Exception exp)
