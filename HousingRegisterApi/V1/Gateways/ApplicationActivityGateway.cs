@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
@@ -70,25 +71,19 @@ namespace HousingRegisterApi.V1.Gateways
 
             try
             {
-                _logger.LogInformation($"Getting ACTIVITYHISTORY_API_URL");
-                var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
-                var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
-                var token = GetAuthorizationHeader();
+                using HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"), UriKind.Relative);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(GetAuthorizationHeader());
+                var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500", UriKind.Relative);
 
-                _logger.LogInformation($"Making request to:" + uri.ToString());
-                _logger.LogInformation($"Making request with token:" + token);
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Authorization", token);
                 var response = await client.GetAsync(uri).ConfigureAwait(true);
                 _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    var pagedResult = await response.Content
-                        .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                        .ConfigureAwait(true);
-
+                    var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>().ConfigureAwait(true);
                     result = pagedResult.Results;
+
                     _logger.LogInformation("activity gateway result count " + result.Count);
                 }
                 else if (response.StatusCode != HttpStatusCode.NotFound)
