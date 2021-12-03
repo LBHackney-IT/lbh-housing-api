@@ -72,7 +72,7 @@ namespace HousingRegisterApi.V1.Gateways
             try
             {
                 using HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"));
+                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"), UriKind.Absolute);
                 string token = GetAuthorizationHeader();
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500");
