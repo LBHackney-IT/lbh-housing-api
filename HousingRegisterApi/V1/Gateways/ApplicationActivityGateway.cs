@@ -75,6 +75,7 @@ namespace HousingRegisterApi.V1.Gateways
                 var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
                 var token = GetAuthorizationHeader();
 
+                _logger.LogInformation($"Making request to:" + uri.ToString());
                 _logger.LogInformation($"Making request with token:" + token);
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
