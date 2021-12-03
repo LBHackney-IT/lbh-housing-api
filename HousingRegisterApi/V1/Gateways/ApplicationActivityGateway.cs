@@ -79,14 +79,14 @@ namespace HousingRegisterApi.V1.Gateways
                 _logger.LogInformation($"Making request with token:" + token);
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
-                var response = await client.GetAsync(uri).ConfigureAwait(false);
+                var response = await client.GetAsync(uri).ConfigureAwait(true);
                 _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var pagedResult = await response.Content
                         .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                        .ConfigureAwait(false);
+                        .ConfigureAwait(true);
 
                     result = pagedResult.Results;
                     _logger.LogInformation("activity gateway result count " + result.Count);
