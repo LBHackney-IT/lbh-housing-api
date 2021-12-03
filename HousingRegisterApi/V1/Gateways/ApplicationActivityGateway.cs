@@ -70,9 +70,11 @@ namespace HousingRegisterApi.V1.Gateways
 
             try
             {
+                _logger.LogInformation($"Getting ACTIVITYHISTORY_API_URL");
                 var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
                 var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
                 var token = GetAuthorizationHeader();
+                _logger.LogInformation($"Getting ACTIVITYHISTORY_API_URL " + baseUrl);
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
