@@ -47,7 +47,7 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("export")]
         public async Task<IActionResult> DownloadReport([FromQuery][Required] InternalReportRequest request)
         {
-            var result = await _getInternalReportUseCase.Execute(request).ConfigureAwait(false);
+            var result = await _getInternalReportUseCase.Execute(request).ConfigureAwait(true);
             if (result == null) return NotFound();
 
             return File(result.Data, result.FileMimeType, result.FileName);
