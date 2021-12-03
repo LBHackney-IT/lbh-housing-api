@@ -31,19 +31,19 @@ namespace HousingRegisterApi.V1.Gateways
             _logger.LogInformation($"Attempting to retrieve {fileName} from bucket {_bucketName}");
 
             string fileKey = GetFileKey(fileName, parentFolderName);
-            var response = await GetAwsFile(fileKey).ConfigureAwait(false);
-            var tags = await GetAwsFileTags(fileKey).ConfigureAwait(false);
+            var s3Object = await GetS3Object(fileKey).ConfigureAwait(false);
+            var s3ObjectTags = await GetS3ObjectTags(fileKey).ConfigureAwait(false);
 
             byte[] data = null;
             using (MemoryStream ms = new MemoryStream())
             {
-                response.ResponseStream.CopyTo(ms);
+                s3Object.ResponseStream.CopyTo(ms);
                 data = ms.ToArray();
             };
 
-            var file = new ExportFile(fileName, response.Headers.ContentType, data)
+            var file = new ExportFile(fileName, s3Object.Headers.ContentType, data)
             {
-                Attributes = tags.Tagging.ToDictionary()
+                Attributes = s3ObjectTags.ToDictionary()
             };
 
             return file;
@@ -53,15 +53,9 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
 
-            ListObjectsV2Request request = new ListObjectsV2Request
-            {
-                BucketName = _bucketName,
-                Prefix = string.IsNullOrWhiteSpace(parentFolderName) ? _bucketName : parentFolderName.ToUpper() + "/"
-            };
+            var s3Objects = await GetS3Objects(parentFolderName).ConfigureAwait(false);
 
-            var response = await _amazonS3.ListObjectsV2Async(request).ConfigureAwait(false);
-
-            var files = response.S3Objects.Select(x => new ExportFileItem(Path.GetFileName(x.Key))
+            var files = s3Objects.Select(x => new ExportFileItem(Path.GetFileName(x.Key))
             {
                 LastModified = x.LastModified,
                 Size = x.Size,
@@ -70,7 +64,7 @@ namespace HousingRegisterApi.V1.Gateways
             foreach (var file in files)
             {
                 string fileKey = GetFileKey(file.FileName, parentFolderName);
-                file.Attributes = (await GetAwsFileTags(fileKey).ConfigureAwait(false)).Tagging.ToDictionary();
+                file.Attributes = (await GetS3ObjectTags(fileKey).ConfigureAwait(false)).ToDictionary();
             }
 
             return files.ToList();
@@ -79,9 +73,63 @@ namespace HousingRegisterApi.V1.Gateways
         public async Task SaveFile(ExportFile file, string parentFolderName = "")
         {
             _logger.LogInformation($"Attempting to save {file.FileName} to bucket {_bucketName}");
-
             string fileKey = GetFileKey(file.FileName, parentFolderName);
+            await PutS3Object(file, fileKey).ConfigureAwait(false);
+        }
 
+        public async Task<Dictionary<string, string>> GetAttributes(string fileName, string parentFolderName = "")
+        {
+            _logger.LogInformation($"Attempting to get {fileName} attributes");
+            string fileKey = GetFileKey(fileName, parentFolderName);
+            var s3ObjectTags = await GetS3ObjectTags(fileKey).ConfigureAwait(false);
+            return s3ObjectTags.ToDictionary();
+        }
+
+        public async Task UpdateAttributes(string fileName, Dictionary<string, string> attributes, string parentFolderName = "")
+        {
+            _logger.LogInformation($"Attempting to set {fileName} attributes");
+            string fileKey = GetFileKey(fileName, parentFolderName);
+            await PutS3ObjectTags(attributes, fileKey).ConfigureAwait(false);
+        }
+
+        private async Task<List<S3Object>> GetS3Objects(string parentFolderName = "")
+        {
+            ListObjectsV2Request request = new ListObjectsV2Request
+            {
+                BucketName = _bucketName,
+                Prefix = string.IsNullOrWhiteSpace(parentFolderName) ? _bucketName : parentFolderName.ToUpper() + "/"
+            };
+
+            var response = await _amazonS3.ListObjectsV2Async(request).ConfigureAwait(false);
+
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            {
+                _logger.LogError($"Unable to get files in {parentFolderName}");
+            }
+
+            return response.S3Objects;
+        }
+
+        private async Task<GetObjectResponse> GetS3Object(string key)
+        {
+            GetObjectRequest request = new GetObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key
+            };
+
+            var response = await _amazonS3.GetObjectAsync(request).ConfigureAwait(false);
+
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            {
+                _logger.LogError($"Unable to get file {key}");
+            }
+
+            return response;
+        }
+
+        private async Task PutS3Object(ExportFile file, string fileKey)
+        {
             PutObjectRequest request = new PutObjectRequest
             {
                 BucketName = _bucketName,
@@ -96,56 +144,11 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
             {
-                _logger.LogError("Error saving file");
+                _logger.LogError($"Unable to save file {fileKey} to {_bucketName}");
             }
         }
 
-        public async Task<Dictionary<string, string>> GetAttributes(string fileName, string parentFolderName = "")
-        {
-            _logger.LogInformation($"Attempting to get {fileName} attributes");
-            string fileKey = GetFileKey(fileName, parentFolderName);
-            var tagsResponse = await GetAwsFileTags(fileKey).ConfigureAwait(false);
-            return tagsResponse.Tagging.ToDictionary();
-        }
-
-        public async Task UpdateAttributes(string fileName, Dictionary<string, string> attributes, string parentFolderName = "")
-        {
-            _logger.LogInformation($"Attempting to set {fileName} attributes");
-
-            if (attributes?.Any() == true)
-            {
-                string fileKey = GetFileKey(fileName, parentFolderName);
-                var currentTagsResponse = await GetAwsFileTags(fileKey).ConfigureAwait(false);
-
-                PutObjectTaggingRequest request = new PutObjectTaggingRequest
-                {
-                    BucketName = _bucketName,
-                    Key = fileKey,
-                    Tagging = new Tagging()
-                    {
-                        TagSet = currentTagsResponse.Tagging.AppendAttributes(attributes)
-                    }
-                };
-
-                if (currentTagsResponse.Tagging.Any() || request.Tagging.TagSet.Any())
-                {
-                    await _amazonS3.PutObjectTaggingAsync(request).ConfigureAwait(false);
-                }
-            }
-        }
-
-        private async Task<GetObjectResponse> GetAwsFile(string key)
-        {
-            GetObjectRequest request = new GetObjectRequest
-            {
-                BucketName = _bucketName,
-                Key = key
-            };
-
-            return await _amazonS3.GetObjectAsync(request).ConfigureAwait(false);
-        }
-
-        private async Task<GetObjectTaggingResponse> GetAwsFileTags(string key)
+        private async Task<List<Tag>> GetS3ObjectTags(string key)
         {
             GetObjectTaggingRequest request = new GetObjectTaggingRequest
             {
@@ -153,7 +156,44 @@ namespace HousingRegisterApi.V1.Gateways
                 Key = key,
             };
 
-            return await _amazonS3.GetObjectTaggingAsync(request).ConfigureAwait(false);
+            var response = await _amazonS3.GetObjectTaggingAsync(request).ConfigureAwait(false);
+
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            {
+                _logger.LogError($"Unable to get tags for {key}");
+            }
+
+            return response.Tagging;
+        }
+
+        private async Task PutS3ObjectTags(Dictionary<string, string> attributes, string key)
+        {
+            // get existing tags
+            var s3ObjectTags = await GetS3ObjectTags(key).ConfigureAwait(false);
+
+            PutObjectTaggingRequest request = new PutObjectTaggingRequest
+            {
+                BucketName = _bucketName,
+                Key = key,
+                Tagging = new Tagging()
+                {
+                    TagSet = s3ObjectTags.AppendAttributes(attributes)
+                }
+            };
+
+            if (s3ObjectTags.Any() || request.Tagging.TagSet.Any())
+            {
+                var response = await _amazonS3.PutObjectTaggingAsync(request).ConfigureAwait(false);
+
+                if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogError($"Unable to set tags for {key}");
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"No tags to update for {key}");
+            }
         }
 
         private static string GetFileKey(string fileName, string parentFolderName = "")
