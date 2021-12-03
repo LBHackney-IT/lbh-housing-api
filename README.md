@@ -2,6 +2,10 @@
 
 An API to submit and review applications to the housing register. Using the Base API as boilerplate code.
 
+## What does it do?
+
+[**🚀 Swagger**](https://app.swaggerhub.com/apis-docs/Hackney/housing-register-api/1.0.0) ([Edit it here](https://app.swaggerhub.com/apis/Hackney/housing-register-api/1.0.0))
+
 ## Stack
 
 - .NET Core as a web framework.
@@ -10,7 +14,9 @@ An API to submit and review applications to the housing register. Using the Base
 
 ## Dependencies
 
-- TBC
+- [Gov.uk Notify](https://gov.uk/notify)
+- [Evidence API](https://github.com/LBHackney-IT/evidence-api)
+- [Activity History API](https://github.com/LBHackney-IT/activity-history-api)
 
 ## Contributing
 
@@ -28,7 +34,8 @@ To serve the application, run it using your IDE of choice, we use Visual Studio 
 **Note**
 When running locally the appropriate database connection details are still needed.
 
-##### DynamoDb
+#### DynamoDb
+
 To use a local instance of DynamoDb, this can be [installed](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html) or run via [Docker](https://www.docker.com/products/docker-desktop).
 
 The following command will start up a new Docker container with DynamoDb.
@@ -51,6 +58,15 @@ Build and serve the application. It will be available in the port 3000.
 ```sh
 $ make build && make serve
 ```
+
+#### Notify
+
+The application uses GOV.UK Notify to send emails.
+
+When running the application locally we make calls to the Notify service and so you need to:
+
+1. Ask to be invited to the _Housing Register applications_ service as a team member to access the Notify dashboard
+2. Update your local `.env` file with the correct values for the properties `NOTIFY_TEMPLATE_VERIFY_CODE*` and `NOTIFY_API_KEY` (these should use the **development** API key)
 
 ### Release process
 
