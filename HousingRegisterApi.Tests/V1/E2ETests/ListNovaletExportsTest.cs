@@ -36,7 +36,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task ListNovaletExportsReturnsAListOfFiles()
         {
             // Arrange
-            await CreateTestFile("samplefile.csv").ConfigureAwait(false);
+            await CreateTestFile("NOVALET/samplefile.csv").ConfigureAwait(false);
 
             // Act            
             var response = await GetTestRequestAsync().ConfigureAwait(false);
