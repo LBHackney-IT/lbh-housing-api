@@ -1,10 +1,6 @@
-using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Report;
 using HousingRegisterApi.V1.Gateways;
-using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
@@ -20,7 +16,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<ExportFile> Execute(string fileName)
         {
-            var file = await _fileGateway.GetFile(fileName).ConfigureAwait(false);
+            var file = await _fileGateway.GetFile(fileName, "Novalet").ConfigureAwait(false);
             return file;
         }
     }

@@ -1,12 +1,8 @@
 using FluentAssertions;
-using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
-using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
 using NUnit.Framework;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
@@ -25,9 +21,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         {
             // Arrange
             string fileName = "samplefile.csv";
-            await CreateTestFile(fileName).ConfigureAwait(false);
-            var tags = await GetFileTags(fileName).ConfigureAwait(false);
-            Assert.IsFalse(tags.Exists(x => x.Key.Equals("status")));
+            string fileKey = "NOVALET/" + fileName;
+            await CreateTestFile(fileKey).ConfigureAwait(false);
+            var tags = await GetFileTags(fileKey).ConfigureAwait(false);
+            var status = tags.Find(x => x.Key == "approvedOn")?.Value ?? null;
+            Assert.IsNull(status);
 
             // Act            
             var response = await PostTestRequestAsync(fileName).ConfigureAwait(false);
@@ -35,8 +33,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            tags = await GetFileTags(fileName).ConfigureAwait(false);
-            Assert.IsTrue(tags.Find(x => x.Key.Equals("status")).Value == "approved");
+            tags = await GetFileTags(fileKey).ConfigureAwait(false);
+            status = tags.Find(x => x.Key == "approvedOn")?.Value ?? null;
+            Assert.IsNotNull(status);
         }
     }
 }

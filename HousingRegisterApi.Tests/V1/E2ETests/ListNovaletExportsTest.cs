@@ -1,9 +1,9 @@
 using FluentAssertions;
-using HousingRegisterApi.Tests.V1.E2ETests.Fixtures;
-using HousingRegisterApi.V1.Domain;
-using HousingRegisterApi.V1.Factories;
+using HousingRegisterApi.V1.Domain.Report;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,6 +23,19 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         public async Task ListNovaletExportsReturnsResponse()
         {
             // Arrange
+            await CreateTestFile("NOVALET/samplefile.csv").ConfigureAwait(false);
+
+            // Act            
+            var response = await GetTestRequestAsync().ConfigureAwait(false);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task ListNovaletExportsReturnsAListOfFiles()
+        {
+            // Arrange
             await CreateTestFile("samplefile.csv").ConfigureAwait(false);
 
             // Act            
@@ -30,6 +43,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseValue = JsonConvert.DeserializeObject<List<ExportFileItem>>(responseContent);
+
+            responseValue.Count.Should().BeGreaterOrEqualTo(1);
         }
     }
 }

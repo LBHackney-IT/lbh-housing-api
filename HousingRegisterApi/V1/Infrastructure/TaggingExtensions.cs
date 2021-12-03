@@ -50,21 +50,34 @@ namespace HousingRegisterApi.V1.Infrastructure
                 }
             }
 
+            // remove all attributes where there are null or empty strings
+            // otherwise the tag update request will fail
+            result.RemoveAll(x => string.IsNullOrWhiteSpace(x.Value));
             return result;
         }
 
-        public static List<Tag> AppendTags(this Dictionary<string, string> source, List<Tag> tags)
+        public static List<Tag> AppendAttributes(this List<Tag> tags, Dictionary<string, string> attributes)
         {
-            var result = source.ToTagList();
+            var destination = tags.ToDictionary();
 
-            if (tags?.Any() == true)
+            if (attributes?.Any() == true)
             {
-                // remove existing and replace with new ones
-                result.RemoveAll(t => tags.Exists(x => x.Key.Equals(t.Key, StringComparison.OrdinalIgnoreCase)));
-                result.AddRange(tags);
+                foreach (var attribute in attributes)
+                {
+                    if (destination.ContainsKey(attribute.Key))
+                    {
+                        // overwrite values
+                        destination[attribute.Key] = attribute.Value;
+                    }
+                    else
+                    {
+                        // add new value
+                        destination.Add(attribute.Key, attribute.Value);
+                    }
+                }
             }
 
-            return result;
+            return destination.ToTagList();
         }
     }
 }

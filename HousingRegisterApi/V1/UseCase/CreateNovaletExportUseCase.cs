@@ -49,7 +49,7 @@ namespace HousingRegisterApi.V1.UseCase
             if (file != null)
             {
                 // save file to s3 gateway
-                var response = _fileGateway.SaveFile(file).ConfigureAwait(false);
+                var response = _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
                 _logger.LogInformation($"File {file.FileName} was succesfully generated");
                 return file;
             }
