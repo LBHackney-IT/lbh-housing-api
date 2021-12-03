@@ -37,8 +37,7 @@ namespace HousingRegisterApi.V1.UseCase
             attributes.ApprovedOn = System.DateTime.UtcNow;
             attributes.ApprovedBy = token?.Name;
 
-            await _fileGateway.UpdateAttributes(fileName, attributes.ToDictionary()
-                , "Novalet").ConfigureAwait(false);
+            await _fileGateway.UpdateAttributes(fileName, attributes.ToDictionary(), "Novalet").ConfigureAwait(false);
 
             return true;
         }

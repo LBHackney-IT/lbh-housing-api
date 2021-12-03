@@ -41,6 +41,8 @@ namespace HousingRegisterApi.V1.UseCase
             attributes.LastDownloadedOn = System.DateTime.UtcNow;
             attributes.LastDownloadedBy = token?.Name;
 
+            await _fileGateway.UpdateAttributes(fileName, attributes.ToDictionary(), "Novalet").ConfigureAwait(false);
+
             return file;
         }
     }
