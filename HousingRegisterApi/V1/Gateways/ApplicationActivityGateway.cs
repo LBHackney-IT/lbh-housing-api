@@ -70,16 +70,15 @@ namespace HousingRegisterApi.V1.Gateways
 
             try
             {
-                _logger.LogInformation($"Getting ACTIVITYHISTORY_API_URL");
                 var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
                 var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
                 var token = GetAuthorizationHeader();
-                _logger.LogInformation($"Getting ACTIVITYHISTORY_API_URL " + baseUrl);
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", token);
                 var response = await client.GetAsync(uri).ConfigureAwait(false);
 
+                _logger.LogError("activity gateway response:" + applicationId + " " + response.StatusCode);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var pagedResult = await response.Content
@@ -87,6 +86,7 @@ namespace HousingRegisterApi.V1.Gateways
                         .ConfigureAwait(false);
 
                     result = pagedResult.Results;
+                    _logger.LogError("activity gateway result count " + result.Count);
                 }
                 else if (response.StatusCode != HttpStatusCode.NotFound)
                 {
