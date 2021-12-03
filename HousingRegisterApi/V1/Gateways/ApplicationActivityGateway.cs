@@ -68,25 +68,32 @@ namespace HousingRegisterApi.V1.Gateways
         {
             var result = new List<ActivityHistoryResponseObject>();
 
-            var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
-            var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
-            var token = GetAuthorizationHeader();
-
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", token);
-            var response = await client.GetAsync(uri).ConfigureAwait(false);
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                var pagedResult = await response.Content
-                    .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                    .ConfigureAwait(false);
+                var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
+                var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
+                var token = GetAuthorizationHeader();
 
-                result = pagedResult.Results;
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", token);
+                var response = await client.GetAsync(uri).ConfigureAwait(false);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var pagedResult = await response.Content
+                        .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
+                        .ConfigureAwait(false);
+
+                    result = pagedResult.Results;
+                }
+                else if (response.StatusCode != HttpStatusCode.NotFound)
+                {
+                    _logger.LogError("Error calling activity gateway");
+                }
             }
-            else if (response.StatusCode != HttpStatusCode.NotFound)
+            catch (Exception exp)
             {
-                _logger.LogError("Error calling activity gateway");
+                _logger.LogError($"Error calling activity gateway: {exp.Message}");
             }
 
             return result;
@@ -112,14 +119,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         private string GetAuthorizationHeader()
         {
-            var headers = _contextAccessor.HttpContext.Request.Headers;
-
-            if (headers.ContainsKey("Authorization"))
-            {
-                return headers["Authorization"];
-            }
-
-            return "Bearer ";
+            return _contextAccessor.HttpContext.Request.Headers["Authorization"];
         }
 
         private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
