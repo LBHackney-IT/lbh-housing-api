@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Domain.Report;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace HousingRegisterApi.V1.UseCase
             _fileGateway = fileGateway;
         }
 
-        public async Task<List<string>> Execute()
+        public async Task<List<ExportFileItem>> Execute()
         {
-            return await _fileGateway.ListFiles().ConfigureAwait(false);
+            return await _fileGateway.ListFiles("Novalet").ConfigureAwait(false);
         }
     }
 }
