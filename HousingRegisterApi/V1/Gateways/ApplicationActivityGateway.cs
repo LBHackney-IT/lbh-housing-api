@@ -72,9 +72,9 @@ namespace HousingRegisterApi.V1.Gateways
             try
             {
                 using HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"), UriKind.Relative);
+                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(GetAuthorizationHeader());
-                var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500", UriKind.Relative);
+                var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500");
 
                 var response = await client.GetAsync(uri).ConfigureAwait(true);
                 _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
