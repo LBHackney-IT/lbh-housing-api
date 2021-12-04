@@ -41,7 +41,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             var periodStart = new DateTime(request.StartDate.Year, request.StartDate.Month, request.StartDate.Day, 23, 59, 59);
             var periodEnd = new DateTime(request.EndDate.Year, request.EndDate.Month, request.EndDate.Day, 0, 0, 0);
-            var file = await GetReportFile(request, periodStart, periodEnd).ConfigureAwait(false);
+            var file = await GetReportFile(request, periodStart, periodEnd).ConfigureAwait(true);
 
             if (file != null)
             {
@@ -63,8 +63,8 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 InternalReportType.CasesReport => await GetCaseReport(periodStart, periodEnd).ConfigureAwait(false),
                 InternalReportType.PeopleReport => await GetPeopleReport(periodStart, periodEnd).ConfigureAwait(false),
-                InternalReportType.CaseActivityReport => await GetCaseActivityReport(periodStart, periodEnd).ConfigureAwait(false),
-                InternalReportType.OfficerActivityReport => await GetOfficerActivityReport(periodStart, periodEnd).ConfigureAwait(false),
+                InternalReportType.CaseActivityReport => await GetCaseActivityReport(periodStart, periodEnd).ConfigureAwait(true),
+                InternalReportType.OfficerActivityReport => await GetOfficerActivityReport(periodStart, periodEnd).ConfigureAwait(true),
                 _ => null
             };
         }
@@ -111,7 +111,7 @@ namespace HousingRegisterApi.V1.UseCase
                 {
                     _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
-                    _logger.LogInformation("activities retrieved");
+                    _logger.LogInformation("activities retrieved " + activities.Count);
 
                     foreach (var activity in activities)
                     {
@@ -136,7 +136,9 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
+                    _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
+                    _logger.LogInformation("activities retrieved " + activities.Count);
 
                     foreach (var activity in activities)
                     {
