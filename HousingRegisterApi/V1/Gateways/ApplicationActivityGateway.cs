@@ -11,13 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
     public class ApplicationActivityGateway : IActivityGateway
     {
+        private readonly HttpClient _client;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IHttpContextWrapper _contextWrapper;
         private readonly ITokenFactory _tokenFactory;
@@ -26,6 +26,8 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly ILogger<ApplicationActivityGateway> _logger;
 
         public ApplicationActivityGateway(
+            HttpClient httpClient,
+            ApiOptions apiOptions,
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
@@ -33,12 +35,15 @@ namespace HousingRegisterApi.V1.Gateways
             ISnsFactory snsFactory,
             ILogger<ApplicationActivityGateway> logger)
         {
+            _client = httpClient;
             _contextAccessor = contextAccessor;
             _contextWrapper = contextWrapper;
             _tokenFactory = tokenFactory;
             _snsGateway = snsGateway;
             _snsFactory = snsFactory;
             _logger = logger;
+
+            _client.BaseAddress = apiOptions.ActivityHistoryApiUrl;
         }
 
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
@@ -71,13 +76,10 @@ namespace HousingRegisterApi.V1.Gateways
 
             try
             {
-                using HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL"), UriKind.Absolute);
-                string token = GetAuthorizationHeader();
-                client.DefaultRequestHeaders.Add("Authorization", token);
                 var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500", UriKind.Relative);
+                _client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationHeader());
 
-                var response = await client.GetAsync(uri).ConfigureAwait(true);
+                var response = await _client.GetAsync(uri).ConfigureAwait(true);
                 _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
 
                 if (response.StatusCode == HttpStatusCode.OK)

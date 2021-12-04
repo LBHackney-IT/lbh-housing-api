@@ -147,13 +147,13 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
-            services.AddScoped<IActivityGateway, ApplicationActivityGateway>();
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddScoped<IFileGateway, FileExportGateway>();
 
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
+            services.AddHttpClient<IActivityGateway, ApplicationActivityGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
