@@ -109,13 +109,13 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
-                    _logger.LogInformation("activities retrieved " + activities.Count);
 
                     foreach (var activity in activities)
                     {
+                        _logger.LogInformation("adding activity " + activity.TargetType);
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
+                        _logger.LogInformation("added activity");
                     };
                 }
             }
@@ -136,13 +136,13 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
-                    _logger.LogInformation("activities retrieved " + activities.Count);
 
                     foreach (var activity in activities)
                     {
+                        _logger.LogInformation("adding activity " + activity.TargetType);
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
+                        _logger.LogInformation("added activity");
                     };
                 }
             }
