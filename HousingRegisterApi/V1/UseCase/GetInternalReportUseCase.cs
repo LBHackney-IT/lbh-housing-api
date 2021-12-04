@@ -116,7 +116,7 @@ namespace HousingRegisterApi.V1.UseCase
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
                     };
 
-                    _logger.LogInformation("case activity item " + exportDataSet.Count);
+                    _logger.LogInformation("case activity item " + exportDataSet.Count + " of " + applicationsInRange.Count);
                 }
             }
 
@@ -141,7 +141,7 @@ namespace HousingRegisterApi.V1.UseCase
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
                     };
 
-                    _logger.LogInformation("officer activity item " + exportDataSet.Count);
+                    _logger.LogInformation("officer activity item " + exportDataSet.Count + " of " + applicationsInRange.Count);
                 }
             }
 
