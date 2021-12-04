@@ -109,7 +109,9 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
+                    _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
+                    _logger.LogInformation("activities retrieved");
 
                     activities?.ToList().ForEach(a =>
                     {

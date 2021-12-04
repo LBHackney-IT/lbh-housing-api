@@ -81,14 +81,11 @@ namespace HousingRegisterApi.V1.Gateways
                 SetRequestHeader();
 
                 var response = await _client.GetAsync(uri).ConfigureAwait(true);
-                _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>().ConfigureAwait(true);
                     result = pagedResult.Results;
-
-                    _logger.LogInformation("activity gateway result count " + result.Count);
                 }
                 else if (response.StatusCode != HttpStatusCode.NotFound)
                 {
