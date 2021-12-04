@@ -113,14 +113,12 @@ namespace HousingRegisterApi.V1.UseCase
 
                     foreach (var activity in activities)
                     {
-                        _logger.LogInformation("adding activity " + activity.TargetType);
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
-                        _logger.LogInformation("added activity");
                     };
+
+                    _logger.LogInformation("case activity item " + exportDataSet.Count);
                 }
             }
-
-            _logger.LogInformation("report item count " + exportDataSet.Count);
 
             return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
         }
@@ -140,14 +138,12 @@ namespace HousingRegisterApi.V1.UseCase
 
                     foreach (var activity in activities)
                     {
-                        _logger.LogInformation("adding activity " + activity.TargetType);
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
-                        _logger.LogInformation("added activity");
                     };
+
+                    _logger.LogInformation("officer activity item " + exportDataSet.Count);
                 }
             }
-
-            _logger.LogInformation("report item count " + exportDataSet.Count);
 
             // order by officer then date
             exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
