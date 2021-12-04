@@ -113,12 +113,14 @@ namespace HousingRegisterApi.V1.UseCase
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
                     _logger.LogInformation("activities retrieved");
 
-                    activities?.ToList().ForEach(a =>
+                    foreach (var activity in activities)
                     {
-                        exportDataSet.Add(new CaseActivityReportDataRow(a, application));
-                    });
+                        exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
+                    };
                 }
             }
+
+            _logger.LogInformation("report item count " + exportDataSet.Count);
 
             return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
         }
@@ -134,16 +136,16 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    _logger.LogInformation("getting activities");
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
-                    _logger.LogInformation("activities retrieved");
 
-                    activities?.ToList().ForEach(a =>
+                    foreach (var activity in activities)
                     {
-                        exportDataSet.Add(new OfficerActivityReportDataRow(a));
-                    });
+                        exportDataSet.Add(new OfficerActivityReportDataRow(activity));
+                    };
                 }
             }
+
+            _logger.LogInformation("report item count " + exportDataSet.Count);
 
             // order by officer then date
             exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
