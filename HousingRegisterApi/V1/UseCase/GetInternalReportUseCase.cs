@@ -109,7 +109,7 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
 
                     activities?.ToList().ForEach(a =>
                     {
