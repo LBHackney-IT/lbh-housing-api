@@ -120,7 +120,7 @@ namespace HousingRegisterApi.V1.UseCase
                 }
             }
 
-            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
         }
 
         private async Task<ExportFile> GetOfficerActivityReport(DateTime startDate, DateTime endDate)
@@ -134,7 +134,9 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
+                    _logger.LogInformation("getting activities");
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
+                    _logger.LogInformation("activities retrieved");
 
                     activities?.ToList().ForEach(a =>
                     {
@@ -146,7 +148,7 @@ namespace HousingRegisterApi.V1.UseCase
             // order by officer then date
             exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
 
-            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
         }
 
         private List<Application> GetApplicationsInRange(DateTime startDate, DateTime endDate)
