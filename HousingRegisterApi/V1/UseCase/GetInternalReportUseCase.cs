@@ -41,7 +41,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             var periodStart = new DateTime(request.StartDate.Year, request.StartDate.Month, request.StartDate.Day, 23, 59, 59);
             var periodEnd = new DateTime(request.EndDate.Year, request.EndDate.Month, request.EndDate.Day, 0, 0, 0);
-            var file = await GetReportFile(request, periodStart, periodEnd).ConfigureAwait(true);
+            var file = await GetReportFile(request, periodStart, periodEnd).ConfigureAwait(false);
 
             if (file != null)
             {
@@ -63,8 +63,8 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 InternalReportType.CasesReport => await GetCaseReport(periodStart, periodEnd).ConfigureAwait(false),
                 InternalReportType.PeopleReport => await GetPeopleReport(periodStart, periodEnd).ConfigureAwait(false),
-                InternalReportType.CaseActivityReport => await GetCaseActivityReport(periodStart, periodEnd).ConfigureAwait(true),
-                InternalReportType.OfficerActivityReport => await GetOfficerActivityReport(periodStart, periodEnd).ConfigureAwait(true),
+                InternalReportType.CaseActivityReport => await GetCaseActivityReport(periodStart, periodEnd).ConfigureAwait(false),
+                InternalReportType.OfficerActivityReport => await GetOfficerActivityReport(periodStart, periodEnd).ConfigureAwait(false),
                 _ => null
             };
         }
@@ -109,18 +109,16 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
 
                     foreach (var activity in activities)
                     {
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
                     };
-
-                    _logger.LogInformation("case activity item " + exportDataSet.Count + " of " + applicationsInRange.Count);
                 }
             }
 
-            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
         }
 
         private async Task<ExportFile> GetOfficerActivityReport(DateTime startDate, DateTime endDate)
@@ -134,21 +132,19 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 foreach (var application in applicationsInRange)
                 {
-                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(true);
+                    var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
 
                     foreach (var activity in activities)
                     {
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
                     };
-
-                    _logger.LogInformation("officer activity item " + exportDataSet.Count + " of " + applicationsInRange.Count);
                 }
             }
 
             // order by officer then date
             exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
 
-            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(true);
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
         }
 
         private List<Application> GetApplicationsInRange(DateTime startDate, DateTime endDate)
@@ -165,7 +161,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GenerateReport(string fileName, Array exportDataSet)
         {
             _logger.LogInformation($"Generating report");
-            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(true);
+            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
             _logger.LogInformation($"Report generated");
             return file;
