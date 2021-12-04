@@ -165,7 +165,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GenerateReport(string fileName, Array exportDataSet)
         {
             _logger.LogInformation($"Generating report");
-            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
+            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(true);
             var file = new ExportFile(fileName, "text/csv", bytes);
             _logger.LogInformation($"Report generated");
             return file;
