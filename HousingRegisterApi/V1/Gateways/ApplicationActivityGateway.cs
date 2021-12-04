@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
@@ -77,7 +78,7 @@ namespace HousingRegisterApi.V1.Gateways
             try
             {
                 var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500", UriKind.Relative);
-                _client.DefaultRequestHeaders.Add("Authorization", GetAuthorizationHeader());
+                SetRequestHeader();
 
                 var response = await _client.GetAsync(uri).ConfigureAwait(true);
                 _logger.LogInformation("activity gateway response:" + applicationId + " " + response.StatusCode);
@@ -120,14 +121,22 @@ namespace HousingRegisterApi.V1.Gateways
             return token;
         }
 
-        private string GetAuthorizationHeader()
+        private string GetAuthToken()
         {
-            return _contextAccessor.HttpContext.Request.Headers["Authorization"];
+            string bearerToken = _contextAccessor.HttpContext.Request.Headers["Authorization"];
+            string token = bearerToken.Replace("Bearer ", "");
+            return token;
         }
 
         private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
         {
             return activity.ActivityType == ApplicationActivityType.SubmittedByResident;
+        }
+
+        private void SetRequestHeader()
+        {
+            string token = GetAuthToken();
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 }
