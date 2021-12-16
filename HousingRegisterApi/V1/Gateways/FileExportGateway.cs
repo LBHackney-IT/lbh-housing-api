@@ -53,21 +53,24 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
 
+            var files = new List<ExportFileItem>();
+
             var s3Objects = await GetS3Objects(parentFolderName).ConfigureAwait(false);
 
-            var files = s3Objects.Select(x => new ExportFileItem(Path.GetFileName(x.Key))
+            foreach (var s3Object in s3Objects)
             {
-                LastModified = x.LastModified,
-                Size = x.Size,
-            });
+                var s3ObjectTags = (await GetS3ObjectTags(s3Object.Key).ConfigureAwait(false));
+                var fileName = Path.GetFileName(s3Object.Key);
 
-            foreach (var file in files)
-            {
-                string fileKey = GetFileKey(file.FileName, parentFolderName);
-                file.Attributes = (await GetS3ObjectTags(fileKey).ConfigureAwait(false)).ToDictionary();
+                files.Add(new ExportFileItem(fileName)
+                {
+                    LastModified = s3Object.LastModified,
+                    Size = s3Object.Size,
+                    Attributes = s3ObjectTags.ToDictionary()
+                });
             }
 
-            return files.ToList();
+            return files;
         }
 
         public async Task SaveFile(ExportFile file, string parentFolderName = "")

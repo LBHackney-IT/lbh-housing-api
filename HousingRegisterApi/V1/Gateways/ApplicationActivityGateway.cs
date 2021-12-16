@@ -11,12 +11,14 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
     public class ApplicationActivityGateway : IActivityGateway
     {
+        private readonly HttpClient _client;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IHttpContextWrapper _contextWrapper;
         private readonly ITokenFactory _tokenFactory;
@@ -25,6 +27,8 @@ namespace HousingRegisterApi.V1.Gateways
         private readonly ILogger<ApplicationActivityGateway> _logger;
 
         public ApplicationActivityGateway(
+            HttpClient httpClient,
+            ApiOptions apiOptions,
             IHttpContextAccessor contextAccessor,
             IHttpContextWrapper contextWrapper,
             ITokenFactory tokenFactory,
@@ -32,12 +36,15 @@ namespace HousingRegisterApi.V1.Gateways
             ISnsFactory snsFactory,
             ILogger<ApplicationActivityGateway> logger)
         {
+            _client = httpClient;
             _contextAccessor = contextAccessor;
             _contextWrapper = contextWrapper;
             _tokenFactory = tokenFactory;
             _snsGateway = snsGateway;
             _snsFactory = snsFactory;
             _logger = logger;
+
+            _client.BaseAddress = apiOptions.ActivityHistoryApiUrl;
         }
 
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
@@ -70,30 +77,24 @@ namespace HousingRegisterApi.V1.Gateways
 
             try
             {
-                var baseUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
-                var uri = new Uri($"{baseUrl}api/v1/activityhistory?targetId={applicationId}&pageSize=500");
-                var token = GetAuthorizationHeader();
+                var uri = new Uri($"api/v1/activityhistory?targetId={applicationId}&pageSize=500", UriKind.Relative);
+                SetRequestHeader();
 
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Authorization", token);
-                var response = await client.GetAsync(uri).ConfigureAwait(false);
+                var response = await _client.GetAsync(uri).ConfigureAwait(true);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    var pagedResult = await response.Content
-                        .ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>()
-                        .ConfigureAwait(false);
-
+                    var pagedResult = await response.Content.ReadAsAsync<PagedResult<ActivityHistoryResponseObject>>().ConfigureAwait(true);
                     result = pagedResult.Results;
                 }
-                else
+                else if (response.StatusCode != HttpStatusCode.NotFound)
                 {
-                    throw new Exception("Invalid response from gateway :" + response.StatusCode);
+                    _logger.LogError("Error calling activity gateway");
                 }
             }
             catch (Exception exp)
             {
-                _logger.LogError($"Error retrieving history for application {applicationId}: {exp.Message}");
+                _logger.LogError($"Error calling activity gateway: {exp.Message}");
             }
 
             return result;
@@ -117,14 +118,22 @@ namespace HousingRegisterApi.V1.Gateways
             return token;
         }
 
-        private string GetAuthorizationHeader()
+        private string GetAuthToken()
         {
-            return _contextAccessor.HttpContext.Request.Headers["Authorization"];
+            string bearerToken = _contextAccessor.HttpContext.Request.Headers["Authorization"];
+            string token = bearerToken.Replace("Bearer ", "");
+            return token;
         }
 
         private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
         {
             return activity.ActivityType == ApplicationActivityType.SubmittedByResident;
+        }
+
+        private void SetRequestHeader()
+        {
+            string token = GetAuthToken();
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 }

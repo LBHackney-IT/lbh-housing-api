@@ -4,10 +4,12 @@ using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Domain.Report.Internal;
 using HousingRegisterApi.V1.Factories;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
@@ -27,15 +29,12 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             await DynamoDbContext.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
-        private async Task<HttpResponseMessage> GetTestRequestAsync(InternalReportRequest request)
+        private async Task<HttpResponseMessage> PostTestRequestAsync(InternalReportRequest request)
         {
-            var baseUrl = "api/v1/reporting/export";
-            var reportType = $"reportType={Convert.ToInt32(request.ReportType)}";
-            var startDate = $"startDate={request.StartDate:yyyy-MM-dd}";
-            var endDate = $"endDate={request.EndDate:yyyy-MM-dd}";
-
-            var uri = new Uri($"{baseUrl}?{reportType}&{startDate}&{endDate}", UriKind.Relative);
-            return await Client.GetAsync(uri).ConfigureAwait(false);
+            var stringRequest = JsonConvert.SerializeObject(request);
+            using var data = new StringContent(stringRequest, Encoding.UTF8, "application/json");
+            var uri = new Uri($"api/v1/reporting/export", UriKind.Relative);
+            return await Client.PostAsync(uri, data).ConfigureAwait(false);
         }
 
         [Test]
@@ -53,7 +52,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             };
 
             // Act            
-            var response = await GetTestRequestAsync(request).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(request).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -74,7 +73,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             };
 
             // Act            
-            var response = await GetTestRequestAsync(request).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(request).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -95,7 +94,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             };
 
             // Act            
-            var response = await GetTestRequestAsync(request).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(request).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -116,7 +115,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             };
 
             // Act            
-            var response = await GetTestRequestAsync(request).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(request).ConfigureAwait(false);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);

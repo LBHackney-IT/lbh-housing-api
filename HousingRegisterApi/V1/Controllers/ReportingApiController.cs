@@ -43,11 +43,11 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet]
+        [HttpPost]
         [Route("export")]
-        public async Task<IActionResult> DownloadReport([FromQuery][Required] InternalReportRequest request)
+        public async Task<IActionResult> DownloadReport([FromBody][Required] InternalReportRequest request)
         {
-            var result = await _getInternalReportUseCase.Execute(request).ConfigureAwait(false);
+            var result = await _getInternalReportUseCase.Execute(request).ConfigureAwait(true);
             if (result == null) return NotFound();
 
             return File(result.Data, result.FileMimeType, result.FileName);

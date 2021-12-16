@@ -71,30 +71,16 @@ namespace HousingRegisterApi.V1.UseCase
 
         private async Task<ExportFile> GetCaseReport(DateTime startDate, DateTime endDate)
         {
-            var applications = _gateway.GetApplications(new SearchQueryParameter());
-
-            var applicationsInRange = applications
-                .Where(x => x.CreatedAt >= startDate
-                        && x.CreatedAt <= endDate).ToList();
-
+            var applicationsInRange = GetApplicationsInRange(startDate, endDate);
             string fileName = $"LBH-CASES REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
-
             var exportDataSet = applicationsInRange.Select(x => new CasesReportDataRow(x)).ToArray();
-            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
-            var file = new ExportFile(fileName, "text/csv", bytes);
-            return file;
+            return await GenerateReport(fileName, exportDataSet).ConfigureAwait(false);
         }
 
         private async Task<ExportFile> GetPeopleReport(DateTime startDate, DateTime endDate)
         {
-            var applications = _gateway.GetApplications(new SearchQueryParameter());
-
-            var applicationsInRange = applications
-                .Where(x => x.CreatedAt >= startDate
-                        && x.CreatedAt <= endDate).ToList();
-
+            var applicationsInRange = GetApplicationsInRange(startDate, endDate);
             string fileName = $"LBH-PEOPLE REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
-
             var exportDataSet = new List<PeopleReportDataRow>();
 
             applicationsInRange.ForEach(x =>
@@ -110,21 +96,13 @@ namespace HousingRegisterApi.V1.UseCase
                 });
             });
 
-            var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
-            var file = new ExportFile(fileName, "text/csv", bytes);
-            return file;
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
         }
 
         private async Task<ExportFile> GetCaseActivityReport(DateTime startDate, DateTime endDate)
         {
-            var applications = _gateway.GetApplications(new SearchQueryParameter());
-
-            var applicationsInRange = applications
-                .Where(x => x.CreatedAt >= startDate
-                        && x.CreatedAt <= endDate).ToList();
-
+            var applicationsInRange = GetApplicationsInRange(startDate, endDate);
             string fileName = $"LBH-CASE-ACTIVITY REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
-
             var exportDataSet = new List<CaseActivityReportDataRow>();
 
             if (applicationsInRange.Any())
@@ -133,26 +111,19 @@ namespace HousingRegisterApi.V1.UseCase
                 {
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
 
-                    activities?.ToList().ForEach(a =>
+                    foreach (var activity in activities)
                     {
-                        exportDataSet.Add(new CaseActivityReportDataRow(a, application));
-                    });
+                        exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
+                    };
                 }
             }
 
-            var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
-            var file = new ExportFile(fileName, "text/csv", bytes);
-            return file;
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
         }
 
         private async Task<ExportFile> GetOfficerActivityReport(DateTime startDate, DateTime endDate)
         {
-            var applications = _gateway.GetApplications(new SearchQueryParameter());
-
-            var applicationsInRange = applications
-                .Where(x => x.CreatedAt >= startDate
-                        && x.CreatedAt <= endDate).ToList();
-
+            var applicationsInRange = GetApplicationsInRange(startDate, endDate);
             string fileName = $"LBH-OFFICER-ACTIVITY REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
 
             var exportDataSet = new List<OfficerActivityReportDataRow>();
@@ -163,18 +134,36 @@ namespace HousingRegisterApi.V1.UseCase
                 {
                     var activities = await _activityGateway.GetActivities(application.Id).ConfigureAwait(false);
 
-                    activities?.ToList().ForEach(a =>
+                    foreach (var activity in activities)
                     {
-                        exportDataSet.Add(new OfficerActivityReportDataRow(a));
-                    });
+                        exportDataSet.Add(new OfficerActivityReportDataRow(activity));
+                    };
                 }
             }
 
             // order by officer then date
             exportDataSet = exportDataSet.OrderBy(x => x.Officer).ThenBy(x => x.ActivityDate).ToList();
 
-            var bytes = await _csvService.Generate(exportDataSet.ToArray()).ConfigureAwait(false);
+            return await GenerateReport(fileName, exportDataSet.ToArray()).ConfigureAwait(false);
+        }
+
+        private List<Application> GetApplicationsInRange(DateTime startDate, DateTime endDate)
+        {
+            var applications = _gateway.GetApplications(new SearchQueryParameter());
+
+            var applicationsInRange = applications
+                .Where(x => x.CreatedAt >= startDate
+                        && x.CreatedAt <= endDate).ToList();
+
+            return applicationsInRange;
+        }
+
+        private async Task<ExportFile> GenerateReport(string fileName, Array exportDataSet)
+        {
+            _logger.LogInformation($"Generating report");
+            var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
+            _logger.LogInformation($"Report generated");
             return file;
         }
     }
