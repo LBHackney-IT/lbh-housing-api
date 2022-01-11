@@ -23,6 +23,7 @@ namespace HousingRegisterApi.V1.Factories
                 VerifyExpiresAt = databaseEntity.VerifyExpiresAt,
                 Assessment = databaseEntity.Assessment,
                 CalculatedBedroomNeed = databaseEntity.CalculatedBedroomNeed,
+                ImportedFromLegacyDatabase = databaseEntity.ImportedFromLegacyDatabase,
             };
         }
 
@@ -43,6 +44,7 @@ namespace HousingRegisterApi.V1.Factories
                 VerifyExpiresAt = entity.VerifyExpiresAt,
                 Assessment = entity.Assessment,
                 CalculatedBedroomNeed = entity.CalculatedBedroomNeed,
+                ImportedFromLegacyDatabase = entity.ImportedFromLegacyDatabase,
             };
         }
     }

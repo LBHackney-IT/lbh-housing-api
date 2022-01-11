@@ -25,6 +25,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICalculateBedroomsUseCase _calculateBedroomsUseCase;
         private readonly IAddApplicationNoteUseCase _addApplicationNoteUseCase;
         private readonly IViewingApplicationUseCase _viewingApplicationUseCase;
+        private readonly IImportApplicationUseCase _importApplicationUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -35,7 +36,8 @@ namespace HousingRegisterApi.V1.Controllers
             ICreateEvidenceRequestUseCase createEvidenceRequestUseCase,
             ICalculateBedroomsUseCase calculateBedroomsUseCase,
             IAddApplicationNoteUseCase addApplicationNoteUseCase,
-            IViewingApplicationUseCase viewingApplicationUseCase)
+            IViewingApplicationUseCase viewingApplicationUseCase,
+            IImportApplicationUseCase importApplicationUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getByIdUseCase = getByIdUseCase;
@@ -46,6 +48,7 @@ namespace HousingRegisterApi.V1.Controllers
             _calculateBedroomsUseCase = calculateBedroomsUseCase;
             _addApplicationNoteUseCase = addApplicationNoteUseCase;
             _viewingApplicationUseCase = viewingApplicationUseCase;
+            _importApplicationUseCase = importApplicationUseCase;
         }
 
         /// <summary>
@@ -144,6 +147,23 @@ namespace HousingRegisterApi.V1.Controllers
             if (result == null) return NotFound(id);
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Imports applications.
+        /// </summary>
+        /// <response code="201">Returns the application created with its ID</response>
+        /// <response code="400">Invalid fields in the post parameter.</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("import-application")]
+        public IActionResult ImportApplication([FromBody] ImportApplicationRequest applicationRequest )
+        {
+            var newApplication = _importApplicationUseCase.Execute(applicationRequest);
+            return Created(new Uri($"api/v1/applications/{newApplication.Id}", UriKind.Relative), newApplication);
         }
 
         /// <summary>

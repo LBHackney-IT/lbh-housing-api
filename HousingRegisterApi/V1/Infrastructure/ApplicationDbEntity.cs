@@ -40,5 +40,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         public Assessment Assessment { get; set; }
 
         public int? CalculatedBedroomNeed { get; set; }
+
+        public bool ImportedFromLegacyDatabase { get; set; }
     }
 }

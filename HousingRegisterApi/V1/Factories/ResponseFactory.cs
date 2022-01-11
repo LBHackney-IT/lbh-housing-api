@@ -23,6 +23,7 @@ namespace HousingRegisterApi.V1.Factories
                 OtherMembers = domain.OtherMembers,
                 Assessment = domain.Assessment,
                 CalculatedBedroomNeed = domain.CalculatedBedroomNeed,
+                ImportedFromLegacyDatabase = domain.ImportedFromLegacyDatabase,
             };
         }
 
