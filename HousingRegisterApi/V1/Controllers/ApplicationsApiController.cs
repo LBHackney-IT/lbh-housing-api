@@ -160,7 +160,7 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Route("import-application")]
-        public IActionResult ImportApplication([FromBody] ImportApplicationRequest applicationRequest )
+        public IActionResult ImportApplication([FromBody] ImportApplicationRequest applicationRequest)
         {
             var newApplication = _importApplicationUseCase.Execute(applicationRequest);
             return Created(new Uri($"api/v1/applications/{newApplication.Id}", UriKind.Relative), newApplication);
