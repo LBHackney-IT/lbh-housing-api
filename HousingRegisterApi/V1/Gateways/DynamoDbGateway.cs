@@ -137,7 +137,8 @@ namespace HousingRegisterApi.V1.Gateways
                 SubmittedAt = null,
                 Status = string.IsNullOrEmpty(request.Status) ? ApplicationStatus.New : request.Status,
                 MainApplicant = request.MainApplicant,
-                OtherMembers = request.OtherMembers.ToList()
+                OtherMembers = request.OtherMembers.ToList(),
+                ImportedFromLegacyDatabase = false
             };
 
             entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
@@ -241,6 +242,23 @@ namespace HousingRegisterApi.V1.Gateways
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
+            return entity.ToDomain();
+        }
+
+        public Application ImportApplication(ImportApplicationRequest request)
+        {
+            var entity = new ApplicationDbEntity
+            {
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                SubmittedAt = request.SubmittedAt,
+                MainApplicant = request.MainApplicant,
+                Status = string.IsNullOrEmpty(request.Status) ? ApplicationStatus.New : request.Status,
+                Assessment = request.Assessment,
+                ImportedFromLegacyDatabase = true
+            };
+
+            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
         }
     }

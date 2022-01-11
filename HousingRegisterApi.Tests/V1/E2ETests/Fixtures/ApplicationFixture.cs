@@ -13,7 +13,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
 
         /// <summary>
         /// Method to construct <see cref="Application"/> that can be used in a test
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public Application ConstructTestEntity()
         {
@@ -21,12 +21,13 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
             entity.CreatedAt = DateTime.UtcNow;
             entity.SubmittedAt = null;
             entity.Reference = _hashHelper.Generate(entity.MainApplicant.ContactInformation.EmailAddress).Substring(0, 10);
+            entity.ImportedFromLegacyDatabase = false;
             return entity;
         }
 
         /// <summary>
         /// Method to construct <see cref="CreateApplicationRequest"/> that can be used in a test
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public CreateApplicationRequest ConstructCreateApplicationRequest()
         {
@@ -36,7 +37,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
 
         /// <summary>
         /// Method to construct <see cref="UpdateApplicationRequest"/> that can be used in a test
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public UpdateApplicationRequest ConstructUpdateApplicationRequest()
         {

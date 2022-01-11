@@ -24,5 +24,7 @@ namespace HousingRegisterApi.V1.Gateways
         Application ConfirmVerifyCode(VerifyAuthRequest request);
 
         Application GetIncompleteApplication(string email);
+
+        Application ImportApplication(ImportApplicationRequest request);
     }
 }

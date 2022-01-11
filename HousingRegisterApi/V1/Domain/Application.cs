@@ -72,5 +72,11 @@ namespace HousingRegisterApi.V1.Domain
         /// Populated after assessment.
         /// </summary>
         public Assessment Assessment { get; set; }
+
+        /// <summary>
+        /// True for applications were imported from the previous system and are based on partially available data.
+        /// </summary>
+        public bool ImportedFromLegacyDatabase { get; set; }
+
     }
 }
