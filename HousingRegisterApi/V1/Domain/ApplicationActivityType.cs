@@ -27,5 +27,8 @@ namespace HousingRegisterApi.V1.Domain
 
         [Description("NoteAddedByUser")]
         NoteAddedByUser = 7,
+
+        [Description("ImportedFromLegacyDatabase")]
+        ImportedFromLegacyDatabase = 8,
     }
 }
