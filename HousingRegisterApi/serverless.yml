@@ -54,7 +54,13 @@ functions:
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
     role: lambdaExecutionRole
     events:
-      - schedule: rate(1 day)
+      - schedule: cron(0 9 ? * MON-FRI *)
+  HousingRegisterNovaletExportUpload:
+    name: ${self:service}-${self:provider.stage}-novalet-export-upload
+    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FtpUploadNovaletExportFunction::Handle
+    role: lambdaExecutionRole
+    events:
+      - schedule: cron(30 16 ? * MON-FRI *)
 resources:
   Resources:
     LambdaSecurityGroup:
