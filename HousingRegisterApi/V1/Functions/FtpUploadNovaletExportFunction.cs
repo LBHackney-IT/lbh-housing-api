@@ -8,14 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HousingRegisterApi.V1.Functions
 {
-    public class NovaletExportUploadFunction : BaseFunction, ILambdaFunctionHandler
+    public class FtpUploadNovaletExportFunction : BaseFunction, ILambdaFunctionHandler
     {
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
         /// region the Lambda function is executed in.
         /// </summary>
-        public NovaletExportUploadFunction()
+        public FtpUploadNovaletExportFunction()
         {
 
         }
@@ -23,17 +23,17 @@ namespace HousingRegisterApi.V1.Functions
         public void Handle(ILambdaContext context)
         {
             context.Logger.LogLine("Generating Novalet export for approval");
-            var createExportFileUseCase = ServiceProvider.GetService<ICreateNovaletExportUseCase>();
+            var ftpNovaletUploadUseCase = ServiceProvider.GetService<IFtpNovaletUploadUseCase>();
 
-            var file = createExportFileUseCase.Execute().ConfigureAwait(false).GetAwaiter().GetResult();
+            var uploaded = ftpNovaletUploadUseCase.Execute().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            if (file != null)
+            if (uploaded)
             {
-                context.Logger.LogLine($"Success");
+                context.Logger.LogLine($"FTP upload successful");
             }
             else
             {
-                context.Logger.LogLine($"File was not generated");
+                context.Logger.LogLine($"Novalet file was not uploaded to ftp");
             }
         }
 

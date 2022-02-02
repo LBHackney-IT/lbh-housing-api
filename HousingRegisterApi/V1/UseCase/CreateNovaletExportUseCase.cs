@@ -5,6 +5,7 @@ using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,6 +46,8 @@ namespace HousingRegisterApi.V1.UseCase
             var exportDataSet = applications.Select(x => new NovaletExportDataRow(x)).ToArray();
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
+
+            File.WriteAllBytes(file.FileName, bytes);
 
             if (file != null)
             {

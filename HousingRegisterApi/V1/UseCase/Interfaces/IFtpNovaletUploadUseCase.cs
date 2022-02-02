@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface IFtpNovaletUploadUseCase
     {
-        Task<ExportFile> Execute(string fileName);
+        Task<bool> Execute();
     }
 }

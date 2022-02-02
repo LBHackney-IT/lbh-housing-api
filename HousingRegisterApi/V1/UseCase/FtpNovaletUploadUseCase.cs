@@ -28,12 +28,24 @@ namespace HousingRegisterApi.V1.UseCase
             _ftpHelper = ftpHelper;
         }
 
-        public async Task<ExportFile> Execute()
+        public async Task<bool> Execute()
         {
             string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:ddMMyyyy}.csv";
 
-            _logger.LogInformation($"Attempting to generate {fileName}");
-
+            _logger.LogInformation($"Attempting to to fetch approved file {fileName}");
+            //Get approved file from S3
+            var file = await _fileGateway.GetFile(fileName, "Novalet").ConfigureAwait(false);
+            if (file.Attributes.ContainsKey("approvedOn"))
+            {
+                //upload fetch file to Novalet Ftp
+                bool result = _ftpHelper.UploadDataToFtp(file.Data, fileName);
+                return result;
+            }
+            else
+            {
+                _logger.LogInformation($"Approved Novalet file not found");
+                return false;
+            }
         }
     }
 }
