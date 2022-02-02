@@ -55,7 +55,8 @@ namespace HousingRegisterApi.Tests
                 var localstackS3Url = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
                 AmazonS3 = new AmazonS3Client(new AmazonS3Config()
                 {
-                    ServiceURL = localstackS3Url, AuthenticationRegion = "eu-west-2"
+                    ServiceURL = localstackS3Url,
+                    AuthenticationRegion = "eu-west-2"
                 });
 
                 var localstackSnsUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");

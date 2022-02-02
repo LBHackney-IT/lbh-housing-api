@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -42,7 +42,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
             catch (WebException e)
             {
-                String status = ((FtpWebResponse)e.Response).StatusDescription;
+                String status = ((FtpWebResponse) e.Response).StatusDescription;
                 _logger.LogError("Unable to upload file to ftp: " + status);
                 return false;
             }
