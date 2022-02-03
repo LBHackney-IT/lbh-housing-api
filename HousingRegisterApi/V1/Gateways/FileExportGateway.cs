@@ -144,7 +144,7 @@ namespace HousingRegisterApi.V1.Gateways
             };
 
             var response = await _amazonS3.PutObjectAsync(request).ConfigureAwait(false);
-
+            _logger.LogError($"File {fileKey} saved to {_bucketName} status code {response.HttpStatusCode}");
             if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
             {
                 _logger.LogError($"Unable to save file {fileKey} to {_bucketName}");
