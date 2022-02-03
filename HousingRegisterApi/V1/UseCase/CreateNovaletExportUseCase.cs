@@ -47,9 +47,9 @@ namespace HousingRegisterApi.V1.UseCase
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
 
-            File.WriteAllBytes(file.FileName, bytes);
+            //File.WriteAllBytes(file.FileName, bytes);
 
-            if (file != null)
+            if (bytes.Length > 0)
             {
                 // save file to s3 gateway
                 var response = _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
