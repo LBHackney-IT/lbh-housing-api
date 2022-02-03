@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="V1\E2ETests\**" />
+    <Compile Remove="V1\Functions\**" />
+    <Content Remove="V1\E2ETests\**" />
+    <Content Remove="V1\Functions\**" />
+    <EmbeddedResource Remove="V1\E2ETests\**" />
+    <EmbeddedResource Remove="V1\Functions\**" />
+    <None Remove="V1\E2ETests\**" />
+    <None Remove="V1\Functions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.1.29" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
