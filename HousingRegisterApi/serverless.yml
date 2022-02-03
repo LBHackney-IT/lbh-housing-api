@@ -32,7 +32,7 @@ functions:
       HACKNEY_JWT_SECRET: ${ssm:/housing-register/${self:provider.stage}/hackney-jwt-secret}
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
       NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register/${self:provider.stage}/notify-template-verify-code}
-      HOUSINGREGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}      
+      HOUSINGREGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
       EVIDENCE_API_URL: ${ssm:/housing-register/${self:provider.stage}/evidence-api/base-url}
       EVIDENCE_API_REQUESTED_BY: ${ssm:/housing-register/${self:provider.stage}/evidence-api/requested-by}
       EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/get/evidence-requests/token}
@@ -47,12 +47,14 @@ functions:
     name: ${self:service}-${self:provider.stage}-bedroom-recalculator
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.RedroomRecalculatorFunction::Handle
     role: lambdaExecutionRole
+    timeout: 300
     events:
       - schedule: rate(1 day)
   HousingRegisterNovaletExportGenerator:
     name: ${self:service}-${self:provider.stage}-novalet-export-generator
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
     role: lambdaExecutionRole
+    timeout: 300
     events:
       - schedule: cron(0 9 ? * MON-FRI *)
   HousingRegisterNovaletExportUpload:
@@ -153,7 +155,7 @@ resources:
                   Resource: "*"
           - PolicyName: postToSns
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
