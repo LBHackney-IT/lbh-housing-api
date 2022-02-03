@@ -49,11 +49,11 @@ namespace HousingRegisterApi.V1.UseCase
 
             File.WriteAllBytes(file.FileName, bytes);
 
-            if (file.Data.Length > 0)
+            if (bytes.Length > 0)
             {
                 // save file to s3 gateway
                 var response = _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
-                _logger.LogInformation($"File {file.FileName} was succesfully generated & has a size of {file.Data.Length} bytes");
+                _logger.LogInformation($"File {file.FileName} was succesfully generated & has a size of {bytes.Length} bytes");
                 return file;
             }
             else
