@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.UseCase
                 _logger.LogInformation($"File {file.FileName} was succesfully generated & has a size of {file.Data.Length} bytes");
                 return file;
             }
-            else 
+            else
             {
                 _logger.LogInformation($"No export file was generated this time");
                 return null;
