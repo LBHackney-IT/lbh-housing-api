@@ -11,15 +11,13 @@ provider:
   region: eu-west-2
   environment:
     HOUSINGREGISTER_EXPORT_BUCKET_NAME: housingregister-exports-${self:provider.stage}-bucket
-  apiKeys:
-    - secureAccess:
-        - api-key-${self:service}-${self:provider.stage}
-  usagePlan:
-    - secureAccess:
-        throttle:
-          burstLimit: 200
-          rateLimit: 100
-
+  apiGateway:
+    apiKeys:
+      - api-key-${self:service}-${self:provider.stage}
+    usagePlan:
+      throttle:
+        burstLimit: 200
+        rateLimit: 100
 package:
   artifact: ./bin/release/netcoreapp3.1/housing-register-api.zip
 
