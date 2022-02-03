@@ -51,10 +51,16 @@ namespace HousingRegisterApi.Tests
                 DynamoDb = serviceProvider.GetRequiredService<IAmazonDynamoDB>();
                 DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
                 SimpleNotificationService = serviceProvider.GetRequiredService<IAmazonSimpleNotificationService>();
-                AmazonS3 = serviceProvider.GetRequiredService<IAmazonS3>();
 
-                var localstackUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
-                AmazonSQS = new AmazonSQSClient(new AmazonSQSConfig() { ServiceURL = localstackUrl, AuthenticationRegion = "eu-west-2" });
+                var localstackS3Url = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
+                AmazonS3 = new AmazonS3Client(new AmazonS3Config()
+                {
+                    ServiceURL = localstackS3Url,
+                    AuthenticationRegion = "eu-west-2"
+                });
+
+                var localstackSnsUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
+                AmazonSQS = new AmazonSQSClient(new AmazonSQSConfig() { ServiceURL = localstackSnsUrl, AuthenticationRegion = "eu-west-2" });
 
                 CreateSnsTopic();
                 CreateS3Bucket();

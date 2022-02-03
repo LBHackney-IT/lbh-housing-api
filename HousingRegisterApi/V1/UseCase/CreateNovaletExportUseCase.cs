@@ -5,6 +5,7 @@ using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -46,14 +47,16 @@ namespace HousingRegisterApi.V1.UseCase
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
 
-            if (file != null)
+            File.WriteAllBytes(file.FileName, bytes);
+
+            if (file.Data.Length > 0)
             {
                 // save file to s3 gateway
                 var response = _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
-                _logger.LogInformation($"File {file.FileName} was succesfully generated");
+                _logger.LogInformation($"File {file.FileName} was succesfully generated & has a size of {file.Data.Length} bytes");
                 return file;
             }
-            else
+            else 
             {
                 _logger.LogInformation($"No export file was generated this time");
                 return null;

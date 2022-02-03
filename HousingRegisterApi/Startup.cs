@@ -61,7 +61,7 @@ namespace HousingRegisterApi
             });
 
             services.AddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
-
+            services.AddSession();
             services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("Token",
@@ -176,12 +176,14 @@ namespace HousingRegisterApi
             services.AddScoped<IViewingApplicationUseCase, ViewingApplicationUseCase>();
             services.AddScoped<IGetInternalReportUseCase, GetInternalReportUseCase>();
             services.AddScoped<IImportApplicationUseCase, ImportApplicationUseCase>();
+            services.AddScoped<IFtpNovaletUploadUseCase, FtpNovaletUploadUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<IBiddingNumberGenerator, BiddingNumberGenerator>();
+            services.AddScoped<IFtpHelper, FtpHelper>();
         }
 
         private static void RegisterServices(IServiceCollection services)
@@ -195,6 +197,7 @@ namespace HousingRegisterApi
         {
             if (env.IsDevelopment())
             {
+                app.UseSession();
                 app.UseDeveloperExceptionPage();
             }
             else

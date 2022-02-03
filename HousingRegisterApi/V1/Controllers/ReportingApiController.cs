@@ -19,19 +19,22 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly ICreateNovaletExportUseCase _createNovaletExportUseCase;
         private readonly IApproveNovaletExportUseCase _approveNovaletExportUseCase;
         private readonly IGetInternalReportUseCase _getInternalReportUseCase;
+        private readonly IFtpNovaletUploadUseCase _ftpNovaletUploadUseCase;
 
         public ReportingApiController(
             IListNovaletExportFilesUseCase listNovaletExportFilesUseCase,
             IGetNovaletExportUseCase getNovaletCsvUseCase,
             ICreateNovaletExportUseCase createNovaletCsvUseCase,
             IApproveNovaletExportUseCase approveNovaletExportUseCase,
-            IGetInternalReportUseCase getInternalReportUseCase)
+            IGetInternalReportUseCase getInternalReportUseCase,
+            IFtpNovaletUploadUseCase ftpNovaletUploadUseCase)
         {
             _listNovaletExportFilesUseCase = listNovaletExportFilesUseCase;
             _getNovaletExportUseCase = getNovaletCsvUseCase;
             _createNovaletExportUseCase = createNovaletCsvUseCase;
             _approveNovaletExportUseCase = approveNovaletExportUseCase;
             _getInternalReportUseCase = getInternalReportUseCase;
+            _ftpNovaletUploadUseCase = ftpNovaletUploadUseCase;
         }
 
         /// <summary>
@@ -102,6 +105,25 @@ namespace HousingRegisterApi.V1.Controllers
         {
             var result = await _createNovaletExportUseCase.Execute().ConfigureAwait(true);
             if (result == null) return BadRequest();
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Upload the Novalet export file
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">Unable to generate export file</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("uploadnovaletexport")]
+        public async Task<IActionResult> UploadNovaletExport()
+        {
+            var result = await _ftpNovaletUploadUseCase.Execute().ConfigureAwait(true);
+            if (result == false) return BadRequest();
 
             return Ok();
         }

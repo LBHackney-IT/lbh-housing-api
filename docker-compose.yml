@@ -46,15 +46,16 @@ services:
       - 8000:8000
 
   localstack:
-    image: localstack/localstack    
-    hostname: awslocal    
+    image: localstack/localstack:0.13.3
+    hostname: awslocal
     ports:
-      - "4566:4566"      
+      - "4566-4580:4566-4580"
     environment:
       - SERVICES=sns,sqs,s3
-      - DEBUG=1                  
+      - DEBUG=1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - HOST_TMP_FOLDER=/tmp/localstack      
+      - HOST_TMP_FOLDER=/tmp/localstack
+      - DATA_DIR=/tmp/localstack/data
     volumes:
       - "./.localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
