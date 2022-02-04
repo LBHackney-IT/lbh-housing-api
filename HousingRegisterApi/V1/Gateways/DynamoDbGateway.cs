@@ -97,7 +97,7 @@ namespace HousingRegisterApi.V1.Gateways
                 },
             };
 
-            var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetRemainingAsync().GetAwaiter().GetResult();
+            var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetNextSetAsync().GetAwaiter().GetResult();
             var searchItems = search.Select(x => x.ToDomain());
 
             return searchItems;
