@@ -12,6 +12,8 @@ namespace HousingRegisterApi.V1.Infrastructure
         private readonly string _ftpPassword = Environment.GetEnvironmentVariable("FtpPassword");
         private readonly string _ftpAddress = Environment.GetEnvironmentVariable("FtpAddress");
         private readonly string _folderName = Environment.GetEnvironmentVariable("FtpFolder");
+        private readonly string _ftpPort = Environment.GetEnvironmentVariable("FtpPort");
+
         private readonly ILogger<FtpHelper> _logger;
 
         public FtpHelper(ILogger<FtpHelper> logger)
@@ -24,7 +26,12 @@ namespace HousingRegisterApi.V1.Infrastructure
             uriBuilder.Scheme = "ftp";
             uriBuilder.Host = _ftpAddress;
             uriBuilder.Path = _folderName + "/" + fileName;
-
+            int portInt;
+            bool parsedInt = int.TryParse(_ftpPort, out portInt);
+            if (parsedInt)
+            {
+                uriBuilder.Port = portInt;
+            }
             Uri uri = uriBuilder.Uri;
             var request = (FtpWebRequest) WebRequest.Create(uri);
             request.Method = WebRequestMethods.Ftp.UploadFile;
