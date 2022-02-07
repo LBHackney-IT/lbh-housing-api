@@ -26,6 +26,7 @@ functions:
     name: ${self:service}-${self:provider.stage}
     handler: HousingRegisterApi::HousingRegisterApi.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
+    timeout: 30
     environment:
       HACKNEY_JWT_SECRET: ${ssm:/housing-register/${self:provider.stage}/hackney-jwt-secret}
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
