@@ -89,7 +89,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
 
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
-            if (legacyOverride)
+            if (!string.IsNullOrEmpty(legacyOverride))
             {
                 return legacyOverride;
             }
