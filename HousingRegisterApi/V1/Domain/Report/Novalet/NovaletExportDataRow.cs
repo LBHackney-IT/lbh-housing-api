@@ -87,6 +87,13 @@ namespace HousingRegisterApi.V1.Domain.Report
 
         private static string GetEthnicity(Application application)
         {
+
+            var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
+            if (legacyOverride)
+            {
+                return legacyOverride;
+            }
+
             var ethnicityCategoryKey = "ethnicity-questions/ethnicity-main-category";
             var extended = "ethnicity-extended-category";
 
