@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -147,7 +147,7 @@ namespace HousingRegisterApi.V1.Gateways
             var response = await _amazonS3.PutObjectAsync(request).ConfigureAwait(false);
             _logger.LogError($"File {fileKey} saved to {_bucketName} status code {response.HttpStatusCode}");
 
-            var json = new JavaScriptSerializer().Serialize(response);
+            var json = JsonSerializer.Serialize(response);
             _logger.LogError(json);
 
             if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
