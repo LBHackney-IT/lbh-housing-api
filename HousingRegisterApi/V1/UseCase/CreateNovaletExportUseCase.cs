@@ -49,7 +49,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (bytes.Length > 0)
             {
-                var response = await _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
+                await _fileGateway.SaveFile(file, "Novalet").ConfigureAwait(false);
                 _logger.LogInformation($"File {file.FileName} was succesfully generated & has a size of {bytes.Length} bytes");
                 return file;
             }
