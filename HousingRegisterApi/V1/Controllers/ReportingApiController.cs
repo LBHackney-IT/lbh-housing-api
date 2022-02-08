@@ -16,7 +16,7 @@ namespace HousingRegisterApi.V1.Controllers
     {
         private readonly IListNovaletExportFilesUseCase _listNovaletExportFilesUseCase;
         private readonly IGetNovaletExportUseCase _getNovaletExportUseCase;
-        private readonly ICreateNovaletExportUseCase _createNovaletExportUseCase;
+        private readonly IPublishNovaletSnsUseCase _publishNovaletExportSns;
         private readonly IApproveNovaletExportUseCase _approveNovaletExportUseCase;
         private readonly IGetInternalReportUseCase _getInternalReportUseCase;
         private readonly IFtpNovaletUploadUseCase _ftpNovaletUploadUseCase;
@@ -24,14 +24,14 @@ namespace HousingRegisterApi.V1.Controllers
         public ReportingApiController(
             IListNovaletExportFilesUseCase listNovaletExportFilesUseCase,
             IGetNovaletExportUseCase getNovaletCsvUseCase,
-            ICreateNovaletExportUseCase createNovaletCsvUseCase,
+            IPublishNovaletSnsUseCase publishNovaletExportSns,
             IApproveNovaletExportUseCase approveNovaletExportUseCase,
             IGetInternalReportUseCase getInternalReportUseCase,
             IFtpNovaletUploadUseCase ftpNovaletUploadUseCase)
         {
             _listNovaletExportFilesUseCase = listNovaletExportFilesUseCase;
             _getNovaletExportUseCase = getNovaletCsvUseCase;
-            _createNovaletExportUseCase = createNovaletCsvUseCase;
+            _publishNovaletExportSns = publishNovaletExportSns;
             _approveNovaletExportUseCase = approveNovaletExportUseCase;
             _getInternalReportUseCase = getInternalReportUseCase;
             _ftpNovaletUploadUseCase = ftpNovaletUploadUseCase;
@@ -103,8 +103,8 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("generatenovaletexport")]
         public async Task<IActionResult> GenerateNovaletExport()
         {
-            var result = await _createNovaletExportUseCase.Execute().ConfigureAwait(true);
-            if (result == null) return BadRequest();
+            var result = await _publishNovaletExportSns.Execute().ConfigureAwait(false);
+            if (((int) result.HttpStatusCode) >= 400) return BadRequest();
 
             return Ok();
         }
