@@ -150,6 +150,7 @@ namespace HousingRegisterApi
             services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
             services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
             services.AddScoped<IFileGateway, FileExportGateway>();
+            services.AddScoped<INovaletSnsGateway, NovaletSnsGateway>();
 
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
@@ -177,6 +178,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetInternalReportUseCase, GetInternalReportUseCase>();
             services.AddScoped<IImportApplicationUseCase, ImportApplicationUseCase>();
             services.AddScoped<IFtpNovaletUploadUseCase, FtpNovaletUploadUseCase>();
+            services.AddScoped<IPublishNovaletSnsUseCase, PublishNovaletSnsUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
