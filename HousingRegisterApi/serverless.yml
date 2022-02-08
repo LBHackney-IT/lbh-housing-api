@@ -52,7 +52,8 @@ functions:
       - schedule: rate(1 day)
   HousingRegisterNovaletExportGenerator:
     dispatcher:
-      handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle.novaletexport-sns-topic
+      name: ${self:service}-${self:provider.stage}-novalet-export-generator
+      handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
       role: lambdaExecutionRole
       timeout: 300
       events:
