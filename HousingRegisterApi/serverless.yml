@@ -51,12 +51,13 @@ functions:
     events:
       - schedule: rate(1 day)
   HousingRegisterNovaletExportGenerator:
-      name: ${self:service}-${self:provider.stage}-novalet-export-generator
-      handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
-      role: lambdaExecutionRole
-      timeout: 300
-      events:
-      - sns: arn:aws:sns:eu-west-2:364864573329:novaletexport-sns-topic
+    name: ${self:service}-${self:provider.stage}-novalet-export-generator
+    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
+    role: lambdaExecutionRole
+    timeout: 300
+    events:
+      - sns:
+          arn: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
   HousingRegisterNovaletExportUpload:
     name: ${self:service}-${self:provider.stage}-novalet-export-upload
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FtpUploadNovaletExportFunction::Handle
