@@ -63,6 +63,7 @@ namespace HousingRegisterApi.Tests
                 AmazonSQS = new AmazonSQSClient(new AmazonSQSConfig() { ServiceURL = localstackSnsUrl, AuthenticationRegion = "eu-west-2" });
 
                 CreateSnsTopic();
+                CreateNovaletSnsTopic();
                 CreateS3Bucket();
                 CreateDynamoDbTable();
             });
@@ -108,6 +109,23 @@ namespace HousingRegisterApi.Tests
             }).Result;
 
             Environment.SetEnvironmentVariable("HOUSINGREGISTER_SNS_ARN", response.TopicArn);
+            SnsVerifer = new SnsEventVerifier<ApplicationSns>(AmazonSQS, SimpleNotificationService, response.TopicArn);
+        }
+
+        private void CreateNovaletSnsTopic()
+        {
+            var snsAttrs = new Dictionary<string, string>
+            {
+                { "fifo_topic", "false" }
+            };
+
+            var response = SimpleNotificationService.CreateTopicAsync(new CreateTopicRequest
+            {
+                Name = "novaletexport-sns-topic",
+                Attributes = snsAttrs,
+            }).Result;
+
+            Environment.SetEnvironmentVariable("NOVALET_SNS_ARN", response.TopicArn);
             SnsVerifer = new SnsEventVerifier<ApplicationSns>(AmazonSQS, SimpleNotificationService, response.TopicArn);
         }
 

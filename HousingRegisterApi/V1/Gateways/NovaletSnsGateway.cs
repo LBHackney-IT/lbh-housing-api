@@ -36,8 +36,7 @@ namespace HousingRegisterApi.V1.Gateways
             var request = new PublishRequest
             {
                 Message = message,
-                TopicArn = Environment.GetEnvironmentVariable("NOVALET_SNS_ARN"),
-                MessageGroupId = "SomeGroupId"
+                TopicArn = Environment.GetEnvironmentVariable("NOVALET_SNS_ARN")
             };
 
             return _amazonSimpleNotificationService.PublishAsync(request);
