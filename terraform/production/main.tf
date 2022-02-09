@@ -67,3 +67,15 @@ resource "aws_s3_bucket" "housingregister_bucket" {
     Environment = var.environment_name
   }
 }
+
+resource "aws_sns_topic" "novaletexport_topic" {
+  name                        = "novaletexport-sns-topic"
+  fifo_topic                  = false
+  kms_master_key_id           = "alias/aws/sns"
+}
+
+resource "aws_ssm_parameter" "novalet_sns_arn" {
+  name  = "/sns-topic/development/novaletexport-sns-topic/arn"
+  type  = "String"
+  value = aws_sns_topic.novaletexport_topic.arn
+}
