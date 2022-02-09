@@ -51,7 +51,6 @@ functions:
     events:
       - schedule: rate(1 day)
   HousingRegisterNovaletExportGenerator:
-    dispatcher:
       name: ${self:service}-${self:provider.stage}-novalet-export-generator
       handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
       role: lambdaExecutionRole
