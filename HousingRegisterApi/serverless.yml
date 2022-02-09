@@ -53,6 +53,7 @@ functions:
   HousingRegisterNovaletExportGenerator:
       name: ${self:service}-${self:provider.stage}-novalet-export-generator
       handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.NovaletExportGeneratorFunction::Handle
+      role: lambdaExecutionRole
       timeout: 300
       events:
       - sns: arn:aws:sns:eu-west-2:364864573329:novaletexport-sns-topic
@@ -161,6 +162,7 @@ resources:
                     - "sns:Publish"
                   Resource:
                     - ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
+                    - ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
           - PolicyName: bucketAccess
             PolicyDocument:
               Version: "2012-10-17"
