@@ -55,7 +55,7 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetRemainingAsync().GetAwaiter().GetResult();
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
             var searchItems = search.Select(x => x.ToDomain());
 
             // filter on nested values
@@ -120,7 +120,7 @@ namespace HousingRegisterApi.V1.Gateways
             };
 
             // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetRemainingAsync().GetAwaiter().GetResult();
+            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
             var searchItems = search.Select(x => x.ToDomain());
             var result = searchItems.FirstOrDefault();
             return result;
