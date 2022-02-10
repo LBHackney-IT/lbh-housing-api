@@ -5,6 +5,17 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
     write_capacity        = 10
     hash_key              = "id"
 
+    autoscaling_enabled = true
+    autoscaling_read = {
+        target_value       = 70
+        max_capacity       = 40
+    }
+
+    autoscaling_write = {
+        target_value       = 70
+        max_capacity       = 40
+    }
+
     attribute {
         name              = "id"
         type              = "S"
