@@ -21,7 +21,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_read_target" {
   max_capacity       = 100
   min_capacity       = 5
-  resource_id        = "table/tableName"
+  resource_id        = "table/HousingRegister"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
 }
