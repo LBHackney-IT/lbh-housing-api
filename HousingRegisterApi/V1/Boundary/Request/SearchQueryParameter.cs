@@ -15,5 +15,7 @@ namespace HousingRegisterApi.V1.Boundary.Request
         public string OrderBy { get; set; }
 
         public bool HasAssessment { get; set; }
+
+        public string PaginationToken { get; set; }
     }
 }

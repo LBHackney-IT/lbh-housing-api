@@ -1,13 +1,17 @@
+using Hackney.Core.DynamoDb;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
     public interface IApplicationApiGateway
     {
         IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters);
+
+        Task<PagedResult<Application>> GetApplicationsAsync(SearchQueryParameter searchParameters);
 
         IEnumerable<Application> GetApplicationsAtStatus(params string[] status);
 

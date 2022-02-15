@@ -63,9 +63,9 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications([FromQuery] SearchQueryParameter searchParameters)
+        public async Task<IActionResult> ListApplications([FromQuery] SearchQueryParameter searchParameters)
         {
-            var response = _getApplicationsUseCase.Execute(searchParameters);
+            var response = await _getApplicationsUseCase.Execute(searchParameters).ConfigureAwait(false);
             if (response == null || !response.Results.Any()) return NotFound(searchParameters);
 
             return Ok(response);
