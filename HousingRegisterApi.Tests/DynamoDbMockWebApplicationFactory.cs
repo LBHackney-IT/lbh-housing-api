@@ -77,14 +77,34 @@ namespace HousingRegisterApi.Tests
 
         private void CreateDynamoDbTable()
         {
+            var housingRegIndex = new GlobalSecondaryIndex
+            {
+                IndexName = "HousingRegIndex",
+                ProvisionedThroughput = new ProvisionedThroughput
+                {
+                    ReadCapacityUnits = (long) 10,
+                    WriteCapacityUnits = (long) 1
+                },
+                Projection = new Projection { ProjectionType = "ALL" }
+            };
+
             foreach (var table in _tables)
             {
                 try
                 {
+                    /*var indexKeySchema = new List<KeySchemaElement> {
+                        {new KeySchemaElement { AttributeName = "status", KeyType = "HASH"}},  //Partition key
+                        {new KeySchemaElement{ AttributeName = "submittedAt", KeyType = "RANGE"}}  //Sort key
+                    };*/
+
+                    //housingRegIndex.KeySchema = indexKeySchema;
+
                     var request = new CreateTableRequest(table.Name,
                         new List<KeySchemaElement> { new KeySchemaElement(table.KeyName, KeyType.HASH) },
                         new List<AttributeDefinition> { new AttributeDefinition(table.KeyName, table.KeyType) },
-                        new ProvisionedThroughput(3, 3));
+                        new ProvisionedThroughput(3, 3)
+                        );
+                    //request.GlobalSecondaryIndexes.Add(housingRegIndex);
                     _ = DynamoDb.CreateTableAsync(request).GetAwaiter().GetResult();
                 }
                 catch (ResourceInUseException)

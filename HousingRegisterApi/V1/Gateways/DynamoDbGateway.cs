@@ -1,13 +1,18 @@
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using Hackney.Core.DynamoDb;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -27,6 +32,56 @@ namespace HousingRegisterApi.V1.Gateways
             _hashHelper = hashHelper;
             _codeGenerator = codeGenerator;
             _bedroomCalculatorService = bedroomCalculatorService;
+        }
+
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var scanConfig = new ScanOperationConfig()
+            {
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken)
+            };
+
+            if (!string.IsNullOrEmpty(searchParameters.Status))
+            {
+                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status);
+            }
+            if (!string.IsNullOrEmpty(searchParameters.Reference))
+            {
+                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference);
+            }
+            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
+            {
+                if (searchParameters.AssignedTo == "unassigned")
+                {
+                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull);
+                }
+                else
+                {
+                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
+                }
+
+            }
+            if (searchParameters.HasAssessment)
+            {
+                scanConfig.Filter.AddCondition(nameof(Assessment), ScanOperator.IsNotNull);
+            }
+
+            var search = table.Scan(scanConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
         }
 
         public IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters)

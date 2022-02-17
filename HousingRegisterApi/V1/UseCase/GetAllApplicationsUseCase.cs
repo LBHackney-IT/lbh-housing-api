@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -18,10 +19,11 @@ namespace HousingRegisterApi.V1.UseCase
             _paginationHelper = paginationHelper;
         }
 
-        public PaginatedApplicationListResponse Execute(SearchQueryParameter searchParameters)
+        public async Task<PaginatedApplicationListResponse> Execute(SearchQueryParameter searchParameters)
         {
-            var totalItems = _gateway.GetApplications(searchParameters);
-            return _paginationHelper.BuildResponse(searchParameters, totalItems, totalItems.Count());
+            var (totalItems, paginationToken) = await _gateway.GetApplicationsAsync(searchParameters).ConfigureAwait(false);
+
+            return _paginationHelper.BuildResponse(searchParameters, totalItems, totalItems.Count(), paginationToken);
         }
     }
 }
