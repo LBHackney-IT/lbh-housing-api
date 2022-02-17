@@ -34,7 +34,7 @@ namespace HousingRegisterApi.V1.Gateways
             _bedroomCalculatorService = bedroomCalculatorService;
         }
 
-        public async Task<(IEnumerable<Application>,string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
             var dbApplications = new List<ApplicationDbEntity>();
