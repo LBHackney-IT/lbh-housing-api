@@ -10,6 +10,9 @@ build:
 serve:
 	docker-compose build housing-register-api && docker-compose up housing-register-api
 
+serve-from-aws:
+	docker-compose build housing-register-api-remote && docker-compose up housing-register-api-remote
+
 .PHONY: shell
 shell:
 	docker-compose run housing-register-api bash
@@ -26,5 +29,5 @@ lint:
 	dotnet format
 
 .PHONY: restart-db
-restart-db:	
+restart-db:
 	docker-compose up -d dynamodb-database
