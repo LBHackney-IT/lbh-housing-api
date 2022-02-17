@@ -10,11 +10,56 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         type              = "S"
     }
 
+    attribute {
+        name              = "activeRecords"
+        type              = "BOOL"
+    }
+
+    attribute {
+        name              = "sortKey"
+        type              = "S"
+    }
+
+    attribute {
+        name              = "status"
+        type              = "S"
+    }
+
+    attribute {
+        name              = "assignedTo"
+        type              = "S"
+    }
+
+
     tags = {
         Name              = "housing-register-api-${var.environment_name}"
         Environment       = var.environment_name
         terraform-managed = true
         project_name      = var.project_name
+    }
+
+    global_secondary_index {
+        name              = "HousingRegisterAll"
+        read_capacity     = 10
+        write_capacity    = 10
+        hash_key          = "activeRecords"
+        range_key         = "sortKey"
+    }
+
+    global_secondary_index {
+        name              = "HousingRegisterStatus"
+        read_capacity     = 10
+        write_capacity    = 10
+        hash_key          = "status"
+        range_key         = "sortKey"
+    }
+
+    global_secondary_index {
+        name              = "HousingRegisterAssignedTo"
+        read_capacity     = 10
+        write_capacity    = 10
+        hash_key          = "assignedTo"
+        range_key         = "sortKey"
     }
 }
 
