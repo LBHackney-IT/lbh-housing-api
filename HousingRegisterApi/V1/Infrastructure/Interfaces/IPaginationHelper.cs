@@ -11,6 +11,6 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         IEnumerable<Application> OrderData(IEnumerable<Application> data, string orderBy);
 
-        PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems);
+        PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems, string paginationToken);
     }
 }

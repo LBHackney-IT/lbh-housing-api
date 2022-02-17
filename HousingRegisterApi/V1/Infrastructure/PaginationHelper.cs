@@ -1,3 +1,4 @@
+using Hackney.Core.DynamoDb;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
@@ -29,7 +30,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             };
         }
 
-        public PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems)
+        public PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems, string paginationToken)
         {
             var results = OrderData(data, searchParameters.OrderBy);
             results = PageData(results, searchParameters.Page, searchParameters.PageSize);
@@ -47,6 +48,9 @@ namespace HousingRegisterApi.V1.Infrastructure
                 }
             }
 
+            var pag = PaginationDetails.EncodeToken(searchParameters.PaginationToken);
+            var pagDec = PaginationDetails.DecodeToken(pag);
+
             return new PaginatedApplicationListResponse
             {
                 PageSize = searchParameters.PageSize,
@@ -55,7 +59,8 @@ namespace HousingRegisterApi.V1.Infrastructure
                 TotalItems = totalItems,
                 TotalNumberOfPages = (int) Math.Ceiling((decimal) totalItems / searchParameters.PageSize),
                 PageStartOffSet = pageStartItem,
-                PageEndOffSet = pageEndItem
+                PageEndOffSet = pageEndItem,
+                PaginationToken = paginationToken,
             };
         }
     }

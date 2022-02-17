@@ -8,5 +8,6 @@ namespace HousingRegisterApi.V1.Boundary.Response
         public int TotalNumberOfPages { get; set; }
         public int PageStartOffSet { get; set; }
         public int PageEndOffSet { get; set; }
+        public string PaginationToken { get; set; }
     }
 }
