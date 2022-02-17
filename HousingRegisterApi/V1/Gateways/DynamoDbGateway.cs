@@ -7,6 +7,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,104 +34,7 @@ namespace HousingRegisterApi.V1.Gateways
             _bedroomCalculatorService = bedroomCalculatorService;
         }
 
-        /*public (IEnumerable<Application>, Dictionary<string, AttributeValue>) GetApplicationsPaged(
-            SearchQueryParameter searchParameters, Dictionary<string, AttributeValue> lastKeyEvaluated)
-        {
-            var request = new ScanRequest
-            {
-                TableName = "ProductCatalog",
-                Limit = 10,
-                ExclusiveStartKey = lastKeyEvaluated
-            };
-
-            // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>((IEnumerable<ScanCondition>) request).GetNextSetAsync().GetAwaiter().GetResult();
-            var searchItems = search.Select(x => x.ToDomain());
-
-            lastKeyEvaluated = new Dictionary<string, AttributeValue>()
-            {
-                { "YOUR_HASH_KEY", new AttributeValue(Guid.NewGuid().ToString()) }
-            };
-
-            return (searchItems, lastKeyEvaluated);
-        }*/
-
-        /*public async Task<PagedResult<Application>> GetApplicationsAsync(SearchQueryParameter searchParameters)
-        {
-            int pageSize = searchParameters.PageSize;
-            var dbApplications = new List<ApplicationDbEntity>();
-            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
-
-            var queryConfig = new QueryOperationConfig
-            {
-                BackwardSearch = true,
-                //ConsistentRead = true,
-                Limit = pageSize,
-                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
-                IndexName = "HousingRegIndex",
-                KeyExpression = new Expression
-                {
-                    ExpressionStatement = "#status = :v_status and #submittedAt <= :v_date",
-                    ExpressionAttributeNames = {
-                        { "#status", "status" },
-                        { "#submittedAt", "submittedAt" }
-                    },
-                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
-                    {
-                        { ":v_status", new Primitive("New") },
-                        { ":v_date", new Primitive(DateTime.Now.ToShortDateString()) },
-                    },
-                },
-            };
-            if (!string.IsNullOrEmpty(searchParameters.Status))
-            {
-                queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status);
-            }
-            if (!string.IsNullOrEmpty(searchParameters.Reference))
-            {
-                queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference);
-            }
-            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
-            {
-                if (searchParameters.AssignedTo == "unassigned")
-                {
-                    queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull);
-                }
-                else
-                {
-                    queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
-                }
-
-            }
-            if (searchParameters.HasAssessment)
-            {
-                queryConfig.Filter.AddCondition(nameof(Assessment), ScanOperator.IsNotNull);
-            }
-
-            var search = table.Query(queryConfig);
-            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
-
-            var paginationToken = search.PaginationToken;
-            if (resultsSet.Any())
-            {
-                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
-
-                // Look ahead for any more, but only if we have a token
-                if (!string.IsNullOrEmpty(PaginationDetails.EncodeToken(paginationToken)))
-                {
-                    queryConfig.PaginationToken = paginationToken;
-                    queryConfig.Limit = 20;
-                    search = table.Query(queryConfig);
-                    resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
-                    if (!resultsSet.Any())
-                        paginationToken = null;
-                }
-            }
-
-            return new PagedResult<Application>(dbApplications.Select(x => x.ToDomain()), new PaginationDetails(paginationToken));
-        }*/
-
-        public async Task<PagedResult<Application>> GetApplicationsAsync(SearchQueryParameter searchParameters)
+        public async Task<(IEnumerable<Application>,string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
             var dbApplications = new List<ApplicationDbEntity>();
@@ -139,10 +43,8 @@ namespace HousingRegisterApi.V1.Gateways
             var scanConfig = new ScanOperationConfig()
             {
                 Limit = pageSize,
-                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken)
             };
-            //var pag = PaginationDetails.EncodeToken(searchParameters.PaginationToken);
-            var pagDec = PaginationDetails.DecodeToken(searchParameters.PaginationToken);
 
             if (!string.IsNullOrEmpty(searchParameters.Status))
             {
@@ -177,22 +79,9 @@ namespace HousingRegisterApi.V1.Gateways
             if (resultsSet.Any())
             {
                 dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
-
-                // Look ahead for any more, but only if we have a token
-                /*if (!string.IsNullOrEmpty(PaginationDetails.EncodeToken(paginationToken)))
-                {
-                    searchParameters.PaginationToken = paginationToken;
-                    scanConfig.PaginationToken = paginationToken;
-                    //searchParameters.PageSize = 20;
-                    search = table.Scan(scanConfig);
-                    //paginationToken = search.PaginationToken;
-                    resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
-                    if (!resultsSet.Any())
-                        paginationToken = null;
-                }*/
             }
 
-            return new PagedResult<Application>(dbApplications.Select(x => x.ToDomain()), new PaginationDetails(paginationToken));
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
         }
 
         public IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters)

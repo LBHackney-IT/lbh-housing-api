@@ -11,7 +11,7 @@ namespace HousingRegisterApi.V1.Gateways
     {
         IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters);
 
-        Task<PagedResult<Application>> GetApplicationsAsync(SearchQueryParameter searchParameters);
+        Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters);
 
         IEnumerable<Application> GetApplicationsAtStatus(params string[] status);
 
