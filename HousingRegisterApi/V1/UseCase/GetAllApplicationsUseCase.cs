@@ -21,7 +21,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<PaginatedApplicationListResponse> Execute(SearchQueryParameter searchParameters)
         {
-            var (data, paginationToken) = await _gateway.GetApplicationsAsync(searchParameters).ConfigureAwait(false);
+            var (data, paginationToken) = await _gateway.GetAllApplicationsAsync(searchParameters).ConfigureAwait(false);
 
             return _paginationHelper.BuildResponse(searchParameters, data, paginationToken);
         }

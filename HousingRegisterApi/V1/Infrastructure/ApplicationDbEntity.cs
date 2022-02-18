@@ -43,8 +43,8 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public bool ImportedFromLegacyDatabase { get; set; }
 
-        public string SortKey {get { return SubmitedAd + ":" + Id; } }
+        public string SortKey { get { return SubmittedAt + ":" + Id; } }
 
-        public int ActiveRecord {get { return 1; } }
+        public static int ActiveRecord { get { return 1; } }
     }
 }

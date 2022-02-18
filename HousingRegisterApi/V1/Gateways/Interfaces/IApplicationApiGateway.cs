@@ -10,7 +10,7 @@ namespace HousingRegisterApi.V1.Gateways
     public interface IApplicationApiGateway
     {
         IEnumerable<Application> GetApplications(SearchQueryParameter searchParameters);
-
+        Task<(IEnumerable<Application>, string)> GetAllApplicationsAsync(SearchQueryParameter searchParameters);
         Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters);
 
         IEnumerable<Application> GetApplicationsAtStatus(params string[] status);

@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.Gateways
             return (searchItems, lastKeyEvaluated);
         }*/
 
-        /*public async Task<PagedResult<Application>> GetApplicationsAsync(SearchQueryParameter searchParameters)
+        public async Task<(IEnumerable<Application>, string)> GetAllApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
             var dbApplications = new List<ApplicationDbEntity>();
@@ -68,45 +68,19 @@ namespace HousingRegisterApi.V1.Gateways
                 //ConsistentRead = true,
                 Limit = pageSize,
                 PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
-                IndexName = "HousingRegIndex",
+                IndexName = "HousingRegisterAll",
                 KeyExpression = new Expression
                 {
-                    ExpressionStatement = "#status = :v_status and #submittedAt <= :v_date",
+                    ExpressionStatement = "#activeRecords = :v_activeRecords",
                     ExpressionAttributeNames = {
-                        { "#status", "status" },
-                        { "#submittedAt", "submittedAt" }
+                        { "#activeRecords", "activeRecords" },
                     },
                     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
                     {
-                        { ":v_status", new Primitive("New") },
-                        { ":v_date", new Primitive(DateTime.Now.ToShortDateString()) },
+                        { ":v_activeRecords", new Primitive("1", true) },
                     },
                 },
             };
-            if (!string.IsNullOrEmpty(searchParameters.Status))
-            {
-                queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status);
-            }
-            if (!string.IsNullOrEmpty(searchParameters.Reference))
-            {
-                queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference);
-            }
-            if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
-            {
-                if (searchParameters.AssignedTo == "unassigned")
-                {
-                    queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull);
-                }
-                else
-                {
-                    queryConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
-                }
-
-            }
-            if (searchParameters.HasAssessment)
-            {
-                queryConfig.Filter.AddCondition(nameof(Assessment), ScanOperator.IsNotNull);
-            }
 
             var search = table.Query(queryConfig);
             var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
@@ -115,21 +89,10 @@ namespace HousingRegisterApi.V1.Gateways
             if (resultsSet.Any())
             {
                 dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
-
-                // Look ahead for any more, but only if we have a token
-                if (!string.IsNullOrEmpty(PaginationDetails.EncodeToken(paginationToken)))
-                {
-                    queryConfig.PaginationToken = paginationToken;
-                    queryConfig.Limit = 20;
-                    search = table.Query(queryConfig);
-                    resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
-                    if (!resultsSet.Any())
-                        paginationToken = null;
-                }
             }
 
-            return new PagedResult<Application>(dbApplications.Select(x => x.ToDomain()), new PaginationDetails(paginationToken));
-        }*/
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
 
         public async Task<(IEnumerable<Application>,string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
         {
