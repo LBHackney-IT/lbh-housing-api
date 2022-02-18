@@ -42,5 +42,9 @@ namespace HousingRegisterApi.V1.Infrastructure
         public int? CalculatedBedroomNeed { get; set; }
 
         public bool ImportedFromLegacyDatabase { get; set; }
+
+        public string SortKey {get { return SubmitedAd + ":" + Id; } }
+
+        public int ActiveRecord {get { return 1; } }
     }
 }
