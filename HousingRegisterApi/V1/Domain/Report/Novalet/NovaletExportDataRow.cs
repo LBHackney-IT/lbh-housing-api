@@ -85,7 +85,8 @@ namespace HousingRegisterApi.V1.Domain.Report
             return null;
         }
 
-        private static string GetBand(string band) {
+        private static string GetBand(string band)
+        {
             return band switch {
                 "A" => "EMG",
                 "B" => "SHN",
