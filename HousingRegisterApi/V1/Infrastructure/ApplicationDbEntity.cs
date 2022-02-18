@@ -43,8 +43,13 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public bool ImportedFromLegacyDatabase { get; set; }
 
-        public string SortKey { get { return SubmittedAt + ":" + Id; } }
+        public string SortKey {
+            get => SubmittedAt + ":" + Id;
+            set {
+                throw new Exception("This value meant to be readonly. See https://github.com/aws/aws-sdk-net/issues/1666)");
+            }
+        }
 
-        public static int ActiveRecord { get { return 1; } }
+        public int ActiveRecord { get; set; } = 1;
     }
 }
