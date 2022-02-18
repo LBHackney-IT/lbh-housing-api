@@ -12,7 +12,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     attribute {
         name              = "activeRecords"
-        type              = "BOOL"
+        type              = "N"
     }
 
     attribute {
