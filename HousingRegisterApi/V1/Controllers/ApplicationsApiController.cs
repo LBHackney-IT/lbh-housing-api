@@ -66,8 +66,6 @@ namespace HousingRegisterApi.V1.Controllers
         public async Task<IActionResult> ListApplications([FromQuery] SearchQueryParameter searchParameters)
         {
             var response = await _getApplicationsUseCase.Execute(searchParameters).ConfigureAwait(false);
-            if (response == null || !response.Results.Any()) return NotFound(searchParameters);
-
             return Ok(response);
         }
 
