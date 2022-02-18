@@ -58,7 +58,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             Sex = application.MainApplicant?.Person?.Gender ?? null;
             RegistrationDate = FormatDate(application.SubmittedAt);
             EffectiveDate = FormatDate(application.Assessment?.EffectiveDate);
-            ApplicantType = application.Assessment?.Band;
+            ApplicantType = GetBand(application.Assessment?.Band);
             MinimumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value - 1).ToString() : null;
             MaximumBedSize = bedroomNeed.HasValue ? Math.Max(0, bedroomNeed.Value).ToString() : null;
             DateOfBirth = FormatDate(application.MainApplicant?.Person?.DateOfBirth);
@@ -83,6 +83,16 @@ namespace HousingRegisterApi.V1.Domain.Report
             }
 
             return null;
+        }
+
+        private static string GetBand(string band) {
+            return band switch {
+                "A" => "EMG",
+                "B" => "SHN",
+                "C" => "SCH",
+                "C-transitional" => "SCH",
+                _ => null
+            };
         }
 
         private static string GetEthnicity(Application application)
