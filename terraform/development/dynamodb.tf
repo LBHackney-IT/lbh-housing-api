@@ -120,7 +120,7 @@ resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_write_ta
   for_each = local.resourceNames
   max_capacity       = local.maxCapacity
   min_capacity       = local.minCapacity
-  resource_id        = "table/HousingRegister"
+  resource_id        = each.key
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
 }
