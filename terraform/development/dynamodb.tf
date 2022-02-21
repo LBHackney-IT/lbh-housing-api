@@ -43,8 +43,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterAll"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = 50
+        write_capacity    = 50
         hash_key          = "activeRecords"
         range_key         = "sortKey"
         projection_type   = "ALL"
@@ -52,8 +52,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterStatus"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = 50
+        write_capacity    = 50
         hash_key          = "status"
         range_key         = "sortKey"
         projection_type   = "ALL"
@@ -61,16 +61,16 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterAssignedTo"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = 50
+        write_capacity    = 50
         hash_key          = "assignedTo"
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
     global_secondary_index {
         name              = "HousingRegisterStatusAssignedTo"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = 50
+        write_capacity    = 50
         hash_key          = "statusAssigneeKey"
         range_key         = "sortKey"
         projection_type   = "ALL"
