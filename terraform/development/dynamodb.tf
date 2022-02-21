@@ -1,8 +1,21 @@
+locals {
+  defaultCapacity = 10
+  minCapacity = 2
+  maxCapacity = 50
+  resourceNames = toset([
+    "table/HousingRegister",
+    "table/HousingRegister/index/HousingRegisterAll",
+    "table/HousingRegister/index/HousingRegisterStatus",
+    "table/HousingRegister/index/HousingRegisterAssignedTo",
+    "table/HousingRegister/index/HousingRegisterStatusAssignedTo"
+  ])
+}
+
 resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
     name                  = "HousingRegister"
     billing_mode          = "PROVISIONED"
-    read_capacity         = 10
-    write_capacity        = 10
+    read_capacity         = locals.defaultCapacity
+    write_capacity        = locals.defaultCapacity
     hash_key              = "id"
 
     attribute {
@@ -43,8 +56,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterAll"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = locals.defaultCapacity
+        write_capacity    = locals.defaultCapacity
         hash_key          = "activeRecords"
         range_key         = "sortKey"
         projection_type   = "ALL"
@@ -52,8 +65,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterStatus"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = locals.defaultCapacity
+        write_capacity    = locals.defaultCapacity
         hash_key          = "status"
         range_key         = "sortKey"
         projection_type   = "ALL"
@@ -61,16 +74,16 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     global_secondary_index {
         name              = "HousingRegisterAssignedTo"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = locals.defaultCapacity
+        write_capacity    = locals.defaultCapacity
         hash_key          = "assignedTo"
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
     global_secondary_index {
         name              = "HousingRegisterStatusAssignedTo"
-        read_capacity     = 10
-        write_capacity    = 10
+        read_capacity     = locals.defaultCapacity
+        write_capacity    = locals.defaultCapacity
         hash_key          = "statusAssigneeKey"
         range_key         = "sortKey"
         projection_type   = "ALL"
@@ -78,19 +91,21 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 }
 
 resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_read_target" {
-  max_capacity       = 50
-  min_capacity       = 5
-  resource_id        = "table/HousingRegister"
+  for_each = locals.resourceNames
+  max_capacity       = locals.maxCapacity
+  min_capacity       = locals.minCapacity
+  resource_id        = each.key
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
 }
 
 resource "aws_appautoscaling_policy" "housingregisterapi_dynamodb_table_read_policy" {
-  name               = "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.housingregisterapi_dynamodb_table_read_target.resource_id}"
+  for_each = locals.resourceNames
+  name               = "DynamoDBReadCapacityUtilization:${each.key}"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.housingregisterapi_dynamodb_table_read_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.housingregisterapi_dynamodb_table_read_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.housingregisterapi_dynamodb_table_read_target.service_namespace
+  resource_id        = each.key
+  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
+  service_namespace  = "dynamodb"
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -102,19 +117,21 @@ resource "aws_appautoscaling_policy" "housingregisterapi_dynamodb_table_read_pol
 }
 
 resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_write_target" {
-  max_capacity       = 50
-  min_capacity       = 5
+  for_each = locals.resourceNames
+  max_capacity       = locals.maxCapacity
+  min_capacity       = locals.minCapacity
   resource_id        = "table/HousingRegister"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
 }
 
 resource "aws_appautoscaling_policy" "housingregisterapi_dynamodb_table_write_policy" {
-  name               = "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.housingregisterapi_dynamodb_table_write_target.resource_id}"
+  for_each = locals.resourceNames
+  name               = "DynamoDBWriteCapacityUtilization:${each.key}"
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.housingregisterapi_dynamodb_table_write_target.resource_id
-  scalable_dimension = aws_appautoscaling_target.housingregisterapi_dynamodb_table_write_target.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.housingregisterapi_dynamodb_table_write_target.service_namespace
+  resource_id        = each.key
+  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
+  service_namespace  = "dynamodb"
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
