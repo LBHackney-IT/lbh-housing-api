@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
-    public class GetAllApplicationsUseCase : IGetAllApplicationsUseCase
+    public class GetAllApplicationsByStatusUseCase : IGetAllApplicationsByStatusUseCase
     {
         private readonly IApplicationApiGateway _gateway;
         private readonly IPaginationHelper _paginationHelper;
 
-        public GetAllApplicationsUseCase(IApplicationApiGateway gateway, IPaginationHelper paginationHelper)
+        public GetAllApplicationsByStatusUseCase(IApplicationApiGateway gateway, IPaginationHelper paginationHelper)
         {
             _gateway = gateway;
             _paginationHelper = paginationHelper;
@@ -21,7 +21,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<PaginatedApplicationListResponse> Execute(SearchQueryParameter searchParameters)
         {
-            var (data, paginationToken) = await _gateway.GetAllApplicationsAsync(searchParameters).ConfigureAwait(false);
+            var (data, paginationToken) = await _gateway.GetApplicationsByStatusAsync(searchParameters).ConfigureAwait(false);
 
             return _paginationHelper.BuildResponse(searchParameters, data, paginationToken);
         }

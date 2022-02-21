@@ -34,6 +34,112 @@ namespace HousingRegisterApi.V1.Gateways
             _bedroomCalculatorService = bedroomCalculatorService;
         }
 
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsByStatusAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
+            {
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterStatus",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "#status = :v_status",
+                    ExpressionAttributeNames = {
+                        { "#status", "status" }
+                    },
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_status", new Primitive(searchParameters.Status) },
+                    },
+                },
+            };
+
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
+
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsByAssignedToAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
+            {
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterAssignedTo",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "assignedTo = :v_assignedTo",
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_assignedTo", (string.IsNullOrEmpty(searchParameters.AssignedTo) ? new Primitive("unassigned") :
+                            new Primitive(searchParameters.AssignedTo)) },
+                    },
+                },
+            };
+
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
+
+        public async Task<(IEnumerable<Application>, string)> GetAllApplicationsAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
+            {
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterAll",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "activeRecords = :v_activeRecords",
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_activeRecords", new Primitive("1", true) },
+                    },
+                },
+            };
+
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
+
         public async Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
@@ -48,27 +154,27 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (!string.IsNullOrEmpty(searchParameters.Status))
             {
-                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Status), ScanOperator.Equal, searchParameters.Status);
+                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Status).ToCamelCase(), ScanOperator.Equal, searchParameters.Status);
             }
             if (!string.IsNullOrEmpty(searchParameters.Reference))
             {
-                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Contains, searchParameters.Reference);
+                scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.Reference).ToCamelCase(), ScanOperator.Contains, searchParameters.Reference);
             }
             if (!string.IsNullOrEmpty(searchParameters.AssignedTo))
             {
                 if (searchParameters.AssignedTo == "unassigned")
                 {
-                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.IsNull);
+                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo).ToCamelCase(), ScanOperator.IsNull);
                 }
                 else
                 {
-                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo), ScanOperator.Equal, searchParameters.AssignedTo);
+                    scanConfig.Filter.AddCondition(nameof(ApplicationDbEntity.AssignedTo).ToCamelCase(), ScanOperator.Equal, searchParameters.AssignedTo);
                 }
 
             }
             if (searchParameters.HasAssessment)
             {
-                scanConfig.Filter.AddCondition(nameof(Assessment), ScanOperator.IsNotNull);
+                scanConfig.Filter.AddCondition(nameof(Assessment).ToCamelCase(), ScanOperator.IsNotNull);
             }
 
             var search = table.Scan(scanConfig);
