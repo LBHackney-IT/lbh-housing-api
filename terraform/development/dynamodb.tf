@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
     name                  = "HousingRegister"
     billing_mode          = "PROVISIONED"
-    read_capacity         = 10
-    write_capacity        = 10
+    read_capacity         = 50
+    write_capacity        = 50
     hash_key              = "id"
 
     attribute {
@@ -29,7 +29,10 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         name              = "assignedTo"
         type              = "S"
     }
-
+    attribute {
+        name              = "statusAssigneeKey"
+        type              = "S"
+    }
 
     tags = {
         Name              = "housing-register-api-${var.environment_name}"
