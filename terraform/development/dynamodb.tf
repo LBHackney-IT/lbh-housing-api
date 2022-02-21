@@ -64,6 +64,14 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
+    global_secondary_index {
+        name              = "HousingRegisterStatusAssignedTo"
+        read_capacity     = 10
+        write_capacity    = 10
+        hash_key          = "statusAssigneeKey"
+        range_key         = "sortKey"
+        projection_type   = "ALL"
+    }
 }
 
 resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_read_target" {
