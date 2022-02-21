@@ -32,7 +32,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime? VerifyExpiresAt { get; set; }
 
-        public string AssignedTo { get; set; }
+        public string AssignedTo { get; set; } = "unassigned";
 
         public bool SensitiveData { get; set; }
 
@@ -43,11 +43,10 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public bool ImportedFromLegacyDatabase { get; set; }
 
-        public string SortKey {
+        public string SortKey
+        {
             get => SubmittedAt + ":" + Id;
-            set {
-                throw new Exception("This value meant to be readonly. See https://github.com/aws/aws-sdk-net/issues/1666)");
-            }
+            set { _ = value; }
         }
 
         public int ActiveRecord { get; set; } = 1;

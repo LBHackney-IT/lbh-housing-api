@@ -34,27 +34,77 @@ namespace HousingRegisterApi.V1.Gateways
             _bedroomCalculatorService = bedroomCalculatorService;
         }
 
-        /*public (IEnumerable<Application>, Dictionary<string, AttributeValue>) GetApplicationsPaged(
-            SearchQueryParameter searchParameters, Dictionary<string, AttributeValue> lastKeyEvaluated)
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsByStatusAsync(SearchQueryParameter searchParameters)
         {
-            var request = new ScanRequest
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
             {
-                TableName = "ProductCatalog",
-                Limit = 10,
-                ExclusiveStartKey = lastKeyEvaluated
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterStatus",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "#status = :v_status",
+                    ExpressionAttributeNames = {
+                        { "#status", "status" }
+                    },
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_status", new Primitive(searchParameters.Status) },
+                    },
+                },
             };
 
-            // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>((IEnumerable<ScanCondition>) request).GetNextSetAsync().GetAwaiter().GetResult();
-            var searchItems = search.Select(x => x.ToDomain());
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
 
-            lastKeyEvaluated = new Dictionary<string, AttributeValue>()
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
             {
-                { "YOUR_HASH_KEY", new AttributeValue(Guid.NewGuid().ToString()) }
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
+
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsByAssignedToAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
+            {
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterAssignedTo",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "assignedTo = :v_assignedTo",
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_assignedTo", (string.IsNullOrEmpty(searchParameters.AssignedTo) ? new Primitive("unassigned") :
+                            new Primitive(searchParameters.AssignedTo)) },
+                    },
+                },
             };
 
-            return (searchItems, lastKeyEvaluated);
-        }*/
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
 
         public async Task<(IEnumerable<Application>, string)> GetAllApplicationsAsync(SearchQueryParameter searchParameters)
         {
@@ -65,16 +115,12 @@ namespace HousingRegisterApi.V1.Gateways
             var queryConfig = new QueryOperationConfig
             {
                 BackwardSearch = true,
-                //ConsistentRead = true,
                 Limit = pageSize,
                 PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
                 IndexName = "HousingRegisterAll",
                 KeyExpression = new Expression
                 {
-                    ExpressionStatement = "#activeRecords = :v_activeRecords",
-                    ExpressionAttributeNames = {
-                        { "#activeRecords", "activeRecords" },
-                    },
+                    ExpressionStatement = "activeRecords = :v_activeRecords",
                     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
                     {
                         { ":v_activeRecords", new Primitive("1", true) },
@@ -94,7 +140,7 @@ namespace HousingRegisterApi.V1.Gateways
             return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
         }
 
-        public async Task<(IEnumerable<Application>,string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
             var dbApplications = new List<ApplicationDbEntity>();
