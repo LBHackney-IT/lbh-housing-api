@@ -6,7 +6,8 @@ locals {
     "table/HousingRegister/index/HousingRegisterAll",
     "table/HousingRegister/index/HousingRegisterStatus",
     "table/HousingRegister/index/HousingRegisterAssignedTo",
-    "table/HousingRegister/index/HousingRegisterStatusAssignedTo"
+    "table/HousingRegister/index/HousingRegisterStatusAssignedTo",
+    "table/HousingRegister/index/HousingRegisterReference"
   ])
 }
 
@@ -34,6 +35,11 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     attribute {
         name              = "status"
+        type              = "S"
+    }
+
+    attribute {
+        name              = "reference"
         type              = "S"
     }
 
@@ -79,11 +85,21 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
+
     global_secondary_index {
         name              = "HousingRegisterStatusAssignedTo"
         read_capacity     = local.defaultCapacity
         write_capacity    = local.defaultCapacity
         hash_key          = "statusAssigneeKey"
+        range_key         = "sortKey"
+        projection_type   = "ALL"
+    }
+
+    global_secondary_index {
+        name              = "HousingRegisterReference"
+        read_capacity     = local.defaultCapacity
+        write_capacity    = local.defaultCapacity
+        hash_key          = "reference"
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
