@@ -14,11 +14,15 @@ namespace HousingRegisterApi.V1.Infrastructure
     {
         public static readonly string DATEFORMAT = "yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ";
 
+        public static string FormatDate(DateTime dateTime) {
+            return dateTime.ToUniversalTime().ToString(DATEFORMAT);
+        }
+
         public DynamoDBEntry ToEntry(object value)
         {
             if (null == value) return new DynamoDBNull();
 
-            return new Primitive { Value = ((DateTime) value).ToUniversalTime().ToString(DATEFORMAT) };
+            return new Primitive { Value = FormatDate((DateTime) value)};
         }
 
         public object FromEntry(DynamoDBEntry entry)

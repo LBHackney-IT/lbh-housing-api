@@ -43,9 +43,13 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public bool ImportedFromLegacyDatabase { get; set; }
 
+        protected DateTime SortDate {
+            get => (SubmittedAt ?? CreatedAt);
+        }
+
         public string SortKey
         {
-            get => (SubmittedAt ?? CreatedAt) + ":" + Id;
+            get => DynamoDbDateTimeConverter.FormatDate(SortDate) + ":" + Id;
             set { _ = value; }
         }
 
