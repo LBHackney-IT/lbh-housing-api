@@ -82,14 +82,13 @@ namespace HousingRegisterApi.V1.Gateways
                 BackwardSearch = true,
                 Limit = pageSize,
                 PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
-                IndexName = "HousingRegisterAssignedTo",
+                IndexName = "HousingRegisterStatusAssignedTo",
                 KeyExpression = new Expression
                 {
-                    ExpressionStatement = "assignedTo = :v_assignedTo",
+                    ExpressionStatement = "statusAssigneeKey = :v_assignedTo",
                     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
                     {
-                        { ":v_assignedTo", (string.IsNullOrEmpty(searchParameters.AssignedTo) ? new Primitive("unassigned") :
-                            new Primitive(searchParameters.AssignedTo)) },
+                        { ":v_assignedTo", new Primitive(searchParameters.Status+":"+searchParameters.AssignedTo) },
                     },
                 },
             };
