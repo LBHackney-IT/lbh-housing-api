@@ -45,7 +45,13 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public string SortKey
         {
-            get => SubmittedAt + ":" + Id;
+            get => (SubmittedAt ?? CreatedAt) + ":" + Id;
+            set { _ = value; }
+        }
+
+        public string StatusAssigneeKey
+        {
+            get => Status + ":" + AssignedTo;
             set { _ = value; }
         }
 
