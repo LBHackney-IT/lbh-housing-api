@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
-    public class GetApplicationsByReferenceUseCase: IGetApplicationsByReferenceUseCase
+    public class GetApplicationsByReferenceUseCase : IGetApplicationsByReferenceUseCase
     {
         private readonly IApplicationApiGateway _gateway;
         private readonly IPaginationHelper _paginationHelper;
