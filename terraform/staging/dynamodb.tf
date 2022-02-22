@@ -1,5 +1,5 @@
 locals {
-  defaultCapacity = 10
+  defaultCapacity = 50
   minCapacity = 2
   maxCapacity = 50
   indexNames = toset([
