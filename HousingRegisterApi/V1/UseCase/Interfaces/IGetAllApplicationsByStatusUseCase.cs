@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
-    public interface IGetAllApplicationsUseCase
+    public interface IGetAllApplicationsByStatusUseCase
     {
         Task<PaginatedApplicationListResponse> Execute(SearchQueryParameter searchParameters);
     }

@@ -17,6 +17,8 @@ namespace HousingRegisterApi.V1.Controllers
     public class ApplicationsApiController : BaseController
     {
         private readonly IGetAllApplicationsUseCase _getApplicationsUseCase;
+        private readonly IGetAllApplicationsByAssigneeUseCase _getApplicationsByAssignedToUseCase;
+        private readonly IGetAllApplicationsByStatusUseCase _getApplicationsByStatusUseCase;
         private readonly IGetApplicationByIdUseCase _getByIdUseCase;
         private readonly ICreateNewApplicationUseCase _createNewApplicationUseCase;
         private readonly IUpdateApplicationUseCase _updateApplicationUseCase;
@@ -26,9 +28,12 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IAddApplicationNoteUseCase _addApplicationNoteUseCase;
         private readonly IViewingApplicationUseCase _viewingApplicationUseCase;
         private readonly IImportApplicationUseCase _importApplicationUseCase;
+        private readonly IGetApplicationsByReferenceUseCase _getApplicationsByReferenceUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
+            IGetAllApplicationsByAssigneeUseCase getApplicationsByAssignedToUseCase,
+            IGetAllApplicationsByStatusUseCase getApplicationsByStatusUseCase,
             IGetApplicationByIdUseCase getByIdUseCase,
             ICreateNewApplicationUseCase createNewApplicationUseCase,
             IUpdateApplicationUseCase updateApplicationUseCase,
@@ -37,9 +42,12 @@ namespace HousingRegisterApi.V1.Controllers
             ICalculateBedroomsUseCase calculateBedroomsUseCase,
             IAddApplicationNoteUseCase addApplicationNoteUseCase,
             IViewingApplicationUseCase viewingApplicationUseCase,
-            IImportApplicationUseCase importApplicationUseCase)
+            IImportApplicationUseCase importApplicationUseCase,
+            IGetApplicationsByReferenceUseCase getApplicationsByReferenceUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
+            _getApplicationsByAssignedToUseCase = getApplicationsByAssignedToUseCase;
+            _getApplicationsByStatusUseCase = getApplicationsByStatusUseCase;
             _getByIdUseCase = getByIdUseCase;
             _createNewApplicationUseCase = createNewApplicationUseCase;
             _updateApplicationUseCase = updateApplicationUseCase;
@@ -49,6 +57,7 @@ namespace HousingRegisterApi.V1.Controllers
             _addApplicationNoteUseCase = addApplicationNoteUseCase;
             _viewingApplicationUseCase = viewingApplicationUseCase;
             _importApplicationUseCase = importApplicationUseCase;
+            _getApplicationsByReferenceUseCase = getApplicationsByReferenceUseCase;
         }
 
         /// <summary>
@@ -63,11 +72,69 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        public IActionResult ListApplications([FromQuery] SearchQueryParameter searchParameters)
+        public async Task<IActionResult> ListApplications([FromQuery] SearchQueryParameter searchParameters)
         {
-            var response = _getApplicationsUseCase.Execute(searchParameters);
-            if (response == null || !response.Results.Any()) return NotFound(searchParameters);
+            var response = await _getApplicationsUseCase.Execute(searchParameters).ConfigureAwait(false);
+            return Ok(response);
+        }
 
+        /// <summary>
+        /// List the applications by status
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid Query Parameter.</response>
+        /// <response code="404">No records found for the specified query</response>
+        /// <response code="500">Something went wrong</response>
+        [ProducesResponseType(typeof(PaginatedApplicationListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("{action}")]
+        [ActionName("ListApplicationsByStatus")]
+        public async Task<IActionResult> ListApplicationsByStatus([FromQuery] SearchQueryParameter searchParameters)
+        {
+            var response = await _getApplicationsByStatusUseCase.Execute(searchParameters).ConfigureAwait(false);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// List the applications by AssignedTo
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid Query Parameter.</response>
+        /// <response code="404">No records found for the specified query</response>
+        /// <response code="500">Something went wrong</response>
+        [ProducesResponseType(typeof(PaginatedApplicationListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("{action}")]
+        [ActionName("ListApplicationsByAssignedTo")]
+        public async Task<IActionResult> ListApplicationsByAssignedTo([FromQuery] SearchQueryParameter searchParameters)
+        {
+            var response = await _getApplicationsByAssignedToUseCase.Execute(searchParameters).ConfigureAwait(false);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// List the applications by Reference
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="400">Invalid Query Parameter.</response>
+        /// <response code="404">No records found for the specified query</response>
+        /// <response code="500">Something went wrong</response>
+        [ProducesResponseType(typeof(PaginatedApplicationListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("{action}")]
+        [ActionName("ListApplicationsByReference")]
+        public async Task<IActionResult> ListApplicationsByReference([FromQuery] SearchQueryParameter searchParameters)
+        {
+            var response = await _getApplicationsByReferenceUseCase.Execute(searchParameters).ConfigureAwait(false);
             return Ok(response);
         }
 

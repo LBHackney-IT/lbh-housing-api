@@ -32,7 +32,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime? VerifyExpiresAt { get; set; }
 
-        public string AssignedTo { get; set; }
+        public string AssignedTo { get; set; } = "unassigned";
 
         public bool SensitiveData { get; set; }
 
@@ -42,5 +42,23 @@ namespace HousingRegisterApi.V1.Infrastructure
         public int? CalculatedBedroomNeed { get; set; }
 
         public bool ImportedFromLegacyDatabase { get; set; }
+
+        protected DateTime SortDate {
+            get => (SubmittedAt ?? CreatedAt);
+        }
+
+        public string SortKey
+        {
+            get => DynamoDbDateTimeConverter.FormatDate(SortDate) + ":" + Id;
+            set { _ = value; }
+        }
+
+        public string StatusAssigneeKey
+        {
+            get => Status + ":" + AssignedTo;
+            set { _ = value; }
+        }
+
+        public int ActiveRecord { get; set; } = 1;
     }
 }

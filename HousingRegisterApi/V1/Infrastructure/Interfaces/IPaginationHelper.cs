@@ -7,10 +7,6 @@ namespace HousingRegisterApi.V1.Infrastructure
 {
     public interface IPaginationHelper
     {
-        IEnumerable<Application> PageData(IEnumerable<Application> data, int page, int itemsPerPage);
-
-        IEnumerable<Application> OrderData(IEnumerable<Application> data, string orderBy);
-
-        PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> data, int totalItems);
+        PaginatedApplicationListResponse BuildResponse(SearchQueryParameter searchParameters, IEnumerable<Application> results, string paginationToken);
     }
 }

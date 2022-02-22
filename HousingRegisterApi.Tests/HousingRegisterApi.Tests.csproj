@@ -21,6 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="V1\UseCase\GetAllApplicationsUseCaseTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="V1\E2ETests\Fixtures\ApplicationFixture.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.1.29" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />

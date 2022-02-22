@@ -1,15 +1,30 @@
 version: "3.2"
 
 services:
+  housing-register-api-remote:
+    image: housing-register-api
+    build:
+      context: .
+      dockerfile: HousingRegisterApi/Dockerfile
+      args:
+        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+    ports:
+      - 5000:5000
+    environment:
+      - AWS_REGION=eu-west-2
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+
   housing-register-api:
     image: housing-register-api
     build:
       context: .
       dockerfile: HousingRegisterApi/Dockerfile
       args:
-      - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     ports:
-      - 3000:3000
+      - 5000:5000
     environment:
       - DynamoDb_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
@@ -27,7 +42,7 @@ services:
       context: .
       dockerfile: HousingRegisterApi.Tests/Dockerfile
       args:
-      - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     environment:
       - DynamoDb_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
