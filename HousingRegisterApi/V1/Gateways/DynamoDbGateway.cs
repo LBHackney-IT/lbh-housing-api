@@ -105,6 +105,43 @@ namespace HousingRegisterApi.V1.Gateways
             return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
         }
 
+        public async Task<(IEnumerable<Application>, string)> GetApplicationsByReferenceAsync(SearchQueryParameter searchParameters)
+        {
+            int pageSize = searchParameters.PageSize;
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
+            {
+                BackwardSearch = true,
+                Limit = pageSize,
+                PaginationToken = PaginationDetails.DecodeToken(searchParameters.PaginationToken),
+                IndexName = "HousingRegisterReference",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "#reference = :v_reference",
+                    ExpressionAttributeNames = {
+                        { "#reference", "reference" }
+                    },
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_reference", new Primitive(searchParameters.Reference) },
+                    },
+                },
+            };
+
+            var search = table.Query(queryConfig);
+            var resultsSet = await search.GetNextSetAsync().ConfigureAwait(false);
+
+            var paginationToken = search.PaginationToken;
+            if (resultsSet.Any())
+            {
+                dbApplications.AddRange(_dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet));
+            }
+
+            return (dbApplications.Select(x => x.ToDomain()), PaginationDetails.EncodeToken(paginationToken));
+        }
+
         public async Task<(IEnumerable<Application>, string)> GetAllApplicationsAsync(SearchQueryParameter searchParameters)
         {
             int pageSize = searchParameters.PageSize;
