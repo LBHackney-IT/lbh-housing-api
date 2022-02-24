@@ -43,11 +43,11 @@ functions:
       NOVALET_FTP_ADDRESS: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-address}
       NOVALET_FTP_FOLDER: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-folder}
       NOVALET_FTP_PORT: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-port}
-      events:
-        - http:
-            path: /{proxy+}
-            method: ANY
-            private: true
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          private: true
   HousingRegisterBedroomRecalulator:
     name: ${self:service}-${self:provider.stage}-bedroom-recalculator
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.RedroomRecalculatorFunction::Handle
