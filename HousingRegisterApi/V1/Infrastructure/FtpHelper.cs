@@ -51,7 +51,7 @@ namespace HousingRegisterApi.V1.Infrastructure
             {
                 String status = ((FtpWebResponse) e.Response).StatusDescription;
                 _logger.LogError("Unable to upload file to ftp: " + status);
-                return false;
+                throw e;
             }
         }
 
