@@ -40,19 +40,10 @@ namespace HousingRegisterApi.V1.Infrastructure
 
             request.Credentials = new NetworkCredential(_ftpUsername, _ftpPassword);
 
-            try
-            {
-                var ftpStream = request.GetRequestStream();
-                ftpStream.Write(data, 0, data.Length);
-                ftpStream.Close();
-                return true;
-            }
-            catch (WebException e)
-            {
-                String status = ((FtpWebResponse) e.Response).StatusDescription;
-                _logger.LogError("Unable to upload file to ftp: " + status);
-                throw e;
-            }
+            var ftpStream = request.GetRequestStream();
+            ftpStream.Write(data, 0, data.Length);
+            ftpStream.Close();
+            return true;
         }
 
     }
