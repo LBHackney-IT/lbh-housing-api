@@ -44,6 +44,7 @@ namespace HousingRegisterApi.V1.Functions
 
             services.AddScoped<IFileGateway, FileExportGateway>();
             services.AddScoped<IFtpHelper, FtpHelper>();
+            services.AddScoped<IFtpNovaletUploadUseCase, FtpNovaletUploadUseCase>();
 
             base.ConfigureServices(services);
         }

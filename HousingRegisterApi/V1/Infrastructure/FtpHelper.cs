@@ -44,18 +44,18 @@ namespace HousingRegisterApi.V1.Infrastructure
                 {
                     _logger.LogInformation("Connected to the client");
 
-                    using (var ms = new MemoryStream(csvFile))
-                    {
-                        client.BufferSize = (uint) ms.Length; // bypass Payload error large files
-                        client.UploadFile(ms, fileName);
-                        return true;
-                    }
-                }
-                else
-                {
-                    _logger.LogError("Couldn't connect");
-                    return false;
-                }
+            try
+            {
+                var ftpStream = request.GetRequestStream();
+                ftpStream.Write(data, 0, data.Length);
+                ftpStream.Close();
+                return true;
+            }
+            catch (WebException e)
+            {
+                String status = ((FtpWebResponse) e.Response).StatusDescription;
+                _logger.LogError("Unable to upload file to ftp: " + status);
+                return false;
             }
         }
 
