@@ -61,3 +61,5 @@ namespace HousingRegisterApi.V1.Infrastructure
 
             }
         }
+    }
+}
