@@ -67,6 +67,7 @@ functions:
     name: ${self:service}-${self:provider.stage}-novalet-export-upload
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FtpUploadNovaletExportFunction::Handle
     role: lambdaExecutionRole
+    timeout: 300
     environment:
       NOVALET_FTP_USERNAME: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-username}
       NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password}
