@@ -30,7 +30,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<bool> Execute()
         {
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:yyyyMMdd}.csv";
 
             _logger.LogInformation($"Attempting to to fetch approved file {fileName}");
             //Get approved file from S3

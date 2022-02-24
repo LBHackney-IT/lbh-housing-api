@@ -72,7 +72,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GetCaseReport(DateTime startDate, DateTime endDate)
         {
             var applicationsInRange = GetApplicationsInRange(startDate, endDate);
-            string fileName = $"LBH-CASES REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-CASES REPORT-{DateTime.UtcNow:yyyyMMdd}.csv";
             var exportDataSet = applicationsInRange.Select(x => new CasesReportDataRow(x)).ToArray();
             return await GenerateReport(fileName, exportDataSet).ConfigureAwait(false);
         }
@@ -80,7 +80,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GetPeopleReport(DateTime startDate, DateTime endDate)
         {
             var applicationsInRange = GetApplicationsInRange(startDate, endDate);
-            string fileName = $"LBH-PEOPLE REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-PEOPLE REPORT-{DateTime.UtcNow:yyyyMMdd}.csv";
             var exportDataSet = new List<PeopleReportDataRow>();
 
             applicationsInRange.ForEach(x =>
@@ -102,7 +102,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GetCaseActivityReport(DateTime startDate, DateTime endDate)
         {
             var applicationsInRange = GetApplicationsInRange(startDate, endDate);
-            string fileName = $"LBH-CASE-ACTIVITY REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-CASE-ACTIVITY REPORT-{DateTime.UtcNow:yyyyMMdd}.csv";
             var exportDataSet = new List<CaseActivityReportDataRow>();
 
             if (applicationsInRange.Any())
@@ -124,7 +124,7 @@ namespace HousingRegisterApi.V1.UseCase
         private async Task<ExportFile> GetOfficerActivityReport(DateTime startDate, DateTime endDate)
         {
             var applicationsInRange = GetApplicationsInRange(startDate, endDate);
-            string fileName = $"LBH-OFFICER-ACTIVITY REPORT-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-OFFICER-ACTIVITY REPORT-{DateTime.UtcNow:yyyyMMdd}.csv";
 
             var exportDataSet = new List<OfficerActivityReportDataRow>();
 

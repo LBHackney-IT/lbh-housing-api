@@ -33,7 +33,7 @@ namespace HousingRegisterApi.V1.UseCase
         public async Task<ExportFile> Execute()
         {
             var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:yyyyMMdd}.csv";
 
             if (!applications.Any())
             {

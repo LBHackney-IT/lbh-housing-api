@@ -23,7 +23,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public Task<PublishResponse> Execute()
         {
-            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:ddMMyyyy}.csv";
+            string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:yyyyMMdd}.csv";
 
             _logger.LogInformation($"Pushing message to SNS for file {fileName}");
             NovaletSns novaletSns = new NovaletSns();
