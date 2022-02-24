@@ -44,20 +44,20 @@ namespace HousingRegisterApi.V1.Infrastructure
                 {
                     _logger.LogInformation("Connected to the client");
 
-            try
-            {
-                var ftpStream = request.GetRequestStream();
-                ftpStream.Write(data, 0, data.Length);
-                ftpStream.Close();
-                return true;
-            }
-            catch (WebException e)
-            {
-                String status = ((FtpWebResponse) e.Response).StatusDescription;
-                _logger.LogError("Unable to upload file to ftp: " + status);
-                return false;
+                    try
+                    {
+                        var ftpStream = request.GetRequestStream();
+                        ftpStream.Write(data, 0, data.Length);
+                        ftpStream.Close();
+                        return true;
+                    }
+                    catch (WebException e)
+                    {
+                        String status = ((FtpWebResponse) e.Response).StatusDescription;
+                        _logger.LogError("Unable to upload file to ftp: " + status);
+                        return false;
+                    }
+                }
+
             }
         }
-
-    }
-}
