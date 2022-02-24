@@ -35,8 +35,6 @@ namespace HousingRegisterApi.V1.Infrastructure
             var username = _ftpUsername;
             var password = _ftpPassword;
 
-            byte[] csvFile = data; // Function returns byte[] csv file
-
             using (var client = new SftpClient(host, port, username, password))
             {
                 client.Connect();
@@ -44,21 +42,18 @@ namespace HousingRegisterApi.V1.Infrastructure
                 {
                     _logger.LogInformation("Connected to the client");
 
-                    try
+                    using (var ms = new MemoryStream(data))
                     {
-                        var ftpStream = request.GetRequestStream();
-                        ftpStream.Write(data, 0, data.Length);
-                        ftpStream.Close();
+                        client.BufferSize = (uint) ms.Length; // bypass Payload error large files
+                        client.UploadFile(ms, fileName);
                         return true;
                     }
-                    catch (WebException e)
-                    {
-                        String status = ((FtpWebResponse) e.Response).StatusDescription;
-                        _logger.LogError("Unable to upload file to ftp: " + status);
-                        return false;
-                    }
                 }
-
+                else
+                {
+                    _logger.LogError("Couldn't connect");
+                    return false;
+                }
             }
         }
     }
