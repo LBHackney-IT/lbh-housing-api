@@ -54,7 +54,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-CASES REPORT-{runDate:ddMMyyyy}.csv");
+            response.FileName.Should().Be($"LBH-CASES REPORT-{runDate:yyyyMMdd}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -71,7 +71,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate:ddMMyyyy}.csv");
+            response.FileName.Should().Be($"LBH-PEOPLE REPORT-{runDate:yyyyMMdd}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -88,7 +88,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-CASE-ACTIVITY REPORT-{runDate:ddMMyyyy}.csv");
+            response.FileName.Should().Be($"LBH-CASE-ACTIVITY REPORT-{runDate:yyyyMMdd}.csv");
             response.Data.Should().NotBeEmpty();
         }
 
@@ -105,7 +105,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             DateTime runDate = DateTime.Now;
             response.Should().NotBeNull();
             response.FileMimeType.Should().Be("text/csv");
-            response.FileName.Should().Be($"LBH-OFFICER-ACTIVITY REPORT-{runDate:ddMMyyyy}.csv");
+            response.FileName.Should().Be($"LBH-OFFICER-ACTIVITY REPORT-{runDate:yyyyMMdd}.csv");
             response.Data.Should().NotBeEmpty();
         }
 

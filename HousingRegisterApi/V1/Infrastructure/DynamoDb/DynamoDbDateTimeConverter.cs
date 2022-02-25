@@ -14,7 +14,8 @@ namespace HousingRegisterApi.V1.Infrastructure
     {
         public static readonly string DATEFORMAT = "yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ";
 
-        public static string FormatDate(DateTime dateTime) {
+        public static string FormatDate(DateTime dateTime)
+        {
             return dateTime.ToUniversalTime().ToString(DATEFORMAT);
         }
 
@@ -22,7 +23,7 @@ namespace HousingRegisterApi.V1.Infrastructure
         {
             if (null == value) return new DynamoDBNull();
 
-            return new Primitive { Value = FormatDate((DateTime) value)};
+            return new Primitive { Value = FormatDate((DateTime) value) };
         }
 
         public object FromEntry(DynamoDBEntry entry)

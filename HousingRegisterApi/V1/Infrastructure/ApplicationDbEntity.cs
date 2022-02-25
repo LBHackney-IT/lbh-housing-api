@@ -43,7 +43,8 @@ namespace HousingRegisterApi.V1.Infrastructure
 
         public bool ImportedFromLegacyDatabase { get; set; }
 
-        protected DateTime SortDate {
+        protected DateTime SortDate
+        {
             get => (SubmittedAt ?? CreatedAt);
         }
 
