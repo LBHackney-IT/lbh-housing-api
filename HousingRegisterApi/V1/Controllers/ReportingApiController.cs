@@ -20,6 +20,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IApproveNovaletExportUseCase _approveNovaletExportUseCase;
         private readonly IGetInternalReportUseCase _getInternalReportUseCase;
         private readonly IFtpNovaletUploadUseCase _ftpNovaletUploadUseCase;
+        private readonly ICreateNovaletExportExtendedUseCase _createNovaletExportExtended;
 
         public ReportingApiController(
             IListNovaletExportFilesUseCase listNovaletExportFilesUseCase,
@@ -27,7 +28,8 @@ namespace HousingRegisterApi.V1.Controllers
             IPublishNovaletSnsUseCase publishNovaletExportSns,
             IApproveNovaletExportUseCase approveNovaletExportUseCase,
             IGetInternalReportUseCase getInternalReportUseCase,
-            IFtpNovaletUploadUseCase ftpNovaletUploadUseCase)
+            IFtpNovaletUploadUseCase ftpNovaletUploadUseCase,
+            ICreateNovaletExportExtendedUseCase createNovaletExportExtended)
         {
             _listNovaletExportFilesUseCase = listNovaletExportFilesUseCase;
             _getNovaletExportUseCase = getNovaletCsvUseCase;
@@ -35,6 +37,7 @@ namespace HousingRegisterApi.V1.Controllers
             _approveNovaletExportUseCase = approveNovaletExportUseCase;
             _getInternalReportUseCase = getInternalReportUseCase;
             _ftpNovaletUploadUseCase = ftpNovaletUploadUseCase;
+            _createNovaletExportExtended = createNovaletExportExtended;
         }
 
         /// <summary>
@@ -102,6 +105,25 @@ namespace HousingRegisterApi.V1.Controllers
         [HttpPost]
         [Route("generatenovaletexport")]
         public async Task<IActionResult> GenerateNovaletExport()
+        {
+            var result = await _publishNovaletExportSns.Execute().ConfigureAwait(false);
+            if (((int) result.HttpStatusCode) >= 400) return BadRequest();
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Generates/Regenerates the Novalet export file
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="404">Unable to generate export file</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("generatenovaletexportextended")]
+        public async Task<IActionResult> GenerateNovaletExportExtended()
         {
             var result = await _publishNovaletExportSns.Execute().ConfigureAwait(false);
             if (((int) result.HttpStatusCode) >= 400) return BadRequest();
