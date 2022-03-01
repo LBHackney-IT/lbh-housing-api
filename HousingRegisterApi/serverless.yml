@@ -38,11 +38,10 @@ functions:
       EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/get/evidence-requests/token}
       EVIDENCE_API_POST_EVIDENCE_REQUESTS_TOKEN: ${ssm:/housing-register/${self:provider.stage}/evidence-api/post/evidence-requests/token}
       ACTIVITYHISTORY_API_URL: ${ssm:/housing-register/${self:provider.stage}/activityhistory-api/base-url}
-      NOVALET_FTP_USERNAME: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-username}
-      NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password}
-      NOVALET_FTP_ADDRESS: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-address}
-      NOVALET_FTP_FOLDER: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-folder}
-      NOVALET_FTP_PORT: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-port}
+      NOVALET_FTP_USERNAME: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-username, ""}
+      NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password, ""}
+      NOVALET_FTP_ADDRESS: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-address, ""}
+      NOVALET_FTP_PORT: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-port, ""}
     events:
       - http:
           path: /{proxy+}
