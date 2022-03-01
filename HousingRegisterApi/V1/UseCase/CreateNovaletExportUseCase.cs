@@ -32,7 +32,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<ExportFile> Execute()
         {
-            var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.Active);
+            var applications = _gateway.GetApplicationsAtStatus(ApplicationStatus.New);
             string fileName = $"LBH-APPLICANT FEED-{DateTime.UtcNow:yyyyMMdd}.csv";
 
             if (!applications.Any())
@@ -40,6 +40,7 @@ namespace HousingRegisterApi.V1.UseCase
                 _logger.LogInformation($"No export file was generated this time");
                 return null;
             }
+
             var checkDupes = applications.GroupBy(x => x.Reference)
                                 .Where(g => g.Count() > 1)
                                 .Select(y => y.Key)
@@ -47,6 +48,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (checkDupes.Any())
             {
+                _logger.LogInformation($"Failed because of duplicate ids: {string.Join(",", checkDupes)}");
                 throw new InvalidOperationException(string.Join(",", checkDupes));
             }
 

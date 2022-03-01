@@ -113,7 +113,7 @@ namespace HousingRegisterApi.V1.Controllers
         }
 
         /// <summary>
-        /// Upload the Novalet export file
+        /// For generating the file locally
         /// </summary>
         /// <response code="200">Success</response>
         /// <response code="404">Unable to generate export file</response>
