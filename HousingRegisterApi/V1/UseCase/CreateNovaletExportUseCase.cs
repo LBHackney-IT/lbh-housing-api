@@ -40,6 +40,15 @@ namespace HousingRegisterApi.V1.UseCase
                 _logger.LogInformation($"No export file was generated this time");
                 return null;
             }
+            var checkDupes = applications.GroupBy(x => x.Reference)
+                                .Where(g => g.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+
+            if (checkDupes.Any())
+            {
+                throw new InvalidOperationException(string.Join(",", checkDupes));
+            }
 
             _logger.LogInformation($"Attempting to generate {fileName}");
 
