@@ -90,10 +90,10 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
             return band switch
             {
-                "Band A" => "EMG",
-                "Band B" => "SHN",
-                "Band C" => "SCH",
-                "C-transitional" => "SCH",
+                "A" => "Band A",
+                "B" => "Band B",
+                "C" => "Band C",
+                "C-transitional" => "Band C",
                 _ => null
             };
         }
