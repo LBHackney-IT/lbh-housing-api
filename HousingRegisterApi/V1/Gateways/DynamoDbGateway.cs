@@ -310,17 +310,30 @@ namespace HousingRegisterApi.V1.Gateways
         {
             string reference = _hashHelper.Generate(email).Substring(0, 10);
 
-            var conditions = new List<ScanCondition>
+            var dbApplications = new List<ApplicationDbEntity>();
+            var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
+
+            var queryConfig = new QueryOperationConfig
             {
-                new ScanCondition(nameof(ApplicationDbEntity.Reference), ScanOperator.Equal, reference),
-                new ScanCondition(nameof(ApplicationDbEntity.Status), ScanOperator.In, ApplicationStatus.Verification, ApplicationStatus.New),
+                IndexName = "HousingRegisterReference",
+                KeyExpression = new Expression
+                {
+                    ExpressionStatement = "#reference = :v_reference",
+                    ExpressionAttributeNames = {
+                        { "#reference", "reference" }
+                    },
+                    ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
+                    {
+                        { ":v_reference", new Primitive(reference) },
+                    },
+                },
             };
 
-            // query dynamodb
-            var search = _dynamoDbContext.ScanAsync<ApplicationDbEntity>(conditions).GetNextSetAsync().GetAwaiter().GetResult();
-            var searchItems = search.Select(x => x.ToDomain());
-            var result = searchItems.FirstOrDefault();
-            return result;
+            var search = table.Query(queryConfig);
+            var resultsSet = search.GetNextSetAsync().GetAwaiter().GetResult();
+
+            var result = _dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet).FirstOrDefault();
+            return result.ToDomain();
         }
 
         public Application CreateNewApplication(CreateApplicationRequest request)

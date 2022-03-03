@@ -170,6 +170,7 @@ namespace HousingRegisterApi
             services.AddScoped<IVerifyAuthUseCase, VerifyAuthUseCase>();
             services.AddScoped<ICalculateBedroomsUseCase, CalculateBedroomsUseCase>();
             services.AddScoped<ICreateNovaletExportUseCase, CreateNovaletExportUseCase>();
+            services.AddScoped<ICreateNovaletExportExtendedUseCase, CreateNovaletExportExtendedUseCase>();
             services.AddScoped<IGetNovaletExportUseCase, GetNovaletExportUseCase>();
             services.AddScoped<IListNovaletExportFilesUseCase, ListNovaletExportFilesUseCase>();
             services.AddScoped<IApproveNovaletExportUseCase, ApproveNovaletExportUseCase>();
