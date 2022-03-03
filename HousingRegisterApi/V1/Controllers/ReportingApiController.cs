@@ -125,8 +125,8 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("generatenovaletexportextended")]
         public async Task<IActionResult> GenerateNovaletExportExtended()
         {
-            var result = await _publishNovaletExportSns.Execute().ConfigureAwait(false);
-            if (((int) result.HttpStatusCode) >= 400) return BadRequest();
+            var result = await _createNovaletExportExtended.Execute().ConfigureAwait(false);
+            if (result == null) return BadRequest();
 
             return Ok();
         }

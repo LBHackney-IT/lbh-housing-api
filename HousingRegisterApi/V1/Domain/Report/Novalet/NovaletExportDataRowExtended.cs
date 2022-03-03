@@ -4,7 +4,7 @@ namespace HousingRegisterApi.V1.Domain.Report.Novalet
     {
         public NovaletExportDataRowExtended(Application application) : base(application)
         {
-                Url = "https://housing-register.hackney.gov.uk/applications/view/" + application.Id;
+            Url = "https://housing-register.hackney.gov.uk/applications/view/" + application.Id;
         }
 
 #pragma warning disable CA1056 // Uri properties should not be strings

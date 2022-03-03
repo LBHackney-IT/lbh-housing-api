@@ -57,7 +57,7 @@ namespace HousingRegisterApi.V1.UseCase
             }
             else
             {
-                _logger.LogInformation($"No export file was generated this time");
+                _logger.LogInformation($"No extended file was generated this time");
                 return null;
             }
         }
