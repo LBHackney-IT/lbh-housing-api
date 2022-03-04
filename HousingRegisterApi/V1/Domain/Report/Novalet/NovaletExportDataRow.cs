@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace HousingRegisterApi.V1.Domain.Report
 {
@@ -54,7 +55,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             HomeTelephone = application.MainApplicant?.ContactInformation?.PhoneNumber ?? null;
             WorkTelephone = null;
             Email = application.MainApplicant?.ContactInformation?.EmailAddress ?? null;
-            NINumber = application.MainApplicant?.Person?.NationalInsuranceNumber ?? null;
+            NINumber = Regex.Replace(application.MainApplicant?.Person?.NationalInsuranceNumber, @"\s", "").ToUpper() ?? null;
             Sex = application.MainApplicant?.Person?.Gender ?? null;
             RegistrationDate = FormatDate(application.SubmittedAt);
             EffectiveDate = FormatDate(application.Assessment?.EffectiveDate);
@@ -66,7 +67,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             MobilityAssessment = null;
             AdditionalBandingInfo = null;
             MedicalRequirements = null;
-            Offered = null;
+            Offered = "N";
             EthnicOrigin = GetEthnicity(application);
             Decant = null;
             AHRCode = null;
@@ -89,10 +90,10 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
             return band switch
             {
-                "A" => "EMG",
-                "B" => "SHN",
-                "C" => "SCH",
-                "C-transitional" => "SCH",
+                "A" => "Band A",
+                "B" => "Band B",
+                "C" => "Band C",
+                "C-transitional" => "Band C",
                 _ => null
             };
         }
