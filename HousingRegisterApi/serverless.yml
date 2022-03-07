@@ -63,7 +63,7 @@ functions:
       - sns:
           arn: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
   ExtendedHousingRegisterNovaletExportGenerator:
-    name: ${self:service}-${self:provider.stage}-novalet-export-generator-extended
+    name: ${self:service}-${self:provider.stage}-novaletexportgenerator-urls
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.ExtendedNovaletExportGeneratorFunction::Handle
     role: lambdaExecutionRole
     timeout: 300
