@@ -25,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="V1\E2ETests\CalculateBedroomsTest.cs" />
     <Compile Include="V1\E2ETests\Fixtures\ApplicationFixture.cs" />
-    <Compile Include="V1\Functions\BedroomRecalculatorTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +44,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HousingRegisterApi\HousingRegisterApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="V1\Functions\" />
   </ItemGroup>
 
 </Project>
