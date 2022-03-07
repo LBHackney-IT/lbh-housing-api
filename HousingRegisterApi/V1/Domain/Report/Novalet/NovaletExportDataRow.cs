@@ -55,7 +55,14 @@ namespace HousingRegisterApi.V1.Domain.Report
             HomeTelephone = application.MainApplicant?.ContactInformation?.PhoneNumber ?? null;
             WorkTelephone = null;
             Email = application.MainApplicant?.ContactInformation?.EmailAddress ?? null;
-            NINumber = Regex.Replace(application.MainApplicant?.Person?.NationalInsuranceNumber, @"\s", "").ToUpper() ?? null;
+            if (application.MainApplicant?.Person?.NationalInsuranceNumber != null)
+            {
+                NINumber = Regex.Replace(application.MainApplicant?.Person?.NationalInsuranceNumber, @"\s", "").ToUpper();
+            }
+            else
+            {
+                NINumber =  null;
+            }
             Sex = application.MainApplicant?.Person?.Gender ?? null;
             RegistrationDate = FormatDate(application.SubmittedAt);
             EffectiveDate = FormatDate(application.Assessment?.EffectiveDate);
