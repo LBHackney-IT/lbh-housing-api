@@ -61,7 +61,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             }
             else
             {
-                NINumber =  null;
+                NINumber = null;
             }
             Sex = application.MainApplicant?.Person?.Gender ?? null;
             RegistrationDate = FormatDate(application.SubmittedAt);
