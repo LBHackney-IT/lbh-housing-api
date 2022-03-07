@@ -9,11 +9,10 @@ namespace HousingRegisterApi.V1.Infrastructure
 {
     public class FtpHelper : IFtpHelper
     {
-        private readonly string _ftpUsername = Environment.GetEnvironmentVariable("FtpUsername");
-        private readonly string _ftpPassword = Environment.GetEnvironmentVariable("FtpPassword");
-        private readonly string _ftpAddress = Environment.GetEnvironmentVariable("FtpAddress");
-        //private readonly string _folderName = Environment.GetEnvironmentVariable("FtpFolder");
-        private readonly string _ftpPort = Environment.GetEnvironmentVariable("FtpPort");
+        private readonly string _ftpUsername = Environment.GetEnvironmentVariable("NOVALET_FTP_USERNAME");
+        private readonly string _ftpPassword = Environment.GetEnvironmentVariable("NOVALET_FTP_PASSWORD");
+        private readonly string _ftpAddress = Environment.GetEnvironmentVariable("NOVALET_FTP_ADDRESS");
+        private readonly string _ftpPort = Environment.GetEnvironmentVariable("NOVALET_FTP_PORT");
 
         private readonly ILogger<FtpHelper> _logger;
 
