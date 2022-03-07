@@ -27,7 +27,7 @@ namespace HousingRegisterApi.V1.UseCase
         public bool Execute()
         {
             bool success = true;
-
+            //TODO: Change this to use new indexes
             var applications = _gateway.GetApplicationsAtStatus("Submitted", "Active", "ActiveUnderAppeal");
 
             // code comes here if applications are found

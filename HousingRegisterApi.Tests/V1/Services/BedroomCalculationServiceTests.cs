@@ -196,6 +196,19 @@ namespace HousingRegisterApi.Tests.V1.Services
             AssertBedrooms(1, application);
         }
 
+        [Test(Description = "Single person over 55 returns 1 bedrooms")]
+        public void SinglePerson55yrsPlusReturns1Bedroom()
+        {
+            // arrange            
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+              new Tuple<int, string, string>(56, Male, MainApplicant)
+            });
+
+            // assert
+            AssertBedrooms(1, application);
+        }
+
         [Test(Description = "Family with 1 child returns 2 bedrooms")]
         public void FamilyWith1ChildReturns2Bedrooms()
         {
@@ -479,6 +492,44 @@ namespace HousingRegisterApi.Tests.V1.Services
               new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent),
               new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent),
               new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent),
+            });
+
+            // assert
+            AssertBedrooms(5, application);
+        }
+
+        //Added this as it was a failing scenario
+        [Test(Description = "Single parent with 2 children under the age of 10 of different genders & a son 21 returns 3 bedrooms")]
+        public void SingleParentWithChildrenUnder10OfDifferentGendersAndSonOf21Returns3Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+                new Tuple<int, string, string>(44, Male, MainApplicant),
+                new Tuple<int, string, string>(9, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(8, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(21, Male, MainApplicantIsMyParent),
+            });
+
+            // assert
+            AssertBedrooms(3, application);
+        }
+
+        //Added this as it was a failing scenario
+        [Test(Description = "Single parent with 6 children under the age of 16 of different genders & a daughter 21 returns 5 bedrooms")]
+        public void SingleParentWithChildrenUnder16OfDifferentGendersAndDaughterOf21Returns5Bedrooms()
+        {
+            // arrange
+            Application application = CreateApplication(new List<Tuple<int, string, string>>()
+            {
+                new Tuple<int, string, string>(50, Female, MainApplicant),
+                new Tuple<int, string, string>(15, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(10, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(3, Male, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(21, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(10, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(8, Female, MainApplicantIsMyParent),
+                new Tuple<int, string, string>(5, Female, MainApplicantIsMyParent),
             });
 
             // assert
