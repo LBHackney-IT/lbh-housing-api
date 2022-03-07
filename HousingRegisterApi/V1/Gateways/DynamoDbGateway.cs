@@ -332,8 +332,10 @@ namespace HousingRegisterApi.V1.Gateways
             var search = table.Query(queryConfig);
             var resultsSet = search.GetNextSetAsync().GetAwaiter().GetResult();
 
-            var result = _dynamoDbContext.FromDocuments<ApplicationDbEntity>(resultsSet).FirstOrDefault();
-            return result.ToDomain();
+            return _dynamoDbContext
+                .FromDocuments<ApplicationDbEntity>(resultsSet)
+                .Select(x => x.ToDomain())
+                .FirstOrDefault();
         }
 
         public Application CreateNewApplication(CreateApplicationRequest request)
