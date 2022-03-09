@@ -53,7 +53,8 @@ namespace HousingRegisterApi.V1.Gateways
             if (activity == null
                 || application == null
                 || application.Status == ApplicationStatus.Verification
-                || application.Status == ApplicationStatus.New)
+                || application.Status == ApplicationStatus.New
+                || application.Status == ApplicationStatus.Disqualified)
             {
                 return;
             }
