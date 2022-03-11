@@ -24,7 +24,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
     }
 
     attribute {
-        name              = "activeRecords"
+        name              = "activeRecord"
         type              = "N"
     }
 
@@ -63,7 +63,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         name              = "HousingRegisterAll"
         read_capacity     = local.defaultCapacity
         write_capacity    = local.defaultCapacity
-        hash_key          = "activeRecords"
+        hash_key          = "activeRecord"
         range_key         = "sortKey"
         projection_type   = "ALL"
     }
