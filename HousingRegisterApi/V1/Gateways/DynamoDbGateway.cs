@@ -156,10 +156,10 @@ namespace HousingRegisterApi.V1.Gateways
                 IndexName = "HousingRegisterAll",
                 KeyExpression = new Expression
                 {
-                    ExpressionStatement = "activeRecords = :v_activeRecords",
+                    ExpressionStatement = "activeRecord = :v_activeRecord",
                     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>()
                     {
-                        { ":v_activeRecords", new Primitive("1", true) },
+                        { ":v_activeRecord", new Primitive("1", true) },
                     },
                 },
             };
