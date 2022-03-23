@@ -29,6 +29,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IViewingApplicationUseCase _viewingApplicationUseCase;
         private readonly IImportApplicationUseCase _importApplicationUseCase;
         private readonly IGetApplicationsByReferenceUseCase _getApplicationsByReferenceUseCase;
+        private readonly IRecalculateBedroomsUseCase _recalculateBedroomsUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -43,7 +44,8 @@ namespace HousingRegisterApi.V1.Controllers
             IAddApplicationNoteUseCase addApplicationNoteUseCase,
             IViewingApplicationUseCase viewingApplicationUseCase,
             IImportApplicationUseCase importApplicationUseCase,
-            IGetApplicationsByReferenceUseCase getApplicationsByReferenceUseCase)
+            IGetApplicationsByReferenceUseCase getApplicationsByReferenceUseCase,
+            IRecalculateBedroomsUseCase recalculateBedroomsUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getApplicationsByAssignedToUseCase = getApplicationsByAssignedToUseCase;
@@ -58,6 +60,7 @@ namespace HousingRegisterApi.V1.Controllers
             _viewingApplicationUseCase = viewingApplicationUseCase;
             _importApplicationUseCase = importApplicationUseCase;
             _getApplicationsByReferenceUseCase = getApplicationsByReferenceUseCase;
+            _recalculateBedroomsUseCase = recalculateBedroomsUseCase;
         }
 
         /// <summary>
@@ -268,6 +271,21 @@ namespace HousingRegisterApi.V1.Controllers
             if (entity == null) return NotFound(id);
 
             var result = _calculateBedroomsUseCase.Execute(id);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Recalculate bedrooms
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("recalculate-bedrooms")]
+        public IActionResult ReCalculateBedrooms()
+        {
+            var result = _recalculateBedroomsUseCase.Execute();
             return Ok(result);
         }
 

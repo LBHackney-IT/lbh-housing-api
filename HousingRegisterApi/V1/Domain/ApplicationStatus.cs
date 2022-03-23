@@ -15,5 +15,6 @@ namespace HousingRegisterApi.V1.Domain
         public const string Housed = "Housed";
         public const string ActiveUnderAppeal = "ActiveUnderAppeal";
         public const string InactiveUnderAppeal = "InactiveUnderAppeal";
+        public const string AwaitingReassessment = "AwaitingReassessment";
     }
 }
