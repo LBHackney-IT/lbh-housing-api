@@ -71,7 +71,7 @@ namespace HousingRegisterApi.V1.UseCase
                     }
                     else if((newBedroomNeed.HasValue && application.Assessment?.BedroomNeed.HasValue == true) && (newBedroomNeed != application.Assessment.BedroomNeed))
                     {
-                        _logger.LogInformation($"Current bedroom need {currentBedroomNeed}");
+                        _logger.LogInformation($"Current bedroom need = {currentBedroomNeed} and newBedroomNeed = {newBedroomNeed}");
                         //Significant birthday found but bedroom need set manually so update application status
                         UpdateApplicationRequest updateRequest = new UpdateApplicationRequest();
                         updateRequest.Status = ApplicationStatus.AwaitingReassessment;
