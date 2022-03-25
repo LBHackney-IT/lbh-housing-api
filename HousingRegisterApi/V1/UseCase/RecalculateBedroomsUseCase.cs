@@ -40,7 +40,7 @@ namespace HousingRegisterApi.V1.UseCase
         {
             bool success = true;
 
-            var applications = _gateway.GetApplicationsAtStatus("Submitted", "Active", "ActiveUnderAppeal");
+            var applications = _gateway.GetApplicationsAtStatus(0, 0, "Submitted", "Active", "ActiveUnderAppeal");
 
             // code comes here if applications are found
             _logger.LogInformation($"Recalculating bedrooms needed for {applications.Count()} applications");
@@ -54,7 +54,7 @@ namespace HousingRegisterApi.V1.UseCase
                     int? currentBedroomNeed = application.CalculatedBedroomNeed;
                     //Not sure if bands are to be recalcilated so setting these to the same for now
                     string currentBand = application.Assessment?.Band;
-                    
+
                     int? newBedroomNeed = _bedroomCalculatorService.Calculate(application);
 
                     if (newBedroomNeed == null)
@@ -69,7 +69,7 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         _logger.LogInformation($"No bedroom changes for application: {application.Id}");
                     }
-                    else if((newBedroomNeed.HasValue && application.Assessment?.BedroomNeed.HasValue == true) && (newBedroomNeed != application.Assessment.BedroomNeed))
+                    else if ((newBedroomNeed.HasValue && application.Assessment?.BedroomNeed.HasValue == true) && (newBedroomNeed != application.Assessment.BedroomNeed))
                     {
                         _logger.LogInformation($"Current bedroom need = {currentBedroomNeed} and newBedroomNeed = {newBedroomNeed}");
                         //Significant birthday found but bedroom need set manually so update application status
@@ -85,8 +85,8 @@ namespace HousingRegisterApi.V1.UseCase
                         //TODO: If we are doing band calculations. Would need to update band in the call below
                         _gateway.UpdateApplication(application.Id, new UpdateApplicationRequest());
                         _logger.LogInformation($"Bedroom need for application {application.Id} recalculated from '{currentBedroomNeed}' to '{newBedroomNeed}'");
-                        
-                         _notifyGateway.NotifyResidentOfBedroomChange(application.MainApplicant.ContactInformation.EmailAddress, application.MainApplicant.Person.FullName, newBedroomNeed.Value, currentBand);
+
+                        _notifyGateway.NotifyResidentOfBedroomChange(application.MainApplicant.ContactInformation.EmailAddress, application.MainApplicant.Person.FullName, newBedroomNeed.Value, currentBand);
 
                         //Create a token for use in activity feed update
                         var token = new Token()
