@@ -52,7 +52,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             // Arrange
             var application = _fixture.Create<Application>();
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
@@ -69,7 +70,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             //Remove main applicant so the bedroom need calculation comes back as null
             application.MainApplicant = null;
 
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
@@ -83,7 +84,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                    It.IsAny<Exception>(),
                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                Times.AtLeastOnce);
-            
+
             success.Should().BeTrue();
         }
 
@@ -99,7 +100,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             application.Assessment.BedroomNeed = null;
 
             _bedroomCalculatorServiceMock.Setup(x => x.Calculate(application)).Returns(newBedroomNeed);
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
@@ -131,7 +132,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             //Set new bedroom need to be different
             _bedroomCalculatorServiceMock.Setup(x => x.Calculate(application)).Returns(newBedroomNeed);
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
@@ -161,7 +162,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             //Set new bedroom need to be different
             _bedroomCalculatorServiceMock.Setup(x => x.Calculate(application)).Returns(newBedroomNeed);
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
@@ -189,7 +190,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             application.Assessment.Band = null;
 
             _bedroomCalculatorServiceMock.Setup(x => x.Calculate(application)).Returns(application.CalculatedBedroomNeed);
-            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(It.IsAny<string[]>())).Returns(new List<Application> { application });
+            _gatewayMock.Setup(x => x.GetApplicationsAtStatus(0, 0, It.IsAny<string[]>())).Returns(new List<Application> { application });
 
             // Act
             bool success = _classUnderTest.Execute();
