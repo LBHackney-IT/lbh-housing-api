@@ -11,6 +11,7 @@
         <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
         <UserSecretsId>0e340547-a23e-461b-b07d-61d053d3704a</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileRunEnvironmentFiles>local.env</DockerfileRunEnvironmentFiles>
     </PropertyGroup>
 
     <ItemGroup>

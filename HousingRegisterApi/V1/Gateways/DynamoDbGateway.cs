@@ -270,6 +270,11 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetApplicationsAtStatus(params string[] status)
         {
+            return GetApplicationsAtStatus(0, 1, status);
+        }
+
+        public IEnumerable<Application> GetApplicationsAtStatus(int importedFromLegacyDatabaseLowNumber, int importedFromLegacyDatabaseHighNumber, params string[] status)
+        {
             var statusNames = new List<string>();
             var statusNameAndValues = new Dictionary<string, DynamoDBEntry>();
 
@@ -279,13 +284,14 @@ namespace HousingRegisterApi.V1.Gateways
                 statusNames.Add(searchName);
                 statusNameAndValues.Add(searchName, new Primitive(status[i]));
             }
-
+            statusNameAndValues.Add(":v_fromLegacyLowNumb", new Primitive(importedFromLegacyDatabaseLowNumber.ToString(), true));
+            statusNameAndValues.Add(":v_fromLegacyHighNumb", new Primitive(importedFromLegacyDatabaseHighNumber.ToString(), true));
             // status is a reserved word, so we have to map it to something else, ie. #application_status
             var scanConfig = new ScanOperationConfig
             {
                 FilterExpression = new Expression()
                 {
-                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())})",
+                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) AND (importedFromLegacyDatabase BETWEEN :v_fromLegacyLowNumb AND :v_fromLegacyHighNumb)",
                     ExpressionAttributeValues = statusNameAndValues,
                     ExpressionAttributeNames = new Dictionary<string, string>()
                     {
