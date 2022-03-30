@@ -50,13 +50,13 @@ namespace HousingRegisterApi.V1.Gateways
             return file;
         }
 
-        public async Task<List<ExportFileItem>> ListFiles(string parentFolderName = "")
+        public async Task<List<ExportFileItem>> ListFiles(string parentFolderName = "", int numberToReturn = 1000)
         {
             _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
 
             var files = new List<ExportFileItem>();
 
-            var s3Objects = await GetS3Objects(parentFolderName).ConfigureAwait(false);
+            var s3Objects = await GetS3Objects(parentFolderName, numberToReturn).ConfigureAwait(false);
 
             foreach (var s3Object in s3Objects)
             {
@@ -96,11 +96,12 @@ namespace HousingRegisterApi.V1.Gateways
             await PutS3ObjectTags(attributes, fileKey).ConfigureAwait(false);
         }
 
-        private async Task<List<S3Object>> GetS3Objects(string parentFolderName = "")
+        private async Task<List<S3Object>> GetS3Objects(string parentFolderName = "", int numberToReturn = 1000)
         {
             ListObjectsV2Request request = new ListObjectsV2Request
             {
                 BucketName = _bucketName,
+                MaxKeys = numberToReturn,
                 Prefix = string.IsNullOrWhiteSpace(parentFolderName) ? _bucketName : parentFolderName.ToUpper() + "/"
             };
 

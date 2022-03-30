@@ -15,9 +15,9 @@ namespace HousingRegisterApi.V1.UseCase
             _fileGateway = fileGateway;
         }
 
-        public async Task<List<ExportFileItem>> Execute()
+        public async Task<List<ExportFileItem>> Execute(int numberToReturn = 1000)
         {
-            return await _fileGateway.ListFiles("Novalet").ConfigureAwait(false);
+            return await _fileGateway.ListFiles("Novalet", numberToReturn).ConfigureAwait(false);
         }
     }
 }
