@@ -68,6 +68,9 @@ functions:
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.ExtendedNovaletExportGeneratorFunction::Handle
     role: lambdaExecutionRole
     timeout: 300
+    events:
+      - sns:
+          arn: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
   HousingRegisterNovaletExportUpload:
     name: ${self:service}-${self:provider.stage}-novalet-export-upload
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FtpUploadNovaletExportFunction::Handle

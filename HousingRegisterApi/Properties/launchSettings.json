@@ -25,12 +25,8 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/v1/healthcheck/ping",
-      "httpPort": 5000,
-      "useSSL": false,
-      "applicationUrl": "http://localhost:5000",
-      "environmentVariables": {
-        "ASPNETCORE_URLS": "http://+:5000"
-      }
-      }
+      "publishAllPorts": true,
+      "useSSL": true
     }
+  }
 }
