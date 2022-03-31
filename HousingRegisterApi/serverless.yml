@@ -31,7 +31,7 @@ functions:
       HACKNEY_JWT_SECRET: ${ssm:/housing-register/${self:provider.stage}/hackney-jwt-secret}
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
       NOTIFY_TEMPLATE_VERIFY_CODE: ${ssm:/housing-register/${self:provider.stage}/notify-template-verify-code}
-      NOTIFY_TEMPLATE_BEDROOMCANGE: ${ssm:/housing-register/${self:provider.stage}/notify-template-bedroom-change}
+      NOTIFY_TEMPLATE_BEDROOMCHANGE: ${ssm:/housing-register/${self:provider.stage}/notify-template-bedroom-change}
       HOUSINGREGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
       NOVALET_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
       EVIDENCE_API_URL: ${ssm:/housing-register/${self:provider.stage}/evidence-api/base-url}
