@@ -38,7 +38,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        [Ignore("Ignore for S3")]
+        
         public async Task GetCasesReportReturnsResponse()
         {
             // Arrange
@@ -60,7 +60,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        [Ignore("Ignore for S3")]
+        
         public async Task GetPeopleReportReturnsResponse()
         {
             // Arrange
@@ -82,7 +82,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        [Ignore("Ignore for S3")]
+        
         public async Task GetCasesActivityReportReturnsResponse()
         {
             // Arrange
@@ -104,7 +104,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        [Ignore("Ignore for S3")]
+        
         public async Task GetOfficerActivityReportReturnsResponse()
         {
             // Arrange

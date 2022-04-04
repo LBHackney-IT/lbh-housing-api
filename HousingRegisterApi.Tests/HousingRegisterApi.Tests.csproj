@@ -11,9 +11,13 @@
 
   <ItemGroup>
     <Compile Remove="V1\E2ETests\**" />
+    <Compile Remove="V1\Functions\**" />
     <Content Remove="V1\E2ETests\**" />
+    <Content Remove="V1\Functions\**" />
     <EmbeddedResource Remove="V1\E2ETests\**" />
+    <EmbeddedResource Remove="V1\Functions\**" />
     <None Remove="V1\E2ETests\**" />
+    <None Remove="V1\Functions\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +25,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="V1\E2ETests\AddApplicationNoteTest.cs" />
+    <Compile Include="V1\E2ETests\ApproveNovaletExportTest.cs" />
+    <Compile Include="V1\E2ETests\CalculateBedroomsTest.cs" />
+    <Compile Include="V1\E2ETests\CreateNewApplicationTest.cs" />
     <Compile Include="V1\E2ETests\Fixtures\ApplicationFixture.cs" />
+    <Compile Include="V1\E2ETests\Fixtures\AuthFixture.cs" />
+    <Compile Include="V1\E2ETests\GenerateAuthCodeTest.cs" />
+    <Compile Include="V1\E2ETests\GetApplicationByIdTest.cs" />
+    <Compile Include="V1\E2ETests\GetInternalReportTest.cs" />
+    <Compile Include="V1\E2ETests\GetNovaletExportTest.cs" />
+    <Compile Include="V1\E2ETests\ListNovaletExportsTest.cs" />
+    <Compile Include="V1\E2ETests\UpdateApplicationTest.cs" />
+    <Compile Include="V1\E2ETests\VerifyAuthCodeTest.cs" />
+    <Compile Include="V1\E2ETests\ViewingApplicationTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

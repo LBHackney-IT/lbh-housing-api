@@ -107,7 +107,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test(Description = "Validating a verification code and email that has no applications returns NotFound")]
-        [Ignore("Ignore for S3")]
+        
         public async Task ValidatingAVerificationCodeAndEmailThatHasNoApplicationsReturnsNotFound()
         {
             // Arrange        
@@ -122,7 +122,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test(Description = "Expired verification code returns NotFound")]
-        [Ignore("Ignore for S3")]
+        
         public async Task ExpiredVerificationCodeReturnsNotFound()
         {
             // Arrange

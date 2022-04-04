@@ -24,7 +24,7 @@ services:
       args:
         - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     ports:
-      - 5000:5000
+      - 3000:3000
     environment:
       - DynamoDb_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000

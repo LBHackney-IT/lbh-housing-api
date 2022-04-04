@@ -20,7 +20,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         }
 
         [Test]
-        [Ignore("Ignore for S3")]
+        
         public async Task GetNovaletExportForApplicationReturnsResponse()
         {
             // Arrange
