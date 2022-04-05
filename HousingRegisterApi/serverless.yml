@@ -50,7 +50,7 @@ functions:
           private: true
   HousingRegisterBedroomRecalulator:
     name: ${self:service}-${self:provider.stage}-bedroom-recalculator
-    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.RedroomRecalculatorFunction::Handle
+    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.BedroomRecalculatorFunction::Handle
     role: lambdaExecutionRole
     timeout: 300
     events:
