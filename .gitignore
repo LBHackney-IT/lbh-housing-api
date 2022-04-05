@@ -67,3 +67,4 @@ database/shared-local-instance.db
 /.localstack
 /env
 /HousingRegisterApi/local.env
+/testEnvironments.json
