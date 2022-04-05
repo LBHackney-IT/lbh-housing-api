@@ -17,7 +17,7 @@ namespace HousingRegisterApi.Tests
             var lamdaContextMock = new Mock<ILambdaContext>();
             lamdaContextMock.Setup(x => x.Logger.Log(It.IsAny<string>()));
 
-            var lamdaFunction = new RedroomRecalculatorFunction();
+            var lamdaFunction = new BedroomRecalculatorFunction();
 
             Action function = () => lamdaFunction.Handle(lamdaContextMock.Object);
 

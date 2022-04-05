@@ -8,14 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HousingRegisterApi.V1.Functions
 {
-    public class RedroomRecalculatorFunction : BaseFunction, ILambdaFunctionHandler
+    public class BedroomRecalculatorFunction : BaseFunction, ILambdaFunctionHandler
     {
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
         /// region the Lambda function is executed in.
         /// </summary>
-        public RedroomRecalculatorFunction()
+        public BedroomRecalculatorFunction()
         {
 
         }
@@ -40,6 +40,7 @@ namespace HousingRegisterApi.V1.Functions
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
+            services.AddScoped<INotifyGateway, NotifyGateway>();
 
             base.ConfigureServices(services);
         }
