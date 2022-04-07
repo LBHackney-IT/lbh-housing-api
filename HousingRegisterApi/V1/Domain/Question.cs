@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -18,7 +19,23 @@ namespace HousingRegisterApi.V1.Domain
         public static string GetAnswer(this IEnumerable<Question> questions, string name)
         {
             var question = questions?.FirstOrDefault(x => x.Id == name);
-            return question != null && !string.IsNullOrEmpty(question.Answer) ? JsonSerializer.Deserialize<string>(question.Answer) : string.Empty;
+            if (question != null && !string.IsNullOrEmpty(question.Answer))
+            {
+                try
+                {
+                    var jsonData = JsonSerializer.Deserialize<string>(question.Answer);
+
+                    return jsonData;
+                }
+                catch (JsonException)
+                {
+                    return "ERROR in question:" + question.Answer;
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

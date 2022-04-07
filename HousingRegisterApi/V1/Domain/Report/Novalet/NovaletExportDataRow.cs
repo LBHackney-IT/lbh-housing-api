@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 
@@ -107,6 +108,7 @@ namespace HousingRegisterApi.V1.Domain.Report
 
         private static string GetEthnicity(Application application)
         {
+            ILogger<NovaletExportDataRow> log = Startup.LogFactory.CreateLogger<NovaletExportDataRow>();
 
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
             if (!string.IsNullOrEmpty(legacyOverride))
@@ -117,7 +119,13 @@ namespace HousingRegisterApi.V1.Domain.Report
             var ethnicityCategoryKey = "ethnicity-questions/ethnicity-main-category";
             var extended = "ethnicity-extended-category";
 
-            var ethnicityKey = (application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey)) switch
+            var ethnicityCategoryKeyAnswer = application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey);
+            if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in question:"))
+            {
+                log.LogError(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
+            }
+
+            var ethnicityKey = ethnicityCategoryKeyAnswer switch
             {
                 PersonEthnicityCategory.AsianOrAsianBritish => $"ethnicity-extended-category-asian-asian-british/{extended}",
                 PersonEthnicityCategory.BlackOrBlackBritish => $"ethnicity-extended-category-black-black-british/{extended}",
