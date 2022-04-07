@@ -106,11 +106,11 @@ namespace HousingRegisterApi.V1.Domain.Report
             };
         }
 
-        
+
         private static readonly ILogger<NovaletExportDataRow> _log = Startup.LogFactory.CreateLogger<NovaletExportDataRow>();
 
         private static string GetEthnicity(Application application)
-        {       
+        {
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
             if (!string.IsNullOrEmpty(legacyOverride))
             {
