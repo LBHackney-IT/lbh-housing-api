@@ -106,10 +106,11 @@ namespace HousingRegisterApi.V1.Domain.Report
             };
         }
 
-        private static string GetEthnicity(Application application)
-        {
-            ILogger<NovaletExportDataRow> log = Startup.LogFactory.CreateLogger<NovaletExportDataRow>();
+        
+        private static readonly ILogger<NovaletExportDataRow> _log = Startup.LogFactory.CreateLogger<NovaletExportDataRow>();
 
+        private static string GetEthnicity(Application application)
+        {       
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
             if (!string.IsNullOrEmpty(legacyOverride))
             {
@@ -122,7 +123,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             var ethnicityCategoryKeyAnswer = application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey);
             if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in question:"))
             {
-                log.LogError(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
+                _log.LogError(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
             }
 
             var ethnicityKey = ethnicityCategoryKeyAnswer switch
