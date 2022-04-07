@@ -107,7 +107,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         }
 
 
-        private static readonly ILogger<NovaletExportDataRow> _log = Startup.LogFactory.CreateLogger<NovaletExportDataRow>();
+        private static readonly ILogger<Application> _log = Startup.LogFactory.CreateLogger<Application>();
 
         private static string GetEthnicity(Application application)
         {
