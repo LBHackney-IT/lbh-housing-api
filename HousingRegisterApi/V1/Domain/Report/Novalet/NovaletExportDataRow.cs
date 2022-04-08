@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
@@ -6,6 +7,7 @@ namespace HousingRegisterApi.V1.Domain.Report
 {
     public class NovaletExportDataRow
     {
+        private static ILogger _log = ApplicationLogging.CreateLogger<NovaletExportDataRow>();
         public string HousingRegisterRef { get; set; }
         public string Title { get; set; }
         public string FirstName { get; set; }
@@ -108,6 +110,8 @@ namespace HousingRegisterApi.V1.Domain.Report
 
         private static string GetEthnicity(Application application)
         {
+
+
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
             if (!string.IsNullOrEmpty(legacyOverride))
             {
@@ -120,7 +124,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             var ethnicityCategoryKeyAnswer = application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey);
             if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in question:"))
             {
-                Serilog.Log.Logger.Error(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
+                _log.LogError(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
             }
 
             var ethnicityKey = ethnicityCategoryKeyAnswer switch

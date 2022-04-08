@@ -198,8 +198,9 @@ namespace HousingRegisterApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory logFactory)
         {
+            ApplicationLogging.LoggerFactory = logFactory;
             if (env.IsDevelopment())
             {
                 app.UseSession();
