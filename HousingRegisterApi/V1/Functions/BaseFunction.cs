@@ -5,8 +5,6 @@ using Hackney.Core.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Formatting.Json;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -19,7 +17,7 @@ namespace HousingRegisterApi.V1.Functions
     {
         protected IConfigurationRoot Configuration { get; }
         protected IServiceProvider ServiceProvider { get; }
-        protected Microsoft.Extensions.Logging.ILogger Logger { get; }
+        protected ILogger Logger { get; }
 
         internal BaseFunction()
         {
@@ -44,11 +42,6 @@ namespace HousingRegisterApi.V1.Functions
             ServiceProvider.UseLogCall();
 
             Logger = ServiceProvider.GetRequiredService<ILogger<BaseFunction>>();
-
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-               .WriteTo.Console(new JsonFormatter())
-               .CreateLogger();
         }
 
         /// <summary>
