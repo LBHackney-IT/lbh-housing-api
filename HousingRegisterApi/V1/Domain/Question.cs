@@ -29,7 +29,7 @@ namespace HousingRegisterApi.V1.Domain
                 }
                 catch (JsonException)
                 {
-                    return "ERROR in question:" + question.Answer;
+                    return "ERROR in answer:" + question.Answer;
                 }
             }
             else
