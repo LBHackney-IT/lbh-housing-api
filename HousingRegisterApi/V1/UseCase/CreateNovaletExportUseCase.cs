@@ -45,12 +45,12 @@ namespace HousingRegisterApi.V1.UseCase
 
             var exportData = applications.Select(x => new NovaletExportDataRow(x));
 
-            var exportDataSet = exportData.ToArray();
             foreach (var error in exportData.Select(x => x.Errors).Where(x => x != null))
             {
                 _logger.LogError($"{error}");
             }
 
+            var exportDataSet = exportData.ToArray();
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
 
