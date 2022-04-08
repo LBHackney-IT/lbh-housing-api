@@ -50,7 +50,7 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 _logger.LogError($"{error}");
             }
-            
+
             var bytes = await _csvService.Generate(exportDataSet).ConfigureAwait(false);
             var file = new ExportFile(fileName, "text/csv", bytes);
 
