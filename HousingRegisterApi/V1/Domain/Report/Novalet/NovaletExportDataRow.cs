@@ -1,5 +1,6 @@
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Text.RegularExpressions;
 
@@ -7,7 +8,6 @@ namespace HousingRegisterApi.V1.Domain.Report
 {
     public class NovaletExportDataRow
     {
-        private static ILogger _log = ApplicationLogging.CreateLogger<NovaletExportDataRow>();
         public string HousingRegisterRef { get; set; }
         public string Title { get; set; }
         public string FirstName { get; set; }
@@ -124,7 +124,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             var ethnicityCategoryKeyAnswer = application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey);
             if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in question:"))
             {
-                _log.LogError(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
+                Log.Logger.Error(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
             }
 
             var ethnicityKey = ethnicityCategoryKeyAnswer switch
