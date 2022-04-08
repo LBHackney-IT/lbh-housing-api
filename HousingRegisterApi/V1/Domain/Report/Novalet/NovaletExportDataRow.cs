@@ -1,5 +1,7 @@
+using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace HousingRegisterApi.V1.Domain.Report
@@ -38,6 +40,9 @@ namespace HousingRegisterApi.V1.Domain.Report
         public string AutoBidPref_MobilityStandard { get; set; }
         public string AutoBidPref_WheelChairStandard { get; set; }
         public string AutoBidPref_AdaptedStandard { get; set; }
+        public static string ErrorData { get; set; }
+
+        public string Errors { get; set; }
 
         public NovaletExportDataRow(Application application)
         {
@@ -82,6 +87,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             AutoBidPref_MobilityStandard = null;
             AutoBidPref_WheelChairStandard = null;
             AutoBidPref_AdaptedStandard = null;
+            Errors = ErrorData;
         }
 
         private static string FormatDate(DateTime? dateTime)
@@ -108,6 +114,8 @@ namespace HousingRegisterApi.V1.Domain.Report
 
         private static string GetEthnicity(Application application)
         {
+
+
             var legacyOverride = application.MainApplicant.Questions.GetAnswer("legacy-database/ethnicOrigin");
             if (!string.IsNullOrEmpty(legacyOverride))
             {
@@ -118,9 +126,9 @@ namespace HousingRegisterApi.V1.Domain.Report
             var extended = "ethnicity-extended-category";
 
             var ethnicityCategoryKeyAnswer = application.MainApplicant.Questions.GetAnswer(ethnicityCategoryKey);
-            if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in question:"))
+            if (ethnicityCategoryKeyAnswer.StartsWith("ERROR in answer:"))
             {
-                Serilog.Log.Logger.Error(ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference);
+                ErrorData += (ethnicityCategoryKeyAnswer + " for application " + application.Id + " and reference " + application.Reference) + "\n";
             }
 
             var ethnicityKey = ethnicityCategoryKeyAnswer switch
@@ -140,6 +148,10 @@ namespace HousingRegisterApi.V1.Domain.Report
             }
 
             var ethnicity = application.MainApplicant.Questions.GetAnswer(ethnicityKey);
+            if (ethnicity.StartsWith("ERROR in answer:"))
+            {
+                ErrorData += (ethnicity + " for application " + application.Id + " and reference " + application.Reference) + "\n";
+            }
 
             return ethnicity switch
             {
