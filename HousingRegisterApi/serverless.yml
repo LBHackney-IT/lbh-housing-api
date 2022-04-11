@@ -53,6 +53,10 @@ functions:
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.BedroomRecalculatorFunction::Handle
     role: lambdaExecutionRole
     timeout: 300
+    environment:
+      NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
+      NOTIFY_TEMPLATE_BEDROOMCHANGE: ${ssm:/housing-register/${self:provider.stage}/notify-template-bedroom-change}
+      HOUSINGREGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
     events:
       - schedule: rate(1 hour)
   HousingRegisterNovaletExportGenerator:
