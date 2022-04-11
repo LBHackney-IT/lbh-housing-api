@@ -5,6 +5,9 @@ using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Notify.Client;
+using Notify.Interfaces;
+using System;
 
 namespace HousingRegisterApi.V1.Functions
 {
@@ -41,6 +44,7 @@ namespace HousingRegisterApi.V1.Functions
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
 
             base.ConfigureServices(services);
         }
