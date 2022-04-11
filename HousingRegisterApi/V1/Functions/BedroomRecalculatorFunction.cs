@@ -1,4 +1,5 @@
 using Amazon.Lambda.Core;
+using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
@@ -45,6 +46,8 @@ namespace HousingRegisterApi.V1.Functions
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
+            services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
+            services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
 
             base.ConfigureServices(services);
         }
