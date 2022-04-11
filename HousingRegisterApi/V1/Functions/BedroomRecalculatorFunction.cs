@@ -36,7 +36,7 @@ namespace HousingRegisterApi.V1.Functions
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureDynamoDB();
-
+            services.ConfigureSns();
             services.AddHttpClient();
 
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
