@@ -136,8 +136,8 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicityCategory.AsianOrAsianBritish => $"ethnicity-extended-category-asian-asian-british/{extended}",
                 PersonEthnicityCategory.BlackOrBlackBritish => $"ethnicity-extended-category-black-black-british/{extended}",
                 PersonEthnicityCategory.MixedOrMultipleBackground => $"ethnicity-extended-category-mixed-multiple-background/{extended}",
-                PersonEthnicityCategory.OtherEthnicGroup => $"ethnicity-extended-category-white/{extended}",
-                PersonEthnicityCategory.White => $"ethnicity-extended-category-other-ethnic-group/{extended}",
+                PersonEthnicityCategory.OtherEthnicGroup => $"ethnicity-extended-category-group/{extended}",
+                PersonEthnicityCategory.White => $"ethnicity-extended-category-other-ethnic-white/{extended}",
                 PersonEthnicityCategory.PreferNotToSay => null,
                 _ => null,
             };
