@@ -287,11 +287,13 @@ namespace HousingRegisterApi.V1.Gateways
             statusNameAndValues.Add(":v_fromLegacyLowNumb", new Primitive(importedFromLegacyDatabaseLowNumber.ToString(), true));
             statusNameAndValues.Add(":v_fromLegacyHighNumb", new Primitive(importedFromLegacyDatabaseHighNumber.ToString(), true));
             // status is a reserved word, so we have to map it to something else, ie. #application_status
-            var scanConfig = new ScanOperationConfig
+            // Using between in the below expression so that we can return all recor
+            ScanOperationConfig scanConfig = new ScanOperationConfig
             {
                 FilterExpression = new Expression()
                 {
-                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) AND (importedFromLegacyDatabase BETWEEN :v_fromLegacyLowNumb AND :v_fromLegacyHighNumb)",
+                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) " +
+                    $"AND (importedFromLegacyDatabase BETWEEN :v_fromLegacyLowNumb AND :v_fromLegacyHighNumb) ",
                     ExpressionAttributeValues = statusNameAndValues,
                     ExpressionAttributeNames = new Dictionary<string, string>()
                     {
@@ -299,6 +301,24 @@ namespace HousingRegisterApi.V1.Gateways
                     }
                 },
             };
+            //If importedFromLegacyDatabase is null then they are not in the legacy database
+            if (importedFromLegacyDatabaseLowNumber == 0 && importedFromLegacyDatabaseHighNumber == 0)
+            {
+                scanConfig = new ScanOperationConfig
+                {
+                    FilterExpression = new Expression()
+                    {
+                        ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) " +
+                            $"AND (importedFromLegacyDatabase = :v_fromLegacyLowNumb OR importedFromLegacyDatabase = :v_fromLegacyHighNumb " +
+                            $"OR attribute_not_exists(importedFromLegacyDatabase))",
+                        ExpressionAttributeValues = statusNameAndValues,
+                        ExpressionAttributeNames = new Dictionary<string, string>()
+                    {
+                        {"#application_status", "status" }
+                    }
+                    },
+                };
+            }
 
             var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetRemainingAsync().GetAwaiter().GetResult();
             var searchItems = search.Select(x => x.ToDomain());
