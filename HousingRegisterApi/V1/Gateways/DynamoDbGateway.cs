@@ -270,10 +270,37 @@ namespace HousingRegisterApi.V1.Gateways
 
         public IEnumerable<Application> GetApplicationsAtStatus(params string[] status)
         {
-            return GetApplicationsAtStatus(0, 1, status);
+            var statusNames = new List<string>();
+            var statusNameAndValues = new Dictionary<string, DynamoDBEntry>();
+
+            for (int i = 0; i < status.Length; i++)
+            {
+                string searchName = $":status{i}";
+                statusNames.Add(searchName);
+                statusNameAndValues.Add(searchName, new Primitive(status[i]));
+            }
+
+            // status is a reserved word, so we have to map it to something else, ie. #application_status
+            var scanConfig = new ScanOperationConfig
+            {
+                FilterExpression = new Expression()
+                {
+                    ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())})",
+                    ExpressionAttributeValues = statusNameAndValues,
+                    ExpressionAttributeNames = new Dictionary<string, string>()
+                    {
+                        {"#application_status", "status" }
+                    }
+                },
+            };
+
+            var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetRemainingAsync().GetAwaiter().GetResult();
+            var searchItems = search.Select(x => x.ToDomain());
+
+            return searchItems;
         }
 
-        public IEnumerable<Application> GetApplicationsAtStatus(int importedFromLegacyDatabaseLowNumber, int importedFromLegacyDatabaseHighNumber, params string[] status)
+        public IEnumerable<Application> GetApplicationsAtStatusForNonLegacy(params string[] status)
         {
             var statusNames = new List<string>();
             var statusNameAndValues = new Dictionary<string, DynamoDBEntry>();
@@ -284,41 +311,23 @@ namespace HousingRegisterApi.V1.Gateways
                 statusNames.Add(searchName);
                 statusNameAndValues.Add(searchName, new Primitive(status[i]));
             }
-            statusNameAndValues.Add(":v_fromLegacyLowNumb", new Primitive(importedFromLegacyDatabaseLowNumber.ToString(), true));
-            statusNameAndValues.Add(":v_fromLegacyHighNumb", new Primitive(importedFromLegacyDatabaseHighNumber.ToString(), true));
+            statusNameAndValues.Add(":v_legacyDbFalse", new Primitive("0", true));
             // status is a reserved word, so we have to map it to something else, ie. #application_status
-            // Using between in the below expression so that we can return all recor
-            ScanOperationConfig scanConfig = new ScanOperationConfig
+            // Here we are assuming that if the importedFromLegacyDatabase attribute is missing than it does not come from the legacy database
+            var scanConfig = new ScanOperationConfig
             {
                 FilterExpression = new Expression()
                 {
                     ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) " +
-                    $"AND (importedFromLegacyDatabase BETWEEN :v_fromLegacyLowNumb AND :v_fromLegacyHighNumb) ",
+                        $"AND (importedFromLegacyDatabase = :v_legacyDbFalse OR attribute_not_exists(importedFromLegacyDatabase))",
                     ExpressionAttributeValues = statusNameAndValues,
                     ExpressionAttributeNames = new Dictionary<string, string>()
-                    {
-                        {"#application_status", "status" }
-                    }
+                {
+                    {"#application_status", "status" }
+                }
                 },
             };
-            //If importedFromLegacyDatabase is null then they are not in the legacy database
-            if (importedFromLegacyDatabaseLowNumber == 0 && importedFromLegacyDatabaseHighNumber == 0)
-            {
-                scanConfig = new ScanOperationConfig
-                {
-                    FilterExpression = new Expression()
-                    {
-                        ExpressionStatement = $"#application_status IN ({string.Join(",", statusNames.ToArray())}) " +
-                            $"AND (importedFromLegacyDatabase = :v_fromLegacyLowNumb OR importedFromLegacyDatabase = :v_fromLegacyHighNumb " +
-                            $"OR attribute_not_exists(importedFromLegacyDatabase))",
-                        ExpressionAttributeValues = statusNameAndValues,
-                        ExpressionAttributeNames = new Dictionary<string, string>()
-                    {
-                        {"#application_status", "status" }
-                    }
-                    },
-                };
-            }
+            
 
             var search = _dynamoDbContext.FromScanAsync<ApplicationDbEntity>(scanConfig).GetRemainingAsync().GetAwaiter().GetResult();
             var searchItems = search.Select(x => x.ToDomain());

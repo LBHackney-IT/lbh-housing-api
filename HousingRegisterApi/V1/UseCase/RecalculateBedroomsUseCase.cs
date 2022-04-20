@@ -40,7 +40,7 @@ namespace HousingRegisterApi.V1.UseCase
         {
             bool success = true;
 
-            var applications = _gateway.GetApplicationsAtStatus(0, 0, "Submitted", "Active", "ActiveUnderAppeal");
+            var applications = _gateway.GetApplicationsAtStatusForNonLegacy("Submitted", "Active", "ActiveUnderAppeal");
 
             // code comes here if applications are found
             _logger.LogInformation($"Recalculating bedrooms needed for {applications.Count()} applications");

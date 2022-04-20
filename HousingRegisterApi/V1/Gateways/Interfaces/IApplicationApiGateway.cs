@@ -21,7 +21,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         IEnumerable<Application> GetApplicationsAtStatus(params string[] status);
 
-        IEnumerable<Application> GetApplicationsAtStatus(int importedFromLegacyDatabaseLowNumber, int importedFromLegacyDatabaseHighNumber, params string[] status);
+        IEnumerable<Application> GetApplicationsAtStatusForNonLegacy(params string[] status);
 
         Application GetApplicationById(Guid id);
 
