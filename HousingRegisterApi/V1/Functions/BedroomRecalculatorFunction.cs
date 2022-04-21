@@ -1,10 +1,14 @@
 using Amazon.Lambda.Core;
+using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Notify.Client;
+using Notify.Interfaces;
+using System;
 
 namespace HousingRegisterApi.V1.Functions
 {
@@ -32,7 +36,7 @@ namespace HousingRegisterApi.V1.Functions
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureDynamoDB();
-
+            services.ConfigureSns();
             services.AddHttpClient();
 
             services.AddScoped<IApplicationApiGateway, DynamoDbGateway>();
@@ -41,6 +45,9 @@ namespace HousingRegisterApi.V1.Functions
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
             services.AddScoped<INotifyGateway, NotifyGateway>();
+            services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
+            services.AddScoped<ISnsGateway, ApplicationSnsGateway>();
+            services.AddScoped<ISnsFactory, ApplicationSnsFactory>();
 
             base.ConfigureServices(services);
         }
