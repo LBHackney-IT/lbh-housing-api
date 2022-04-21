@@ -24,6 +24,17 @@ namespace HousingRegisterApi.V1.Domain
         public string GenderDescription { get; set; }
         public string RelationshipType { get; set; }
         public string NationalInsuranceNumber { get; set; }
-        public int Age => DateTime.UtcNow.Year - DateOfBirth.Year;
+        public int Age => CalculateAge(DateOfBirth);
+
+        public static int CalculateAge(DateTime birthDate)
+        {
+            DateTime now = DateTime.UtcNow;
+            int age = now.Year - birthDate.Year;
+
+            if (now.Month < birthDate.Month || (now.Month == birthDate.Month && now.Day < birthDate.Day))
+                age--;
+
+            return age;
+        }
     }
 }
