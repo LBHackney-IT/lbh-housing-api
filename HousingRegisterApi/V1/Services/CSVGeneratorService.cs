@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -90,7 +91,10 @@ namespace HousingRegisterApi.V1.Services
         /// <returns></returns>
         private static List<string> GetHeaders(Type entityType)
         {
-            PropertyInfo[] properties = entityType.GetProperties();
+            var toExclude = new HashSet<string>();
+            toExclude.Add("Errors");
+            toExclude.Add("ErrorData");
+            PropertyInfo[] properties = entityType.GetProperties().Where(property => !toExclude.Contains(property.Name)).ToArray();
             List<string> headers = new List<string>();
 
             foreach (var property in properties)
