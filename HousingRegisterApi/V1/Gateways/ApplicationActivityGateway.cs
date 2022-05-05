@@ -51,9 +51,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             // we only want to log activites after an application has been submitted
             if (activity == null
-                || application == null
-                || application.Status == ApplicationStatus.Verification
-                || application.Status == ApplicationStatus.New)
+                || application == null)
             {
                 return;
             }
