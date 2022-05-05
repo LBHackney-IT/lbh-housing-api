@@ -68,3 +68,4 @@ database/shared-local-instance.db
 /env
 /HousingRegisterApi/local.env
 /testEnvironments.json
+/docker-compose.dcproj
