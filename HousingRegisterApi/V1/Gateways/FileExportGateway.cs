@@ -71,7 +71,7 @@ namespace HousingRegisterApi.V1.Gateways
                 });
             }
 
-            return files;
+            return files.OrderByDescending(x => x.LastModified).ToList();
         }
 
         public async Task SaveFile(ExportFile file, string parentFolderName = "")
