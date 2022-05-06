@@ -30,17 +30,16 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             var response = new List<EvidenceRequestResponse>();
-            foreach (var documentType in request.DocumentTypes)
-            {
-                var createEvidenceRequest = BuildEvidenceRequest(application.MainApplicant, documentType, request.UserRequestedBy);
-                var evidenceResponse = await _evidenceApiGateway.CreateEvidenceRequest(createEvidenceRequest).ConfigureAwait(true);
 
-                response.Add(evidenceResponse);
-            }
+            var createEvidenceRequest = BuildEvidenceRequest(application.MainApplicant, request.DocumentTypes, request.UserRequestedBy);
+            var evidenceResponse = await _evidenceApiGateway.CreateEvidenceRequest(createEvidenceRequest).ConfigureAwait(true);
+
+            response.Add(evidenceResponse);
+
             return response;
         }
 
-        private static CreateEvidenceRequest BuildEvidenceRequest(Applicant applicant, string documentType, string userRequestedBy)
+        private static CreateEvidenceRequest BuildEvidenceRequest(Applicant applicant, List<string> documentTypes, string userRequestedBy)
         {
             return new CreateEvidenceRequest
             {
@@ -49,7 +48,7 @@ namespace HousingRegisterApi.V1.UseCase
                     Name = applicant.Person.FullName,
                     Email = applicant.ContactInformation.EmailAddress
                 },
-                DocumentTypes = new List<string> { documentType },
+                DocumentTypes = documentTypes,
                 DeliveryMethods = new List<string> { "EMAIL" },
                 Team = "Housing Register",
                 Reason = "Assessment",
