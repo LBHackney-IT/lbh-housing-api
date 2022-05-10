@@ -50,10 +50,11 @@ namespace HousingRegisterApi.V1.Gateways
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
             // we only want to log activites after an application has been submitted
-            if ((activity == null
+            if (activity == null
                 || application == null
-                || application.Status == ApplicationStatus.Verification
-                || application.Status == ApplicationStatus.New) && activity.ActivityType != ApplicationActivityType.NoteAddedByUser)
+                ||
+                ((application.Status == ApplicationStatus.Verification
+                || application.Status == ApplicationStatus.New) && activity.ActivityType != ApplicationActivityType.NoteAddedByUser))
             {
                 return;
             }
