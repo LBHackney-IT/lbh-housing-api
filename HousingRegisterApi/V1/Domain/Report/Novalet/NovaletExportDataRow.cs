@@ -169,7 +169,8 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicity.BlackCaribbean => "CAR",
                 PersonEthnicity.BlackBritish => "BBR",
                 PersonEthnicity.BlackCongolese => "CON",
-                PersonEthnicity.BlackGhanaian => "GHA",
+                PersonEthnicity.Ghanaian => "GHA",
+                PersonEthnicity.BlackGhanaian => "BGH",
                 PersonEthnicity.BlackNigerian => "NIG",
                 PersonEthnicity.BlackSomali => "SOM",
                 PersonEthnicity.BlackAngolan => "BLA",
@@ -219,6 +220,7 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicity.OtherMoroccan => "MOR",
                 PersonEthnicity.OtherPolynesian => "POL",
                 PersonEthnicity.OtherLatinSouthCentralAmerican => "LAT",
+                PersonEthnicity.OtherCongolese => "CON",
                 _ => "AOO",
             };
         }
