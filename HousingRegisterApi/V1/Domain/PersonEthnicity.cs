@@ -27,6 +27,7 @@ namespace HousingRegisterApi.V1.Domain
         public const string BlackBritish = "black-british";
         public const string BlackAngolan = "black-angolan";
         public const string BlackCongolese = "black-congolese";
+        public const string Ghanaian = "ghanaian";
         public const string BlackGhanaian = "black-ghanaian";
         public const string BlackNigerian = "black-nigerian";
         public const string BlackSierraLeonean = "black-sierra-leonean";
@@ -57,6 +58,7 @@ namespace HousingRegisterApi.V1.Domain
 
         public const string OtherArab = "arab";
         public const string OtherAfghan = "afghan";
+        public const string OtherCongolese = "congolese";
         public const string OtherEgyptian = "egyptian";
         public const string OtherFilipino = "filipino";
         public const string OtherIranian = "iranian";
