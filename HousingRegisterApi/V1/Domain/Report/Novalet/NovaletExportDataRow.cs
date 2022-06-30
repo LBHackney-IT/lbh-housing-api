@@ -189,7 +189,7 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicity.WhiteGreekCypriot => "GCY",
                 PersonEthnicity.WhiteIrish => "IRI",
                 PersonEthnicity.WhiteTurkishCypriot => "TCY",
-                PersonEthnicity.WhiteOtherEasternEuropean => "EEU",
+                PersonEthnicity.WhiteOtherEasternEuropean => "WOE",
                 PersonEthnicity.WhiteOtherWesternEuropean => "WWE",
                 PersonEthnicity.WhiteGypsyOrIrishTraveller => "IRT",
                 PersonEthnicity.WhiteOther => "AOW",
