@@ -54,7 +54,8 @@ namespace HousingRegisterApi.V1.Gateways
                 || application == null
                 ||
                 ((application.Status == ApplicationStatus.Verification
-                || application.Status == ApplicationStatus.New) && activity.ActivityType != ApplicationActivityType.NoteAddedByUser))
+                || application.Status == ApplicationStatus.New) && activity.ActivityType != ApplicationActivityType.NoteAddedByUser)
+                )
             {
                 return;
             }

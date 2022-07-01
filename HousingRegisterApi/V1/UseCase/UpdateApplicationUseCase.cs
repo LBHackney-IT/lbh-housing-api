@@ -112,6 +112,46 @@ namespace HousingRegisterApi.V1.UseCase
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser,
                         "Assessment.EffectiveDate", application.Assessment?.EffectiveDate, request.Assessment.EffectiveDate));
                 }
+
+                if (!string.IsNullOrEmpty(request.Assessment?.Band))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BandChangedByUser,
+                        "Assessment.Band", application.Assessment?.Band, request.Assessment.Band));
+                }
+
+                if (request.Assessment?.InformationReceivedDate.HasValue == true)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.InformationReceivedDateChangedByUser,
+                        "Assessment.InformationReceivedDate", application.Assessment?.InformationReceivedDate, request.Assessment.InformationReceivedDate));
+                }
+
+                if (!string.IsNullOrEmpty(request.Assessment?.BiddingNumber))
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BiddingNumberChangedByUser,
+                        "Assessment.BiddingNumber", application.Assessment?.BiddingNumber, request.Assessment.BiddingNumber));
+                }
+
+                if (request.MainApplicant != null)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.MainApplicantChangedByUser,
+                        "MainApplicant", application.MainApplicant, request.MainApplicant));
+                }
+
+                //Remove all of the above and check the application against the request.
+                //Change EntityActivity to accept a sring instead of an ApplicationActivityType
+                Applicant oldApplicant = application.MainApplicant;
+                Applicant newApplicant = request.MainApplicant;
+                //application.Assessment.
+                var changes = ObjectExtensions.GetChangedProperties<Applicant>(oldApplicant, newApplicant);
+                if (changes.Count > 0)
+                {
+                    List<string> changeList = new List<string>();
+                    foreach (var change in changes)
+                    {
+                        changeList.Add(change + ": " + "");
+                    }
+
+                }
             }
 
             return activities;
