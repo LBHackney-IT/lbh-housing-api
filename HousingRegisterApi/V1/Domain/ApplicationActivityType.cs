@@ -39,7 +39,7 @@ namespace HousingRegisterApi.V1.Domain
 
         [Description("BiddingNumberChangedByUser")]
         BiddingNumberChangedByUser = 11,
-        
+
         [Description("PersonChangedByUser")]
         PersonChangedByUser = 12,
 
@@ -48,7 +48,7 @@ namespace HousingRegisterApi.V1.Domain
 
         [Description("ContactInformationChangedByUser")]
         ContactInformationChangedByUser = 14,
-        
+
         [Description("QuestionsChangedByUser")]
         QuestionsChangedByUser = 15,
 

@@ -41,6 +41,6 @@ namespace HousingRegisterApi.V1.Infrastructure
               || type.IsEnum
               || type.Equals(typeof(string))
               || type.Equals(typeof(decimal));
-        }        
+        }
     }
 }

@@ -112,14 +112,14 @@ namespace HousingRegisterApi.V1.UseCase
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.EffectiveDateChangedByUser,
                         "Assessment.EffectiveDate", application.Assessment?.EffectiveDate, request.Assessment.EffectiveDate));
                 }
-                
-                if(!string.IsNullOrEmpty(request.Assessment?.Band))
+
+                if (!string.IsNullOrEmpty(request.Assessment?.Band))
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BandChangedByUser,
                         "Assessment.Band", application.Assessment?.Band, request.Assessment.Band));
                 }
 
-                if(request.Assessment?.InformationReceivedDate.HasValue == true)
+                if (request.Assessment?.InformationReceivedDate.HasValue == true)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.InformationReceivedDateChangedByUser,
                         "Assessment.InformationReceivedDate", application.Assessment?.InformationReceivedDate, request.Assessment.InformationReceivedDate));
@@ -143,7 +143,7 @@ namespace HousingRegisterApi.V1.UseCase
                 Applicant newApplicant = request.MainApplicant;
                 //application.Assessment.
                 var changes = ObjectExtensions.GetChangedProperties<Applicant>(oldApplicant, newApplicant);
-                if(changes.Count > 0)
+                if (changes.Count > 0)
                 {
                     List<string> changeList = new List<string>();
                     foreach (var change in changes)
