@@ -136,7 +136,7 @@ namespace HousingRegisterApi.V1.UseCase
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.MainApplicantChangedByUser,
                         "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }
-                
+
                 //if (request.MainApplicant?.Person?.FirstName != null)
                 //{
                 //    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
