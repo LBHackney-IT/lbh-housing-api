@@ -137,10 +137,10 @@ namespace HousingRegisterApi.V1.UseCase
                         "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }*/
 
-                if (request.MainApplicant?.Person != null)
+                if (request.MainApplicant?.Person?.FirstName != null)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        "MainApplicant.Person", application.MainApplicant?.Person, request.MainApplicant?.Person));
+                        "MainApplicant.Person.Firstname", application.MainApplicant?.Person?.FirstName, request.MainApplicant?.Person?.FirstName));
                 }
 
                 //Remove all of the above and check the application against the request.
