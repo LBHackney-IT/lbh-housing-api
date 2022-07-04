@@ -140,7 +140,7 @@ namespace HousingRegisterApi.V1.UseCase
                 if (request.MainApplicant?.Person != null)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        null, application.MainApplicant?.Person, request.MainApplicant?.Person));
+                        "Person", application.MainApplicant?.Person, request.MainApplicant?.Person));
                 }
 
                 //Remove all of the above and check the application against the request.
