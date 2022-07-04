@@ -131,11 +131,11 @@ namespace HousingRegisterApi.V1.UseCase
                         "Assessment.BiddingNumber", application.Assessment?.BiddingNumber, request.Assessment.BiddingNumber));
                 }
 
-                if (request.MainApplicant?.Person?.FirstName != null)
-                {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        "MainApplicant.Person.FirstName", application.MainApplicant?.Person?.FirstName, request.MainApplicant?.Person?.FirstName));
-                }
+                //if (request.MainApplicant?.Person?.FirstName != null)
+                //{
+                //    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
+                //        "MainApplicant.Person.FirstName", application.MainApplicant?.Person?.FirstName, request.MainApplicant?.Person?.FirstName));
+                //}
 
                 //Remove all of the above and check the application against the request.
                 //Change EntityActivity to accept a sring instead of an ApplicationActivityType
