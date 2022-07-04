@@ -22,12 +22,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                        select pi.Name;
                 return unequalProperties.ToList();
             }
-            else
-            {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException("You need to provide 2 non-null objects");
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-            }
+            return null;
         }
 
         public static bool IsSimpleType(this Type type)

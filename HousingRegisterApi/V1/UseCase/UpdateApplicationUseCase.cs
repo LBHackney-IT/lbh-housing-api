@@ -139,9 +139,9 @@ namespace HousingRegisterApi.V1.UseCase
 
                 //Remove all of the above and check the application against the request.
                 //Change EntityActivity to accept a sring instead of an ApplicationActivityType
-                Applicant oldApplicant = application.MainApplicant;
+                /*Applicant oldApplicant = application.MainApplicant;
                 Applicant newApplicant = request.MainApplicant;
-                //application.Assessment.
+
                 var changes = ObjectExtensions.GetChangedProperties<Applicant>(oldApplicant, newApplicant);
                 if (changes.Count > 0)
                 {
@@ -151,7 +151,7 @@ namespace HousingRegisterApi.V1.UseCase
                         changeList.Add(change + ": " + "");
                     }
 
-                }
+                }*/
             }
 
             return activities;
