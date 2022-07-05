@@ -37,7 +37,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             NamingStrategy = new CamelCaseNamingStrategy()
         };
-       
+
         public void Publish(ApplicationSns applicationSns)
         {
             var options = new JsonSerializerSettings
@@ -47,7 +47,7 @@ namespace HousingRegisterApi.V1.Gateways
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented
             };
-            
+
             string message = JsonConvert.SerializeObject(applicationSns, options);
             var request = new PublishRequest
             {
