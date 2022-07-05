@@ -31,7 +31,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public void Publish(ApplicationSns applicationSns)
         {
-            string message = JsonSerializer.Serialize(applicationSns, _jsonOptions);
+            string message = JsonSerializer.Serialize(applicationSns);
             var request = new PublishRequest
             {
                 Message = message,
