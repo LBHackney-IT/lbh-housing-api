@@ -40,22 +40,7 @@ namespace HousingRegisterApi.V1.Domain
         [Description("BiddingNumberChangedByUser")]
         BiddingNumberChangedByUser = 11,
 
-        [Description("PersonChangedByUser")]
-        PersonChangedByUser = 12,
-
-        [Description("AddressChangedByUser")]
-        AddressChangedByUser = 13,
-
-        [Description("ContactInformationChangedByUser")]
-        ContactInformationChangedByUser = 14,
-
-        [Description("QuestionsChangedByUser")]
-        QuestionsChangedByUser = 15,
-
-        [Description("MedicalNeedChangedByUser")]
-        MedicalNeedChangedByUser = 16,
-
         [Description("MainApplicantChangedByUser")]
-        MainApplicantChangedByUser = 17
+        MainApplicantChangedByUser = 12
     }
 }
