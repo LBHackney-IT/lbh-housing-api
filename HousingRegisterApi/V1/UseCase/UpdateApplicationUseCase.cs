@@ -137,17 +137,17 @@ namespace HousingRegisterApi.V1.UseCase
                         "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }*/
 
-                if (request.MainApplicant?.Person?.FirstName != null)
+                if (request.MainApplicant != null)
                 {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        "FirstName", application.MainApplicant?.Person?.FirstName, request.MainApplicant?.Person?.FirstName));
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.MainApplicantChangedByUser,
+                        "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }
 
-                if (request.MainApplicant?.Person?.Surname != null)
-                {
-                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        "Surname", application.MainApplicant?.Person?.Surname, request.MainApplicant?.Person?.Surname));
-                }
+                //if (request.MainApplicant?.Person?.Surname != null)
+                //{
+                //    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
+                //        "Surname", application.MainApplicant?.Person?.Surname, request.MainApplicant?.Person?.Surname));
+                //}
 
                 //Remove all of the above and check the application against the request.
                 //Change EntityActivity to accept a sring instead of an ApplicationActivityType
