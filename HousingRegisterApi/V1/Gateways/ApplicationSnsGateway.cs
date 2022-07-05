@@ -1,6 +1,7 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using HousingRegisterApi.V1.Domain.Sns;
+using Newtonsoft.Json;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,7 +32,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public void Publish(ApplicationSns applicationSns)
         {
-            string message = JsonSerializer.Serialize(applicationSns);
+            string message = JsonConvert.SerializeObject(applicationSns);
             var request = new PublishRequest
             {
                 Message = message,
