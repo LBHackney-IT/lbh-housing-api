@@ -137,10 +137,16 @@ namespace HousingRegisterApi.V1.UseCase
                         "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }*/
 
-                if (request.MainApplicant?.Person != null)
+                if (request.MainApplicant?.Person?.FirstName != null)
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
-                        "Person", application.MainApplicant?.Person, request.MainApplicant?.Person));
+                        "FirstName", application.MainApplicant?.Person?.FirstName, request.MainApplicant?.Person?.FirstName));
+                }
+
+                if (request.MainApplicant?.Person?.Surname != null)
+                {
+                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.PersonChangedByUser,
+                        "Surname", application.MainApplicant?.Person?.Surname, request.MainApplicant?.Person?.Surname));
                 }
 
                 //Remove all of the above and check the application against the request.
