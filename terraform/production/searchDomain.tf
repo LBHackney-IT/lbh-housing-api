@@ -22,7 +22,7 @@ module "elasticsearch_db_production" {
   project_name     = lower(var.project_name)
   es_version       = "7.10"
   encrypt_at_rest  = "true"
-  instance_type    = "t3.small.elasticsearch"
+  instance_type    = "t3.medium.elasticsearch"
   instance_count   = "2"
   ebs_enabled      = "true"
   ebs_volume_size  = "10"
