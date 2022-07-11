@@ -184,6 +184,7 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicity.OtherMixedBackground => "AOM",
 
                 PersonEthnicity.WhiteBritish => "WBR",
+                PersonEthnicity.WhiteJewish => "JEW",
                 PersonEthnicity.WhiteCharediJew => "CHJ",
                 PersonEthnicity.WhiteOrthodoxJew => "OJE",
                 PersonEthnicity.WhiteGreekCypriot => "GCY",
@@ -221,7 +222,8 @@ namespace HousingRegisterApi.V1.Domain.Report
                 PersonEthnicity.OtherPolynesian => "POL",
                 PersonEthnicity.OtherLatinSouthCentralAmerican => "LAT",
                 PersonEthnicity.OtherCongolese => "CON",
-                _ => "AOO",
+                PersonEthnicity.Other => "AOO",
+                _ => "PRE",
             };
         }
     }

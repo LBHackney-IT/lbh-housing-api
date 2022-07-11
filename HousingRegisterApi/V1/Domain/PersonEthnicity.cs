@@ -44,6 +44,7 @@ namespace HousingRegisterApi.V1.Domain
         public const string WhiteIrish = "white-irish";
         public const string WhiteGypsyOrIrishTraveller = "gypsy-or-irish-traveller";
         public const string WhiteAustralianNewZealander = "white-australian-new-zealander";
+        public const string WhiteJewish = "white-jewish";
         public const string WhiteCharediJew = "white-charedi-jew";
         public const string WhiteOrthodoxJew = "white-orthodox-jew";
         public const string WhiteItalian = "white-italian";
@@ -78,5 +79,7 @@ namespace HousingRegisterApi.V1.Domain
         public const string OtherYemeni = "yemeni";
         public const string OtherGypsyRoma = "gypsy-roma";
         public const string OtherEuropean = "other-european";
+        public const string OtherEthnicGroup = "other-ethnic-group";
+        public const string Other = "other";
     }
 }
