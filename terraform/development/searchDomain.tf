@@ -32,7 +32,7 @@ module "elasticsearch_db_development" {
 }
 
 resource "aws_ssm_parameter" "search_elasticsearch_domain" {
-  name  = "${lower(var.project_name)}/${var.environment_name}/elasticsearch-domain"
+  name  = "/${lower(var.project_name)}/${var.environment_name}/elasticsearch-domain"
   type  = "String"
   value = "https://${module.elasticsearch_db_development.es_endpoint_url}"
 }
