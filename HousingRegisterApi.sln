@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "development", "development"
 	ProjectSection(SolutionItems) = preProject
 		terraform\development\dynamodb.tf = terraform\development\dynamodb.tf
 		terraform\development\main.tf = terraform\development\main.tf
+		terraform\development\searchDomain.tf = terraform\development\searchDomain.tf
 		terraform\development\variables.tf = terraform\development\variables.tf
 	EndProjectSection
 EndProject
@@ -19,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staging", "staging", "{01FB
 	ProjectSection(SolutionItems) = preProject
 		terraform\staging\dynamodb.tf = terraform\staging\dynamodb.tf
 		terraform\staging\main.tf = terraform\staging\main.tf
+		terraform\staging\searchDomain.tf = terraform\staging\searchDomain.tf
 		terraform\staging\variables.tf = terraform\staging\variables.tf
 	EndProjectSection
 EndProject
@@ -26,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "production", "production", 
 	ProjectSection(SolutionItems) = preProject
 		terraform\production\dynamodb.tf = terraform\production\dynamodb.tf
 		terraform\production\main.tf = terraform\production\main.tf
+		terraform\production\searchDomain.tf = terraform\production\searchDomain.tf
 		terraform\production\variables.tf = terraform\production\variables.tf
 	EndProjectSection
 EndProject
