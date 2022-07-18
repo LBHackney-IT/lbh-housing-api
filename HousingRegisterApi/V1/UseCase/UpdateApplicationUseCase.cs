@@ -176,6 +176,18 @@ namespace HousingRegisterApi.V1.UseCase
                     $"OtherMembers[{member.Person.Id}]", null, member));
                         }
                     }
+
+                    //Check for household members that have been removed
+
+                    foreach (var applicationMember in application.OtherMembers)
+                    {
+                        var requestMember = request.OtherMembers.SingleOrDefault(om => om.Person.Id == applicationMember.Person.Id);
+                        if(requestMember == null)
+                        {
+                            activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantRemovedByUser,
+                    $"OtherMembers[{applicationMember.Person.Id}]", applicationMember, null));
+                        }
+                    }
                 }
             }
 
