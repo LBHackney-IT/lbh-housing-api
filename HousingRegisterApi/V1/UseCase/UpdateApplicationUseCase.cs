@@ -8,6 +8,8 @@ using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -137,24 +139,104 @@ namespace HousingRegisterApi.V1.UseCase
                         "MainApplicant", application.MainApplicant, request.MainApplicant));
                 }
 
-                //Remove all of the above and check the application against the request.
-                //Change EntityActivity to accept a sring instead of an ApplicationActivityType
-                /*Applicant oldApplicant = application.MainApplicant;
-                Applicant newApplicant = request.MainApplicant;
-
-                var changes = ObjectExtensions.GetChangedProperties<Applicant>(oldApplicant, newApplicant);
-                if (changes.Count > 0)
+                if (request.OtherMembers != null)
                 {
-                    List<string> changeList = new List<string>();
-                    foreach (var change in changes)
+                    if (application.OtherMembers != null)
                     {
-                        changeList.Add(change + ": " + "");
-                    }
+                        //New member added?
+                        foreach (var requestMember in request.OtherMembers)
+                        {
+                            var applicationMember = application.OtherMembers.SingleOrDefault(om => om.Person.Id == requestMember.Person.Id);
+                            if (applicationMember == null)
+                            {
+                                //member is newly added
+                                activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantChangedByUser,
+                        $"OtherMembers[{requestMember.Person.Id}]", null, requestMember));
+                            }
+                            else
+                            {
+                                //Member already exists - check if any properties have changed
+                                var differences = Compare(requestMember, applicationMember);
+                                if(differences.Any())
+                                {
+                                    //This person has changed, add activity type
+                                    activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantChangedByUser,
+                        $"OtherMembers[{requestMember.Person.Id}]", applicationMember, requestMember));
+                                }
 
-                }*/
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //First time other members added
+                        foreach (var member in request.OtherMembers)
+                        {
+                            activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantChangedByUser,
+                    $"OtherMembers[{member.Person.Id}]", null, member));
+                        }
+                    }
+                }
             }
+
+            //Remove all of the above and check the application against the request.
+            //Change EntityActivity to accept a sring instead of an ApplicationActivityType
+            /*Applicant oldApplicant = application.MainApplicant;
+            Applicant newApplicant = request.MainApplicant;
+
+            var changes = ObjectExtensions.GetChangedProperties<Applicant>(oldApplicant, newApplicant);
+            if (changes.Count > 0)
+            {
+                List<string> changeList = new List<string>();
+                foreach (var change in changes)
+                {
+                    changeList.Add(change + ": " + "");
+                }
+
+            }*/
+
 
             return activities;
         }
+
+        private static List<Variance> Compare<T>(T objectA, T objectB)
+        {
+            var variances = new List<Variance>();
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var property in properties)
+            {
+                var v = new Variance
+                {
+                    PropertyName = property.Name,
+                    ValueA = property.GetValue(objectA),
+                    ValueB = property.GetValue(objectB)
+                };
+                if (v.ValueA == null && v.ValueB == null)
+                {
+                    continue;
+                }
+                if (
+                    (v.ValueA == null && v.ValueB != null)
+                    ||
+                    (v.ValueA != null && v.ValueB == null)
+                )
+                {
+                    variances.Add(v);
+                    continue;
+                }
+                if (!v.ValueA.Equals(v.ValueB))
+                {
+                    variances.Add(v);
+                }
+            }
+            return variances;
+        }
+
+    }
+    internal class Variance
+    {
+        public string PropertyName { get; set; }
+        public object ValueA { get; set; }
+        public object ValueB { get; set; }
     }
 }

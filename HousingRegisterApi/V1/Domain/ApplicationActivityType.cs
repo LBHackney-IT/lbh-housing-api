@@ -41,6 +41,9 @@ namespace HousingRegisterApi.V1.Domain
         BiddingNumberChangedByUser = 11,
 
         [Description("MainApplicantChangedByUser")]
-        MainApplicantChangedByUser = 12
+        MainApplicantChangedByUser = 12,
+
+        [Description("HouseholdApplicantChangedByUser")]
+        HouseholdApplicantChangedByUser = 13
     }
 }

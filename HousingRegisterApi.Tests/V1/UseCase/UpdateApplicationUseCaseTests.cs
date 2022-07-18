@@ -66,28 +66,28 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             func.Should().Throw<ApplicationException>().WithMessage(exception.Message);
         }
 
-        //[Test]
-        //public void UpdateApplicationLogsActivites()
-        //{
-        //    // Arrange
-        //    var id = Guid.NewGuid();
-        //    var application = _fixture.Create<Application>();
+        [Test]
+        public void UpdateApplicationLogsActivites()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var application = _fixture.Create<Application>();
 
-        //    _mockGateway
-        //        .Setup(x => x.GetApplicationById(id))
-        //        .Returns(application);
+            _mockGateway
+                .Setup(x => x.GetApplicationById(id))
+                .Returns(application);
 
-        //    _mockGateway
-        //        .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-        //        .Returns(application);
+            _mockGateway
+                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
+                .Returns(application);
 
-        //    var response = _classUnderTest.Execute(id, new UpdateApplicationRequest()
-        //    {
-        //        Status = ApplicationStatus.New
-        //    });
+            var response = _classUnderTest.Execute(id, new UpdateApplicationRequest()
+            {
+                Status = ApplicationStatus.New
+            });
 
-        //    // Assert
-        //    _mockActivityGateway.Verify(x => x.LogActivity(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()));
-        //}
+            // Assert
+            _mockActivityGateway.Verify(x => x.LogActivity(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()));
+        }
     }
 }
