@@ -157,13 +157,12 @@ namespace HousingRegisterApi.V1.UseCase
                             {
                                 //Member already exists - check if any properties have changed
                                 var differences = Compare(requestMember, applicationMember);
-                                if(differences.Any())
+                                if (differences.Any())
                                 {
                                     //This person has changed, add activity type
                                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantChangedByUser,
                         $"OtherMembers[{requestMember.Person.Id}]", applicationMember, requestMember));
                                 }
-
                             }
                         }
                     }
@@ -178,11 +177,10 @@ namespace HousingRegisterApi.V1.UseCase
                     }
 
                     //Check for household members that have been removed
-
                     foreach (var applicationMember in application.OtherMembers)
                     {
                         var requestMember = request.OtherMembers.SingleOrDefault(om => om.Person.Id == applicationMember.Person.Id);
-                        if(requestMember == null)
+                        if (requestMember == null)
                         {
                             activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.HouseholdApplicantRemovedByUser,
                     $"OtherMembers[{applicationMember.Person.Id}]", applicationMember, null));
