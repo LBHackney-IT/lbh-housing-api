@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Infrastructure;
 
 namespace HousingRegisterApi.V1.Factories
 {
@@ -32,5 +34,49 @@ namespace HousingRegisterApi.V1.Factories
             if (null == domainList) return new List<ApplicationResponse>();
             return domainList.Select(domain => domain.ToResponse()).ToList();
         }
+
+        public static ApplicationSearchResultResponse ToResponse(this ApplicationSearchEntity searchEntity)
+        {
+            if (null == searchEntity) return null;
+            return new ApplicationSearchResultResponse
+            {
+                ApplicationId = searchEntity.ApplicationId,
+                AssignedTo = searchEntity.AssignedTo,
+                BiddingNumber = searchEntity.BiddingNumber,
+                CreatedAt = searchEntity.CreatedAt,
+                DateOfBirth = searchEntity.DateOfBirth,
+                FirstName = searchEntity.FirstName,
+                HasAssessment = searchEntity.HasAssessment,
+                MiddleName = searchEntity.MiddleName,
+                NationalInsuranceNumber = searchEntity.NationalInsuranceNumber,
+                Reference = searchEntity.Reference,
+                SensitiveData = searchEntity.SensitiveData,
+                Status = searchEntity.Status,
+                SubmittedAt = searchEntity.SubmittedAt,
+                Surname = searchEntity.Surname,
+                Title = searchEntity.Title,
+                OtherMembers = GetOtherMembers(searchEntity.OtherMembers)
+            };
+        }
+
+        private static List<ApplicationOtherMemberSearchResultResponse> GetOtherMembers(List<ApplicationOtherMembersSearchEntity> otherMembers)
+        {
+            if(otherMembers == null) return null;
+            List<ApplicationOtherMemberSearchResultResponse> response = new List<ApplicationOtherMemberSearchResultResponse>();
+
+            foreach (var otherMember in otherMembers)
+            {
+                response.Add(new ApplicationOtherMemberSearchResultResponse
+                {
+                    DateOfBirth = otherMember.DateOfBirth,
+                    FirstName = otherMember.FirstName,
+                    Id = otherMember.Id,
+                    MiddleName = otherMember.MiddleName,
+                    NationalInsuranceNumber = otherMember.NationalInsuranceNumber,
+                    Surname = otherMember.Surname                    
+                });
+            }
+            return response;
+        }    
     }
 }
