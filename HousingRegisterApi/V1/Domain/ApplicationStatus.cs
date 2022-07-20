@@ -3,6 +3,7 @@ namespace HousingRegisterApi.V1.Domain
     public static class ApplicationStatus
     {
         public const string Verification = "Verification";
+        public const string ManualDraft = "ManualDraft";
         public const string New = "New";
         public const string Submitted = "Submitted";
         public const string Active = "Active";
