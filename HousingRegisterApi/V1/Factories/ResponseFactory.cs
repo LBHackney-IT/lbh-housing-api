@@ -61,7 +61,7 @@ namespace HousingRegisterApi.V1.Factories
 
         private static List<ApplicationOtherMemberSearchResultResponse> GetOtherMembers(List<ApplicationOtherMembersSearchEntity> otherMembers)
         {
-            if(otherMembers == null) return null;
+            if (otherMembers == null) return null;
             List<ApplicationOtherMemberSearchResultResponse> response = new List<ApplicationOtherMemberSearchResultResponse>();
 
             foreach (var otherMember in otherMembers)
@@ -73,10 +73,10 @@ namespace HousingRegisterApi.V1.Factories
                     Id = otherMember.Id,
                     MiddleName = otherMember.MiddleName,
                     NationalInsuranceNumber = otherMember.NationalInsuranceNumber,
-                    Surname = otherMember.Surname                    
+                    Surname = otherMember.Surname
                 });
             }
             return response;
-        }    
+        }
     }
 }
