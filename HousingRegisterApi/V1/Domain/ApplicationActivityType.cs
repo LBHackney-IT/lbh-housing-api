@@ -47,6 +47,9 @@ namespace HousingRegisterApi.V1.Domain
         HouseholdApplicantChangedByUser = 13,
 
         [Description("HouseholdApplicantRemovedByUser")]
-        HouseholdApplicantRemovedByUser = 14
+        HouseholdApplicantRemovedByUser = 14,
+
+        [Description("Created")]
+        Created = 15
     }
 }

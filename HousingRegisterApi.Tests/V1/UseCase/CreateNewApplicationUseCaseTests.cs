@@ -15,6 +15,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class CreateNewApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
+        private Mock<IActivityGateway> _mockActivityGateway;
         private CreateNewApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -22,7 +23,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _classUnderTest = new CreateNewApplicationUseCase(_mockGateway.Object);
+            _mockActivityGateway = new Mock<IActivityGateway>();
+            _classUnderTest = new CreateNewApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object);
             _fixture = new Fixture();
         }
 
