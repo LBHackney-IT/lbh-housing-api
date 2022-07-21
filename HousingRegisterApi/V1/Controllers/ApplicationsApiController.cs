@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IGetApplicationsByReferenceUseCase _getApplicationsByReferenceUseCase;
         private readonly IRecalculateBedroomsUseCase _recalculateBedroomsUseCase;
         private readonly ISearchApplicationUseCase _searchApplicationsUseCase;
+        private readonly IApplicationBreakdownByStatusUseCase _applicationBreakdownByStatusUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -47,7 +49,8 @@ namespace HousingRegisterApi.V1.Controllers
             IImportApplicationUseCase importApplicationUseCase,
             IGetApplicationsByReferenceUseCase getApplicationsByReferenceUseCase,
             IRecalculateBedroomsUseCase recalculateBedroomsUseCase,
-            ISearchApplicationUseCase searchApplicationsUseCase)
+            ISearchApplicationUseCase searchApplicationsUseCase,
+            IApplicationBreakdownByStatusUseCase applicationBreakdownByStatusUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getApplicationsByAssignedToUseCase = getApplicationsByAssignedToUseCase;
@@ -64,6 +67,7 @@ namespace HousingRegisterApi.V1.Controllers
             _getApplicationsByReferenceUseCase = getApplicationsByReferenceUseCase;
             _recalculateBedroomsUseCase = recalculateBedroomsUseCase;
             _searchApplicationsUseCase = searchApplicationsUseCase;
+            _applicationBreakdownByStatusUseCase = applicationBreakdownByStatusUseCase;
         }
 
         /// <summary>
@@ -341,7 +345,23 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("search")]
         public async Task<IActionResult> SearchApplications([FromBody] ApplicationSearchRequest request)
         {
-            var result = await _searchApplicationsUseCase.Execute(request).ConfigureAwait(true);
+            var result = await _searchApplicationsUseCase.Execute(request).ConfigureAwait(false);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Give a breakdown of the case numbers by case status
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(Dictionary<string, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("breakdown/status")]
+        public async Task<IActionResult> ApplicationBreakdownByStatus()
+        {
+            var result = await _applicationBreakdownByStatusUseCase.Execute().ConfigureAwait(false);
 
             return Ok(result);
         }

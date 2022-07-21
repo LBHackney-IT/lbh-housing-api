@@ -36,7 +36,7 @@ namespace HousingRegisterApi.V1.Gateways
                     .Bool(bq => bq
                         .Should(sq => sq
                             .Nested(nq => nq
-                                .Path(np=>np.OtherMembers)
+                                .Path(np => np.OtherMembers)
                                 .Query(inq => inq
                                     .SimpleQueryString(isq => isq
                                         .Query(queryPhrase)
@@ -55,7 +55,7 @@ namespace HousingRegisterApi.V1.Gateways
                 )
                 .Take(pageSize)
                 .From(pageSize * pageNumber)
-            ).ConfigureAwait(true);
+            ).ConfigureAwait(false);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
         }
@@ -70,7 +70,7 @@ namespace HousingRegisterApi.V1.Gateways
                 )
                 .Size(0)
                 .Source(false)
-            ).ConfigureAwait(true);
+            ).ConfigureAwait(false);
 
             Dictionary<string, long> result = new Dictionary<string, long>();
 
@@ -121,7 +121,7 @@ namespace HousingRegisterApi.V1.Gateways
                 Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } }
             };
 
-            var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(true);
+            var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);
 
             return results.ToPagedResult(filterParameters.Page, filterParameters.PageSize);
         }
