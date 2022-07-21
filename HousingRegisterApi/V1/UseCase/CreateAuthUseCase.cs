@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 
 namespace HousingRegisterApi.V1.UseCase
@@ -12,13 +13,16 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly IApplicationApiGateway _applicationGateway;
         private readonly INotifyGateway _notifyGateway;
+        private readonly IActivityGateway _activityGateway;
 
         public CreateAuthUseCase(
             IApplicationApiGateway applicationGateway,
-            INotifyGateway notifyGateway)
+            INotifyGateway notifyGateway,
+            IActivityGateway activityGateway)
         {
             _applicationGateway = applicationGateway;
             _notifyGateway = notifyGateway;
+            _activityGateway = activityGateway;
         }
 
         public CreateAuthResponse Execute(CreateAuthRequest request)
@@ -44,6 +48,15 @@ namespace HousingRegisterApi.V1.UseCase
                 });
 
                 applicationId = blankApplication.Id;
+
+
+                var activity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.Created,
+                        "", null, blankApplication);
+
+                activity.AddChange("", null, blankApplication);
+
+                _activityGateway.LogActivity(blankApplication, activity);
+
             }
 
             // this generates a new verification code and assigns it to the application entity
