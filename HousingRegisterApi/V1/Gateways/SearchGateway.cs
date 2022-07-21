@@ -64,9 +64,11 @@ namespace HousingRegisterApi.V1.Gateways
         public async Task<Dictionary<string, long>> GetStatusBreakdown()
         {
             var aggsResult = await _client.SearchAsync<ApplicationSearchEntity>(r => r
+                .Index(HousingRegisterReadAlias)
                 .Aggregations(agg => agg
                     .Terms("status", ta => ta
                         .Field("status")
+                        .Size(100)
                     )
                 )
                 .Size(0)
