@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HousingRegisterApi.V1.Infrastructure.Search;
 using HousingRegisterApi.V1.Boundary.Request;
+using System.Text;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -124,6 +125,43 @@ namespace HousingRegisterApi.V1.Gateways
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);
 
             return results.ToPagedResult(filterParameters.Page, filterParameters.PageSize);
+        }
+
+        public static string ProcessFuzzyMatching(string inputQuery)
+        {
+            if (string.IsNullOrWhiteSpace(inputQuery)) return inputQuery;
+
+            string expertSymbols = "+|-\"*()~";
+            StringBuilder output = new StringBuilder();
+
+            //If the user is an expert, and is already using the advanced search query capabilities, dont touch the query string
+            //Please see the simple query syntax here - https://www.elastic.co/guide/en/elasticsearch/reference/7.10/query-dsl-simple-query-string-query.html#simple-query-string-syntax
+
+            if (inputQuery.Intersect(expertSymbols).Any())
+            {
+                return inputQuery;
+            }
+
+            var terms = inputQuery.Split(" ");
+            var termFuzziness = 0;
+            var maxFuzinessPerTerm = 3;
+
+            foreach (var term in terms)
+            {
+                if (term.Any(char.IsDigit))
+                {
+                    //leave this term as-is - its a date, or a reference number
+                    output.Append(" " + term);
+                }
+                else
+                {
+                    termFuzziness = Math.Min(term.Length / 4, maxFuzinessPerTerm);
+
+                    output.Append($" {term}~{termFuzziness}");
+                }
+            }
+
+            return output.ToString().Trim();
         }
     }
 }
