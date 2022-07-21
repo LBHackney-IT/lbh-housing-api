@@ -184,6 +184,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsByAssigneeUseCase, GetAllApplicationsByAssigneeUseCase>();
             services.AddScoped<IGetAllApplicationsByStatusUseCase, GetAllApplicationsByStatusUseCase>();
             services.AddScoped<IGetApplicationsByReferenceUseCase, GetApplicationsByReferenceUseCase>();
+            services.AddScoped<ISearchApplicationUseCase, SearchApplicationsUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();
