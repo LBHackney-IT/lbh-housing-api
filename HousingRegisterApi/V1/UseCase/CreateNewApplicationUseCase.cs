@@ -24,7 +24,7 @@ namespace HousingRegisterApi.V1.UseCase
             Application application = _gateway.CreateNewApplication(request);
 
             var activity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.Created,
-                        "", request, request.Status);
+                        "", null, application);
 
             activity.AddChange("", null, application);
 

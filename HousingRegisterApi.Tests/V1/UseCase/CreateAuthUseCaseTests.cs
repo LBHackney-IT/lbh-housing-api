@@ -15,6 +15,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     {
         private Mock<IApplicationApiGateway> _mockApplicationGateway;
         private Mock<INotifyGateway> _mockNotifyGateway;
+        private Mock<IActivityGateway> _mockActivityGateway;
         private CreateAuthUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -23,7 +24,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockApplicationGateway = new Mock<IApplicationApiGateway>();
             _mockNotifyGateway = new Mock<INotifyGateway>();
-            _classUnderTest = new CreateAuthUseCase(_mockApplicationGateway.Object, _mockNotifyGateway.Object);
+            _mockActivityGateway = new Mock<IActivityGateway>();
+            _classUnderTest = new CreateAuthUseCase(_mockApplicationGateway.Object, _mockNotifyGateway.Object, _mockActivityGateway.Object);
             _fixture = new Fixture();
         }
 
