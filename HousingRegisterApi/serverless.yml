@@ -45,7 +45,7 @@ functions:
       NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password, false}
       NOVALET_FTP_ADDRESS: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-address, false}
       NOVALET_FTP_PORT: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-port, false}
-      SEARCHDOMAIN: ${ssm:/housing-register/${self:provider.stage}/elasticsearch-domain, false}
+      SEARCHDOMAIN: ${ssm:/housing-${self:provider.stage}/${self:provider.stage}/elasticsearch-domain}
     events:
       - http:
           path: /{proxy+}
