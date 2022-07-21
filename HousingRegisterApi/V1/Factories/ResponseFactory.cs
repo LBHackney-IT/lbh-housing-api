@@ -78,5 +78,38 @@ namespace HousingRegisterApi.V1.Factories
             }
             return response;
         }
+
+
+        private static List<ApplicationOtherMemberSearchResultResponse> GetOtherMembers(ApplicationSearchEntity searchResultEntity)
+        {
+            List<ApplicationOtherMemberSearchResultResponse> response = new List<ApplicationOtherMemberSearchResultResponse>();
+            foreach (var member in searchResultEntity.OtherMembers)
+            {
+                response.Add(new ApplicationOtherMemberSearchResultResponse
+                {
+                    DateOfBirth = member.DateOfBirth,
+                    FirstName = member.FirstName,
+                    Id = member.Id,
+                    MiddleName = member.MiddleName,
+                    NationalInsuranceNumber = member.NationalInsuranceNumber,
+                    Surname = member.Surname
+                });
+            }
+
+            return response;
+        }
+
+        public static ApplicationSearchPagedResponse ToResponse(this ApplicationSearchPagedResult searchResults)
+        {
+            ApplicationSearchPagedResponse response = new ApplicationSearchPagedResponse
+            {
+                Page = searchResults.Page,
+                PageSize = searchResults.PageSize,
+                TotalResults = searchResults.TotalResults,
+                Results = searchResults.Results.Select(r => r.ToResponse()).ToList()
+            };
+
+            return response;
+        }
     }
 }
