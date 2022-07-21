@@ -21,14 +21,16 @@ namespace HousingRegisterApi.V1.UseCase
 
         public ApplicationResponse Execute(CreateApplicationRequest request)
         {
-            var application = _gateway.CreateNewApplication(request).ToResponse();
+            Application application = _gateway.CreateNewApplication(request);
 
             var activity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.Created,
                         "", request, request.Status);
 
             activity.AddChange("", null, application);
 
-            return application;
+            _activityGateway.LogActivity(application, activity);
+
+            return application.ToResponse();
         }
     }
 }
