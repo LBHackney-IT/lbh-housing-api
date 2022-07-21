@@ -36,6 +36,7 @@ namespace HousingRegisterApi.V1.Gateways
                     .Bool(bq => bq
                         .Should(sq => sq
                             .Nested(nq => nq
+                                .Path(np=>np.OtherMembers)
                                 .Query(inq => inq
                                     .SimpleQueryString(isq => isq
                                         .Query(queryPhrase)
