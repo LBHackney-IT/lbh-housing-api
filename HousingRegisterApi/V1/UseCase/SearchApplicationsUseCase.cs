@@ -18,7 +18,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<ApplicationSearchPagedResponse> Execute(ApplicationSearchRequest request)
         {
-            var searchResults = await _search.SearchApplications(request.QueryString, request.Page, request.PageSize).ConfigureAwait(true);
+            var searchResults = await _search.SearchApplications(request.QueryString, request.Page, request.PageSize).ConfigureAwait(false);
 
             return searchResults.ToResponse();
         }
