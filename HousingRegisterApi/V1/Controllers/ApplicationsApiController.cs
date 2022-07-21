@@ -30,6 +30,7 @@ namespace HousingRegisterApi.V1.Controllers
         private readonly IImportApplicationUseCase _importApplicationUseCase;
         private readonly IGetApplicationsByReferenceUseCase _getApplicationsByReferenceUseCase;
         private readonly IRecalculateBedroomsUseCase _recalculateBedroomsUseCase;
+        private readonly ISearchApplicationUseCase _searchApplicationsUseCase;
 
         public ApplicationsApiController(
             IGetAllApplicationsUseCase getApplicationsUseCase,
@@ -45,7 +46,8 @@ namespace HousingRegisterApi.V1.Controllers
             IViewingApplicationUseCase viewingApplicationUseCase,
             IImportApplicationUseCase importApplicationUseCase,
             IGetApplicationsByReferenceUseCase getApplicationsByReferenceUseCase,
-            IRecalculateBedroomsUseCase recalculateBedroomsUseCase)
+            IRecalculateBedroomsUseCase recalculateBedroomsUseCase,
+            ISearchApplicationUseCase searchApplicationsUseCase)
         {
             _getApplicationsUseCase = getApplicationsUseCase;
             _getApplicationsByAssignedToUseCase = getApplicationsByAssignedToUseCase;
@@ -61,6 +63,7 @@ namespace HousingRegisterApi.V1.Controllers
             _importApplicationUseCase = importApplicationUseCase;
             _getApplicationsByReferenceUseCase = getApplicationsByReferenceUseCase;
             _recalculateBedroomsUseCase = recalculateBedroomsUseCase;
+            _searchApplicationsUseCase = searchApplicationsUseCase;
         }
 
         /// <summary>
@@ -323,6 +326,22 @@ namespace HousingRegisterApi.V1.Controllers
         {
             var result = _addApplicationNoteUseCase.Execute(id, request);
             if (result == null) return NotFound(id);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Search for an application
+        /// </summary>
+        /// <response code="200">Success</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(ApplicationSearchPagedResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("search")]
+        public async Task<IActionResult> SearchApplications([FromBody] ApplicationSearchRequest request)
+        {
+            var result = await _searchApplicationsUseCase.Execute(request).ConfigureAwait(true);
 
             return Ok(result);
         }

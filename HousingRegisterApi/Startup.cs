@@ -9,6 +9,7 @@ using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
@@ -154,6 +155,7 @@ namespace HousingRegisterApi
             services.AddTransient<INotificationClient>(x => new NotificationClient(Environment.GetEnvironmentVariable("NOTIFY_API_KEY")));
             services.AddHttpClient<IEvidenceApiGateway, EvidenceApiGateway>();
             services.AddHttpClient<IActivityGateway, ApplicationActivityGateway>();
+            services.AddSingleton<ISearchGateway, SearchGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -182,6 +184,7 @@ namespace HousingRegisterApi
             services.AddScoped<IGetAllApplicationsByAssigneeUseCase, GetAllApplicationsByAssigneeUseCase>();
             services.AddScoped<IGetAllApplicationsByStatusUseCase, GetAllApplicationsByStatusUseCase>();
             services.AddScoped<IGetApplicationsByReferenceUseCase, GetApplicationsByReferenceUseCase>();
+            services.AddScoped<ISearchApplicationUseCase, SearchApplicationsUseCase>();
 
             services.AddScoped<ISHA256Helper, SHA256Helper>();
             services.AddScoped<IPaginationHelper, PaginationHelper>();

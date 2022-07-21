@@ -208,7 +208,7 @@ namespace HousingRegisterApi.V1.Gateways
                 }
 
             }
-            if (searchParameters.HasAssessment)
+            if (searchParameters.HasAssessment.Value)
             {
                 scanConfig.Filter.AddCondition(nameof(Assessment).ToCamelCase(), ScanOperator.IsNotNull);
             }
@@ -246,7 +246,7 @@ namespace HousingRegisterApi.V1.Gateways
 
                 conditions.Add(assignCondition);
             }
-            if (searchParameters.HasAssessment)
+            if (searchParameters.HasAssessment.Value)
             {
                 conditions.Add(new ScanCondition(nameof(Assessment), ScanOperator.IsNotNull));
             }
