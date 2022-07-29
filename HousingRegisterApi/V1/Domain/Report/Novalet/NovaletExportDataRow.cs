@@ -87,7 +87,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             List<Applicant> applicants = new List<Applicant>();
             applicants.Add(application.MainApplicant);
             applicants.AddRange(application.OtherMembers);
-            AHRCode = GetAHRCode(applicants.Where(a => !string.IsNullOrEmpty(a.MedicalNeed.AccessibileHousingRegister)).ToList());
+            AHRCode = GetAHRCode(applicants.Where(a => a.MedicalNeed != null && a.MedicalNeed.AccessibileHousingRegister != null).ToList());
             AutoBidPref_MobilityStandard = AHRCode == "COD" ? "Y" : "N";
             AutoBidPref_WheelChairStandard = AHRCode == "AOB" ? "Y" : "N";
             AutoBidPref_AdaptedStandard = AHRCode == "EEE" || AHRCode == "EPL" || AHRCode == "EPS" || AHRCode == "FLS" || AHRCode == "STL" ? "Y" : "N";
