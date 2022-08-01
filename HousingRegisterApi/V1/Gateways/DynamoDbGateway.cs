@@ -376,6 +376,14 @@ namespace HousingRegisterApi.V1.Gateways
         public Application CreateNewApplication(CreateApplicationRequest request)
         {
             var newApplicationGuid = Guid.NewGuid();
+
+            string emailAddress = request.MainApplicant?.ContactInformation?.EmailAddress;
+
+            if (string.IsNullOrWhiteSpace(emailAddress))
+            {
+                emailAddress = null;
+            }
+
             var entity = new ApplicationDbEntity
             {
                 Id = newApplicationGuid,
