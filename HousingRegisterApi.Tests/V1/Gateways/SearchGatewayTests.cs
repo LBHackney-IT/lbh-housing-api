@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
 {
@@ -39,10 +40,10 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "Martin Hughes~2";
 
             //Act
-            string outputQuery = SearchGateway.ProcessFuzzyMatching(query);
+            var outputQuery = SearchGateway.ParseQuery(query);
 
             //Assert
-            Assert.AreEqual(query, outputQuery, $"Expert query was changed");
+            Assert.AreEqual(query, outputQuery.GetSimpleQueryStringWithFuzziness(), $"Expert query was changed");
         }
 
         [Test]
@@ -52,10 +53,67 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "Martin Hughes";
 
             //Act
-            string outputQuery = SearchGateway.ProcessFuzzyMatching(query);
+            var outputQuery = SearchGateway.ParseQuery(query);
 
             //Assert
-            Assert.AreEqual(outputQuery, "Martin~1 Hughes~1", "Expected fuzziness not applied");
+            Assert.AreEqual(outputQuery.GetSimpleQueryStringWithFuzziness(), "Martin~1 Hughes~1", "Expected fuzziness not applied");
+        }
+
+        [Test]
+        public void FuzzinessIsAppliedForLongTerms()
+        {
+            //Arrange
+            string query = "Martin Smithson";
+
+            //Act
+            var outputQuery = SearchGateway.ParseQuery(query);
+
+            //Assert
+            Assert.AreEqual(outputQuery.GetSimpleQueryStringWithFuzziness(), "Martin~1 Smithson~2", "Expected fuzziness not applied");
+        }
+
+        [Test]
+        public void PartialNINOsAreCaptured()
+        {
+            //Arrange
+            string query = "JL998";
+
+            //Act
+            var outputQuery = SearchGateway.ParseQuery(query);
+
+            //Assert
+            Assert.That(outputQuery.NINOs.Count == 1);
+            Assert.AreEqual(outputQuery.NINOs.First(), query, "NINO captured incorrectly");
+        }
+
+        [Test]
+        public void PartialReferenceNumbersAreCaptured()
+        {
+            //Arrange
+            string query = "bbd";
+
+            //Act
+            var outputQuery = SearchGateway.ParseQuery(query);
+
+            //Assert
+            Assert.That(outputQuery.ReferenceNumbers.Count == 1);
+            Assert.AreEqual(outputQuery.ReferenceNumbers.First(), query, "ReferenceNumber captured incorrectly");
+        }
+
+        [Test]
+        public void AmbiguousTermIsInBothNinoAndReferenceList()
+        {
+            //Arrange
+            string query = "bd6";
+
+            //Act
+            var outputQuery = SearchGateway.ParseQuery(query);
+
+            //Assert
+            Assert.That(outputQuery.ReferenceNumbers.Count == 1);
+            Assert.That(outputQuery.NINOs.Count == 1);
+            Assert.AreEqual(outputQuery.ReferenceNumbers.First(), query, "Expected fuzziness not applied");
+            Assert.AreEqual(outputQuery.NINOs.First(), query, "Expected fuzziness not applied");
         }
     }
 }
