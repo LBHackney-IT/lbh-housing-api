@@ -31,6 +31,15 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<ApplicationSearchPagedResult> SearchApplications(string queryPhrase, int pageNumber, int pageSize = 10)
         {
+            var baseSearch = ConstructApplicationSearch(queryPhrase, pageNumber, pageSize);
+
+            var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
+
+            return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
+        }
+
+        public static SearchDescriptor<ApplicationSearchEntity> ConstructApplicationSearch(string queryPhrase, int pageNumber, int pageSize)
+        {
             var structuedQuery = ParseQuery(queryPhrase);
 
             var topLevelQuery = new QueryContainerDescriptor<ApplicationSearchEntity>()
@@ -64,7 +73,7 @@ namespace HousingRegisterApi.V1.Gateways
 
             SearchDescriptor<ApplicationSearchEntity> baseSearch = new SearchDescriptor<ApplicationSearchEntity>()
             .Index(HousingRegisterReadAlias)
-            .Query(topLevelQuery => topLevelQuery
+            .Query(tlq => tlq
                 .Bool(bq => bq
                     .Should(sq => sq
                         .Nested(nq => nq
@@ -77,16 +86,7 @@ namespace HousingRegisterApi.V1.Gateways
             )
             .Take(pageSize)
             .From(pageSize * pageNumber);
-
-            if (structuedQuery.NINOs.Any())
-            {
-
-
-            }
-
-            var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
-
-            return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
+            return baseSearch;
         }
 
         public async Task<Dictionary<string, long>> GetStatusBreakdown()
