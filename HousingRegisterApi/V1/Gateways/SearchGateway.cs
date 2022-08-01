@@ -51,7 +51,7 @@ namespace HousingRegisterApi.V1.Gateways
                             .SimpleQueryString(isq => isq
                                 .Query(queryPhrase)
                                 .DefaultOperator(Operator.Or)
-                            )                            
+                            )
                         )
                     )
                 )
