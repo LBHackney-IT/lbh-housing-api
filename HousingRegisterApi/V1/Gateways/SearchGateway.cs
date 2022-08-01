@@ -46,18 +46,17 @@ namespace HousingRegisterApi.V1.Gateways
                                         .DefaultOperator(Operator.Or)
                                     )
                                 )
-                            )
-                        )
-                        .Should(sq => sq
+                            ),
+                            sq => sq
                             .SimpleQueryString(isq => isq
                                 .Query(queryPhrase)
                                 .DefaultOperator(Operator.Or)
-                            )
+                            )                            
                         )
                     )
                 )
                 .Take(pageSize)
-                .From(pageSize * offsetPageNumber - 1)
+                .From(pageSize * (offsetPageNumber - 1))
                 .TrackTotalHits()
             ).ConfigureAwait(false);
 
