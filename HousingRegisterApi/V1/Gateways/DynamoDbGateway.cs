@@ -375,10 +375,19 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application CreateNewApplication(CreateApplicationRequest request)
         {
+            var newApplicationGuid = Guid.NewGuid();
+
+            string emailAddress = request.MainApplicant?.ContactInformation?.EmailAddress;
+
+            if (string.IsNullOrWhiteSpace(emailAddress))
+            {
+                emailAddress = null;
+            }
+
             var entity = new ApplicationDbEntity
             {
-                Id = Guid.NewGuid(),
-                Reference = _hashHelper.Generate(request.MainApplicant.ContactInformation.EmailAddress).Substring(0, 10),
+                Id = newApplicationGuid,
+                Reference = _hashHelper.Generate(request.MainApplicant?.ContactInformation?.EmailAddress ?? newApplicationGuid.ToString()).Substring(0, 10),
                 CreatedAt = DateTime.UtcNow,
                 SensitiveData = request.SensitiveData,
                 SubmittedAt = null,

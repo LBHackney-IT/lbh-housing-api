@@ -1,6 +1,7 @@
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -83,12 +84,28 @@ namespace HousingRegisterApi.V1.Domain.Report
             Offered = "N";
             EthnicOrigin = GetEthnicity(application);
             Decant = null;
-            AHRCode = null;
-            AutoBidPref_MobilityStandard = null;
-            AutoBidPref_WheelChairStandard = null;
-            AutoBidPref_AdaptedStandard = null;
+            List<Applicant> applicants = new List<Applicant>();
+            applicants.Add(application.MainApplicant);
+            applicants.AddRange(application.OtherMembers);
+            AHRCode = GetAHRCode(applicants.Where(a => a.MedicalNeed != null && a.MedicalNeed.AccessibileHousingRegister != null).ToList());
+            AutoBidPref_MobilityStandard = AHRCode == "COD" ? "Y" : "N";
+            AutoBidPref_WheelChairStandard = AHRCode == "AOB" ? "Y" : "N";
+            AutoBidPref_AdaptedStandard = AHRCode == "EEE" || AHRCode == "EPL" || AHRCode == "EPS" || AHRCode == "FLS" || AHRCode == "STL" ? "Y" : "N";
             Errors = ErrorData;
         }
+
+        /**
+AOB - A or B Wheelchair standard
+COD - C or D level access with wide doors
+EEE - E level access
+EPL - E + Ground floor up to 4 steps
+FLS - F any floor but with level access shower
+EPS - E + ground floor and level access shower
+STL - stairlift        
+FFF - F any floor
+
+
+        **/
 
         private static string FormatDate(DateTime? dateTime)
         {
@@ -98,6 +115,52 @@ namespace HousingRegisterApi.V1.Domain.Report
             }
 
             return null;
+        }
+
+        private static string GetAHRCode(List<Applicant> applicants)
+        {
+            string AHRCodePriority = "";
+            foreach (Applicant app in applicants)
+            { }
+
+            if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("AOB"))
+            {
+                AHRCodePriority = "AOB";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("COD"))
+            {
+                AHRCodePriority = "COD";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EEE"))
+            {
+                AHRCodePriority = "EEE";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EPL"))
+            {
+                AHRCodePriority = "EPL";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("FLS"))
+            {
+                AHRCodePriority = "FLS";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EPS"))
+            {
+                AHRCodePriority = "EPS";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("STL"))
+            {
+                AHRCodePriority = "STL";
+            }
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("FFF"))
+            {
+                AHRCodePriority = "FFF";
+            }
+            else
+            {
+                AHRCodePriority = "";
+            }
+
+            return AHRCodePriority;
         }
 
         private static string GetBand(string band)
