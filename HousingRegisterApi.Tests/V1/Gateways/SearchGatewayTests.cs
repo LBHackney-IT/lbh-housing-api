@@ -115,5 +115,20 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             Assert.AreEqual(outputQuery.ReferenceNumbers.First(), query, "Expected fuzziness not applied");
             Assert.AreEqual(outputQuery.NINOs.First(), query, "Expected fuzziness not applied");
         }
+
+        [Test]
+        public void QueryConstructionWorks()
+        {
+            //Arrange
+            string query = "bd6";
+
+            //Act
+            var outputQuery = SearchGateway.ConstructApplicationSearch(query, 0, 10);
+
+            string outputQueryAsString = outputQuery.ToString();
+
+            //Assert
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(outputQueryAsString));
+        }
     }
 }
