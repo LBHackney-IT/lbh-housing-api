@@ -9,6 +9,8 @@ using Moq;
 using NUnit.Framework;
 using System;
 using HousingRegisterApi.V1.Services;
+using HousingRegisterApi.V1.Boundary.Request;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
 {
@@ -17,7 +19,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
     {
         private readonly Fixture _fixture = new Fixture();
         private Mock<IDynamoDBContext> _dynamoDb;
-        private Mock<ISHA256Helper> _hashHelper;
+        private ISHA256Helper _hashHelper;
         private Mock<IVerifyCodeGenerator> _codeGenerator;
         private DynamoDbGateway _classUnderTest;
         private Mock<IBedroomCalculatorService> _bedroomCalculatorService;
@@ -26,10 +28,10 @@ namespace HousingRegisterApi.Tests.V1.Gateways
         public void Setup()
         {
             _dynamoDb = new Mock<IDynamoDBContext>();
-            _hashHelper = new Mock<ISHA256Helper>();
+            _hashHelper = new SHA256Helper();
             _codeGenerator = new Mock<IVerifyCodeGenerator>();
             _bedroomCalculatorService = new Mock<IBedroomCalculatorService>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper.Object, _codeGenerator.Object, _bedroomCalculatorService.Object);
+            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper, _codeGenerator.Object, _bedroomCalculatorService.Object);
         }
 
         [Test]
@@ -59,6 +61,35 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             // Assert
             _dynamoDb.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default), Times.Once);
             entity.Should().BeEquivalentTo(response);
+        }
+
+        [Test]
+        public void CreateNewEntityHasCorrectHashWhenEmailIsWhitespace()
+        {
+            // Arrange
+            var createRequest = _fixture.Create<CreateApplicationRequest>();
+            createRequest.MainApplicant.ContactInformation.EmailAddress = " ";
+
+            // Act
+            var application = _classUnderTest.CreateNewApplication(createRequest);
+
+            // Assert
+            Assert.AreEqual(application.Reference, _hashHelper.Generate(application.Id.ToString()).Substring(0, 10), "Reference is incorrect");
+        }
+
+        [Test]
+        public void CreateNewEntityHasCorrectHashWhenEmailIsPresent()
+        {
+            // Arrange
+            string emailAddress = "test.email@testdomain.com";
+            var createRequest = _fixture.Create<CreateApplicationRequest>();
+            createRequest.MainApplicant.ContactInformation.EmailAddress = emailAddress;
+
+            // Act
+            var application = _classUnderTest.CreateNewApplication(createRequest);
+
+            // Assert
+            Assert.AreEqual(application.Reference, _hashHelper.Generate(emailAddress).Substring(0, 10), "Reference is incorrect");
         }
     }
 }

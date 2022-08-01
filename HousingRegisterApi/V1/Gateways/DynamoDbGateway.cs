@@ -387,7 +387,7 @@ namespace HousingRegisterApi.V1.Gateways
             var entity = new ApplicationDbEntity
             {
                 Id = newApplicationGuid,
-                Reference = _hashHelper.Generate(request.MainApplicant?.ContactInformation?.EmailAddress ?? newApplicationGuid.ToString()).Substring(0, 10),
+                Reference = _hashHelper.Generate(emailAddress ?? newApplicationGuid.ToString()).Substring(0, 10),
                 CreatedAt = DateTime.UtcNow,
                 SensitiveData = request.SensitiveData,
                 SubmittedAt = null,

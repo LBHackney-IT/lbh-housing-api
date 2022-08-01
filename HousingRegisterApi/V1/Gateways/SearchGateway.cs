@@ -31,6 +31,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<ApplicationSearchPagedResult> SearchApplications(string queryPhrase, int pageNumber, int pageSize = 10)
         {
+            int offsetPageNumber = Math.Max(1, pageNumber);
+
             var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => s
                 .Index(HousingRegisterReadAlias)
                 .Query(topLevelQuery => topLevelQuery
@@ -44,9 +46,8 @@ namespace HousingRegisterApi.V1.Gateways
                                         .DefaultOperator(Operator.Or)
                                     )
                                 )
-                            )
-                        )
-                        .Should(sq => sq
+                            ),
+                            sq => sq
                             .SimpleQueryString(isq => isq
                                 .Query(queryPhrase)
                                 .DefaultOperator(Operator.Or)
@@ -55,7 +56,8 @@ namespace HousingRegisterApi.V1.Gateways
                     )
                 )
                 .Take(pageSize)
-                .From(pageSize * pageNumber)
+                .From(pageSize * (offsetPageNumber - 1))
+                .TrackTotalHits()
             ).ConfigureAwait(false);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
@@ -121,7 +123,8 @@ namespace HousingRegisterApi.V1.Gateways
                 Query = queryContainer,
                 From = filterParameters.Page * filterParameters.PageSize,
                 Size = filterParameters.PageSize,
-                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } }
+                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } },
+                TrackTotalHits = true
             };
 
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);

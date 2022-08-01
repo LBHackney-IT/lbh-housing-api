@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.V1.Factories;
 using System.Threading.Tasks;
+using System;
 
 namespace HousingRegisterApi.V1.UseCase
 {
