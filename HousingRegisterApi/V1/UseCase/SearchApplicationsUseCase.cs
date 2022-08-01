@@ -19,10 +19,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task<ApplicationSearchPagedResponse> Execute(ApplicationSearchRequest request)
         {
-            //Paginating fix for front end - page 1 is the first set of results.
-            int page = Math.Max(1, request.Page);
-
-            var searchResults = await _search.SearchApplications(request.QueryString, page - 1, request.PageSize).ConfigureAwait(false);
+            var searchResults = await _search.SearchApplications(request.QueryString, request.Page, request.PageSize).ConfigureAwait(false);
 
             return searchResults.ToResponse();
         }

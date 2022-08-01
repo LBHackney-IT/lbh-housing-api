@@ -31,6 +31,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<ApplicationSearchPagedResult> SearchApplications(string queryPhrase, int pageNumber, int pageSize = 10)
         {
+            int offsetPageNumber = Math.Max(1, pageNumber);
+
             var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => s
                 .Index(HousingRegisterReadAlias)
                 .Query(topLevelQuery => topLevelQuery
@@ -55,7 +57,7 @@ namespace HousingRegisterApi.V1.Gateways
                     )
                 )
                 .Take(pageSize)
-                .From(pageSize * pageNumber)
+                .From(pageSize * offsetPageNumber - 1)
             ).ConfigureAwait(false);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
