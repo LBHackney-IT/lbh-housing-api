@@ -42,6 +42,8 @@ namespace HousingRegisterApi.V1.Gateways
         {
             var structuedQuery = ParseQuery(queryPhrase);
 
+            var offsetPageNumber = Math.Max(1, pageNumber);
+
             var topLevelQuery = new QueryContainerDescriptor<ApplicationSearchEntity>()
                 .SimpleQueryString(isq => isq
                                     .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
@@ -85,7 +87,7 @@ namespace HousingRegisterApi.V1.Gateways
                  )
             )
             .Take(pageSize)
-            .From(pageSize * pageNumber);
+            .From(pageSize * (offsetPageNumber - 1));
             return baseSearch;
         }
 
