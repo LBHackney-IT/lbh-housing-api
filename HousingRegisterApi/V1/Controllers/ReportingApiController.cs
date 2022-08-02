@@ -68,9 +68,9 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         [Route("listnovaletfiles")]
-        public async Task<IActionResult> ViewNovaletExportFiles(int numberToReturn = 1000)
+        public IActionResult ViewNovaletExportFiles(int numberToReturn = 3)
         {
-            var result = await _listNovaletExportFilesUseCase.Execute(numberToReturn).ConfigureAwait(false);
+            var result = _listNovaletExportFilesUseCase.Execute(numberToReturn);
             return Ok(result);
         }
 
