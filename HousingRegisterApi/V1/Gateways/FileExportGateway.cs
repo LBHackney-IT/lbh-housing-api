@@ -50,24 +50,23 @@ namespace HousingRegisterApi.V1.Gateways
             return file;
         }
 
-        public async Task<List<ExportFileItem>> ListFiles(string parentFolderName = "", int numberToReturn = 1000)
+        public List<ExportFileItem> ListFiles(string parentFolderName = "", int numberOfMonthsHistory = 3)
         {
             _logger.LogInformation($"Attempting to list files from bucket {_bucketName}");
 
             var files = new List<ExportFileItem>();
 
-            var s3Objects = await GetS3Objects(parentFolderName, numberToReturn).ConfigureAwait(false);
+            var s3Objects = GetNovaletS3Objects(parentFolderName, numberOfMonthsHistory);
 
             foreach (var s3Object in s3Objects)
             {
-                var s3ObjectTags = (await GetS3ObjectTags(s3Object.Key).ConfigureAwait(false));
                 var fileName = Path.GetFileName(s3Object.Key);
 
                 files.Add(new ExportFileItem(fileName)
                 {
                     LastModified = s3Object.LastModified,
                     Size = s3Object.Size,
-                    Attributes = s3ObjectTags.ToDictionary()
+                    Attributes = new Dictionary<string, string>()
                 });
             }
 
@@ -96,23 +95,49 @@ namespace HousingRegisterApi.V1.Gateways
             await PutS3ObjectTags(attributes, fileKey).ConfigureAwait(false);
         }
 
-        private async Task<List<S3Object>> GetS3Objects(string parentFolderName = "", int numberToReturn = 1000)
+        private List<S3Object> GetNovaletS3Objects(string parentFolderName = "", int numberToReturn = 3)
         {
-            ListObjectsV2Request request = new ListObjectsV2Request
-            {
-                BucketName = _bucketName,
-                MaxKeys = numberToReturn,
-                Prefix = string.IsNullOrWhiteSpace(parentFolderName) ? _bucketName : parentFolderName.ToUpper() + "/"
-            };
+            numberToReturn = Math.Max(numberToReturn, 3);//Limit the number of months to look back on to 3   
+            List<S3Object> s3Blobs = new List<S3Object>();
+            List<Task> s3Tasks = new List<Task>();
 
-            var response = await _amazonS3.ListObjectsV2Async(request).ConfigureAwait(false);
-
-            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            List<string> datePrefixes = new List<string>();
+            for (int i = 0; i < numberToReturn; i++)
             {
-                _logger.LogError($"Unable to get files in {parentFolderName}");
+                DateTime currentDate = DateTime.UtcNow.AddMonths(i * -1);
+                datePrefixes.Add($"LBH-APPLICANT FEED-{currentDate.Year}{currentDate.Month.ToString().PadLeft(2, '0')}");
             }
 
-            return response.S3Objects;
+            foreach (var datePrefix in datePrefixes)
+            {
+                ListObjectsV2Request request = new ListObjectsV2Request
+                {
+                    BucketName = _bucketName,
+                    MaxKeys = numberToReturn,
+                    Prefix = string.IsNullOrWhiteSpace(parentFolderName) ? _bucketName : parentFolderName.ToUpper() + "/" + datePrefix
+                };
+
+                s3Tasks.Add(_amazonS3.ListObjectsV2Async(request));
+            }
+
+            //Wait for the parallel tasks to complete
+            Task.WaitAll(s3Tasks.ToArray());
+
+            foreach (var s3Task in s3Tasks)
+            {
+                Task<ListObjectsV2Response> listResponseTask = (Task<ListObjectsV2Response>) s3Task;
+
+                if (listResponseTask.Result.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogError($"Unable to get files in {parentFolderName}");
+                }
+                else
+                {
+                    s3Blobs.AddRange(listResponseTask.Result.S3Objects);
+                }
+            }
+
+            return s3Blobs;
         }
 
         private async Task<GetObjectResponse> GetS3Object(string key)
