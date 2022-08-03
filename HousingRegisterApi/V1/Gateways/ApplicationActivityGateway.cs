@@ -108,8 +108,28 @@ namespace HousingRegisterApi.V1.Gateways
 
             if (authHeader.Trim().Length > 10)
             {
-                //A token has most likely been supplied in this header - attempt to parse the token
-                token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+                try
+                {
+                    //A token has most likely been supplied in this header - attempt to parse the token
+                    token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+                }
+                catch (ArgumentException ex)
+                {
+                    _logger.LogError(ex, $"Failed to parse JWT token {authHeader}");
+                }
+                finally
+                {
+                    if (token == null)
+                    {
+                        //No VALID token has been passed in, but yet the caller must have had a X-Api-Key to get passed API Gateway
+                        //Assume this user is a resident
+                        token = new Token()
+                        {
+                            Name = application?.MainApplicant?.Person?.FullName ?? "Verify",
+                            Email = application?.MainApplicant?.ContactInformation?.EmailAddress,
+                        };
+                    }
+                }
             }
             else
             {
