@@ -99,7 +99,16 @@ namespace HousingRegisterApi.V1.Gateways
 
         private Token GetToken(Application application, EntityActivity<ApplicationActivityType> activity)
         {
-            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+            Token token = null;
+
+            try
+            {
+                token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Couldn't decode token");
+            }
 
             // residents will not have an auth token so
             // generate a simple token to hold some user info
