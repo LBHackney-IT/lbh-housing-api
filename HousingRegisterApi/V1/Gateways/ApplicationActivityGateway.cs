@@ -107,8 +107,8 @@ namespace HousingRegisterApi.V1.Gateways
             {
                 token = new Token()
                 {
-                    Name = application.MainApplicant.Person.FullName,
-                    Email = application.MainApplicant.ContactInformation.EmailAddress,
+                    Name = application?.MainApplicant?.Person?.FullName ?? "Verify",
+                    Email = application?.MainApplicant?.ContactInformation?.EmailAddress,
                 };
             }
 
