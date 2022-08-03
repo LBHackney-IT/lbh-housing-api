@@ -6,6 +6,6 @@ namespace HousingRegisterApi.V1.UseCase.Interfaces
 {
     public interface IListNovaletExportFilesUseCase
     {
-        Task<List<ExportFileItem>> Execute(int numberToReturn = 1000);
+        List<ExportFileItem> Execute(int numberOfMonthsToReturn = 3);
     }
 }

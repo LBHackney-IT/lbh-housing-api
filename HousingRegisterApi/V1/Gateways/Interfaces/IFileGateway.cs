@@ -26,9 +26,9 @@ namespace HousingRegisterApi.V1.Gateways
         /// Returns a list of files that have been generated
         /// </summary>
         /// <param name="parentFolderName"></param>
-        /// <param name="numberToReturn"></param>
+        /// <param name="numberOfMonthsToReturn"></param>
         /// <returns></returns>
-        Task<List<ExportFileItem>> ListFiles(string parentFolderName = "", int numberToReturn = 1000);
+        List<ExportFileItem> ListFiles(string parentFolderName = "", int numberOfMonthsToReturn = 3);
 
         /// <summary>
         /// Gets the current attributes for a file
