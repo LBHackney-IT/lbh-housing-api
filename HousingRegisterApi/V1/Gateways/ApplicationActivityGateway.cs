@@ -101,24 +101,19 @@ namespace HousingRegisterApi.V1.Gateways
         {
             Token token = null;
 
-            try
+            if (ActivityPerformedByResident(activity))
             {
-                token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Couldn't decode token");
-            }
-
-            // residents will not have an auth token so
-            // generate a simple token to hold some user info
-            if (ActivityPerformedByResident(activity) == true || token == null)
-            {
+                // residents will not have an auth token so
+                // generate a simple token to hold some user info
                 token = new Token()
                 {
                     Name = application?.MainApplicant?.Person?.FullName ?? "Verify",
                     Email = application?.MainApplicant?.ContactInformation?.EmailAddress,
                 };
+            }
+            else
+            {
+                token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
             }
 
             return token;
