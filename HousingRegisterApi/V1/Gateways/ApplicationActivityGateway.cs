@@ -7,8 +7,10 @@ using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -55,7 +57,7 @@ namespace HousingRegisterApi.V1.Gateways
                 return;
             }
 
-            var token = GetToken(application, activity);
+            var token = GetToken(application);
 
             if (token != null && activity.HasChanges())
             {
@@ -97,14 +99,42 @@ namespace HousingRegisterApi.V1.Gateways
             return result;
         }
 
-        private Token GetToken(Application application, EntityActivity<ApplicationActivityType> activity)
+        private Token GetToken(Application application)
         {
-            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+            Token token = null;
+            StringValues values = new StringValues();
+            _contextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out values);
+            string authHeader = values.FirstOrDefault() ?? "";
 
-            // residents will not have an auth token so
-            // generate a simple token to hold some user info
-            if (ActivityPerformedByResident(activity) == true || token == null)
+            if (authHeader.Trim().Length > 10)
             {
+                try
+                {
+                    //A token has most likely been supplied in this header - attempt to parse the token
+                    token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(_contextAccessor.HttpContext));
+                }
+                catch (ArgumentException ex)
+                {
+                    _logger.LogError(ex, $"Failed to parse JWT token {authHeader}");
+                }
+                finally
+                {
+                    if (token == null)
+                    {
+                        //No VALID token has been passed in, but yet the caller must have had a X-Api-Key to get passed API Gateway
+                        //Assume this user is a resident
+                        token = new Token()
+                        {
+                            Name = application?.MainApplicant?.Person?.FullName ?? "Verify",
+                            Email = application?.MainApplicant?.ContactInformation?.EmailAddress,
+                        };
+                    }
+                }
+            }
+            else
+            {
+                //No token has been passed in, but yet the caller must have had a X-Api-Key to get passed API Gateway
+                //Assume this user is a resident
                 token = new Token()
                 {
                     Name = application?.MainApplicant?.Person?.FullName ?? "Verify",
@@ -120,11 +150,6 @@ namespace HousingRegisterApi.V1.Gateways
             string bearerToken = _contextAccessor.HttpContext.Request.Headers["Authorization"];
             string token = bearerToken.Replace("Bearer ", "");
             return token;
-        }
-
-        private static bool ActivityPerformedByResident(EntityActivity<ApplicationActivityType> activity)
-        {
-            return activity.ActivityType == ApplicationActivityType.SubmittedByResident;
         }
 
         private void SetRequestHeader()
