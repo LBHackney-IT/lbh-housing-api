@@ -123,41 +123,38 @@ FFF - F any floor
             foreach (Applicant app in applicants)
             { }
 
-            if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("AOB"))
+            if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("a-b-wheelchair-standard"))
             {
                 AHRCodePriority = "AOB";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("COD"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("c-d-large-level-access"))
             {
                 AHRCodePriority = "COD";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EEE"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-step-free-level-access"))
             {
                 AHRCodePriority = "EEE";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EPL"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-minimal-steps-up-to-4-steps"))
             {
                 AHRCodePriority = "EPL";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("FLS"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-ground-floor-and-level-access-shower"))
             {
                 AHRCodePriority = "FLS";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("EPS"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-up-to-4-steps-and-level-access-shower"))
             {
                 AHRCodePriority = "EPS";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("STL"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("stairlift"))
             {
                 AHRCodePriority = "STL";
             }
-            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("FFF"))
+            else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("f-general-needs-any-floor")
+                || applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("f-any-floor-with-level-access-shower"))
             {
                 AHRCodePriority = "FFF";
-            }
-            else
-            {
-                AHRCodePriority = "";
             }
 
             return AHRCodePriority;
