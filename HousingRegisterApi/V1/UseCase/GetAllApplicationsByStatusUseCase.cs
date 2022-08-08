@@ -11,7 +11,7 @@ namespace HousingRegisterApi.V1.UseCase
     {
         private readonly ISearchGateway _searchGateway;
 
-        public GetAllApplicationsByStatusUseCase( ISearchGateway searchGateway)
+        public GetAllApplicationsByStatusUseCase(ISearchGateway searchGateway)
         {
             _searchGateway = searchGateway;
         }
