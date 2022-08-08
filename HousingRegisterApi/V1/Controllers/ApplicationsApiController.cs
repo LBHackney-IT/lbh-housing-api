@@ -77,7 +77,7 @@ namespace HousingRegisterApi.V1.Controllers
         /// <response code="400">Invalid Query Parameter.</response>
         /// <response code="404">No records found for the specified query</response>
         /// <response code="500">Something went wrong</response>
-        [ProducesResponseType(typeof(PaginatedApplicationListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApplicationSearchPagedResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
