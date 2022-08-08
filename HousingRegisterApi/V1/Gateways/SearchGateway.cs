@@ -81,9 +81,8 @@ namespace HousingRegisterApi.V1.Gateways
                         .Nested(nq => nq
                             .Path(np => np.OtherMembers)
                             .Query(inq => nestedDocQuery)
-                        )
+                        ), sq => topLevelQuery
                     )
-                    .Should(sq => topLevelQuery)
                  )
             )
             .Take(pageSize)
