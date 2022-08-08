@@ -131,12 +131,30 @@ namespace HousingRegisterApi.V1.Gateways
                 Query = queryContainer,
                 From = filterParameters.PageSize * (offsetPageNumber - 1),
                 Size = filterParameters.PageSize,
-                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } }
+                Sort = new List<ISort> { { new FieldSort { Field = new Field(GetKeywordFieldName(filterParameters.OrderBy)), Order = SortOrder.Descending } } }
             };
 
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);
 
             return results.ToPagedResult(filterParameters.Page, filterParameters.PageSize);
+        }
+
+        private static string GetKeywordFieldName(string orderBy)
+        {
+
+            switch (orderBy?.ToLower()?.Trim())
+            {
+                case "firstname":
+                case "surname":
+                case "nationalinsurancenumber":
+                case "emailaddress":
+                case "phonenumber":
+                case "reference":
+                    return $"{orderBy}.keyword";
+                default:
+                    return orderBy ?? "surname.keyword";
+            }
+
         }
 
         public static string ProcessFuzzyMatching(string inputQuery)
