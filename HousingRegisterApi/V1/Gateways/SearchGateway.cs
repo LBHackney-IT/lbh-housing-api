@@ -18,13 +18,22 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly ILogger<SearchGateway> _logger;
         private ElasticClient _client;
+        private ConnectionSettings _connectionSettings;
 
         const string HousingRegisterReadAlias = "housing-register-applications";
 
         public SearchGateway(ILogger<SearchGateway> logger, IConfiguration configuration)
         {
             _logger = logger;
-            _client = new ElasticClient(new Uri(configuration["SEARCHDOMAIN"]));
+            var searchDomainUri = new Uri(configuration["SEARCHDOMAIN"]);
+            _connectionSettings = new ConnectionSettings(searchDomainUri);
+
+#if DEBUG
+            //When debugging locally, dont check for valid SSL to the search domain
+            _connectionSettings.ServerCertificateValidationCallback((o, cert, chain, sslErrors) => true);
+            _connectionSettings.EnableDebugMode();
+#endif
+            _client = new ElasticClient(_connectionSettings);
 
             _client.ConnectionSettings.IdProperties.Add(typeof(ApplicationSearchEntity), "ApplicationId");
         }
@@ -34,6 +43,8 @@ namespace HousingRegisterApi.V1.Gateways
             var baseSearch = ConstructApplicationSearch(queryPhrase, pageNumber, pageSize);
 
             var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
+
+            string queryJson = System.Text.Encoding.UTF8.GetString(simpleQueryStringSearch.ApiCall.RequestBodyInBytes);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
         }
@@ -58,19 +69,19 @@ namespace HousingRegisterApi.V1.Gateways
             //Add wildcards on detected entities
             foreach (var partialNino in structuedQuery.NINOs)
             {
-                topLevelQuery &= +Query<ApplicationSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
-                nestedDocQuery &= +Query<ApplicationOtherMembersSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
+                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
+                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
             }
 
             foreach (var partialReference in structuedQuery.ReferenceNumbers)
             {
-                topLevelQuery &= +Query<ApplicationSearchEntity>.Wildcard(w => w.Reference, $"{partialReference}*");
+                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.Reference, $"{partialReference}*");
             }
 
             foreach (var date in structuedQuery.Dates)
             {
-                topLevelQuery &= +Query<ApplicationSearchEntity>.Term(f => f.DateOfBirth, date);
-                nestedDocQuery &= +Query<ApplicationOtherMembersSearchEntity>.Term(f => f.DateOfBirth, date);
+                topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.DateOfBirth, date);
+                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Term(f => f.DateOfBirth, date);
             }
 
             SearchDescriptor<ApplicationSearchEntity> baseSearch = new SearchDescriptor<ApplicationSearchEntity>()
@@ -81,7 +92,8 @@ namespace HousingRegisterApi.V1.Gateways
                         .Nested(nq => nq
                             .Path(np => np.OtherMembers)
                             .Query(inq => nestedDocQuery)
-                        ), sq => topLevelQuery
+                        ),
+                        sq => topLevelQuery
                     )
                  )
             )
@@ -150,8 +162,7 @@ namespace HousingRegisterApi.V1.Gateways
                 Query = queryContainer,
                 From = filterParameters.Page * filterParameters.PageSize,
                 Size = filterParameters.PageSize,
-                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } },
-                TrackTotalHits = true
+                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } }
             };
 
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);
