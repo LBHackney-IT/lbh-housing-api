@@ -57,7 +57,6 @@ namespace HousingRegisterApi.V1.Gateways
                 )
                 .Take(pageSize)
                 .From(pageSize * (offsetPageNumber - 1))
-                .TrackTotalHits()
             ).ConfigureAwait(false);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
@@ -92,6 +91,7 @@ namespace HousingRegisterApi.V1.Gateways
         public async Task<ApplicationSearchPagedResult> FilterApplications(SearchQueryParameter filterParameters)
         {
             QueryContainer queryContainer = null;
+            int offsetPageNumber = Math.Max(1, filterParameters.Page);
 
             if (!string.IsNullOrWhiteSpace(filterParameters.Status))
             {
@@ -121,10 +121,9 @@ namespace HousingRegisterApi.V1.Gateways
             SearchRequest<ApplicationSearchEntity> request = new SearchRequest<ApplicationSearchEntity>(HousingRegisterReadAlias)
             {
                 Query = queryContainer,
-                From = filterParameters.Page * filterParameters.PageSize,
+                From = filterParameters.PageSize * (offsetPageNumber - 1),
                 Size = filterParameters.PageSize,
-                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } },
-                TrackTotalHits = true
+                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } }
             };
 
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);

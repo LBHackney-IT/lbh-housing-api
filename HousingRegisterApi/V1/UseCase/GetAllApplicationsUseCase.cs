@@ -12,14 +12,10 @@ namespace HousingRegisterApi.V1.UseCase
 {
     public class GetAllApplicationsUseCase : IGetAllApplicationsUseCase
     {
-        private readonly IApplicationApiGateway _gateway;
-        private readonly IPaginationHelper _paginationHelper;
         private readonly ISearchGateway _searchGateway;
 
-        public GetAllApplicationsUseCase(IApplicationApiGateway gateway, IPaginationHelper paginationHelper, ISearchGateway searchGateway)
+        public GetAllApplicationsUseCase(ISearchGateway searchGateway)
         {
-            _gateway = gateway;
-            _paginationHelper = paginationHelper;
             _searchGateway = searchGateway;
         }
 
