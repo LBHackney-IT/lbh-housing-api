@@ -18,13 +18,21 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly ILogger<SearchGateway> _logger;
         private ElasticClient _client;
+        private ConnectionSettings _connectionSettings;
 
         const string HousingRegisterReadAlias = "housing-register-applications";
 
         public SearchGateway(ILogger<SearchGateway> logger, IConfiguration configuration)
         {
             _logger = logger;
-            _client = new ElasticClient(new Uri(configuration["SEARCHDOMAIN"]));
+            var searchDomainUri = new Uri(configuration["SEARCHDOMAIN"]);
+            _connectionSettings = new ConnectionSettings(searchDomainUri);
+
+#if DEBUG
+            //When debugging locally, dont check for valid SSL to the search domain
+            _connectionSettings.ServerCertificateValidationCallback((o, cert, chain, sslErrors) => true);
+#endif
+            _client = new ElasticClient(_connectionSettings);
 
             _client.ConnectionSettings.IdProperties.Add(typeof(ApplicationSearchEntity), "ApplicationId");
         }
