@@ -22,6 +22,8 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
 
         public List<Guid> ApplicationIds { get; set; }
 
+        public List<int> BiddingNumbers { get; set; }
+
         public ApplicationSearchQueryParser(string inputQuery)
         {
             Terms = inputQuery.Split(" ").ToList();
@@ -30,6 +32,7 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
             NINOs = new List<string>();
             MatchedTerms = new List<string>();
             ApplicationIds = new List<Guid>();
+            BiddingNumbers = new List<int>();
             OriginalQuery = inputQuery;
             if (!string.IsNullOrWhiteSpace(inputQuery))
             {
@@ -65,7 +68,7 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
         {
             foreach (var term in Terms.ToArray())
             {
-                if (long.TryParse(term, System.Globalization.NumberStyles.HexNumber, null, out _))
+                if (long.TryParse(term, System.Globalization.NumberStyles.HexNumber, null, out _) && term.Length <= 10)
                 {
                     ReferenceNumbers.Add(term);
 
@@ -98,6 +101,27 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
                 }
             }
             return this;
+        }
+
+        public ApplicationSearchQueryParser CaptureFullBiddingNumbers(bool capture)
+        {
+            foreach (var term in Terms.ToArray())
+            {
+                int matchedBiddingNumber = 0;
+                if (int.TryParse(term, out matchedBiddingNumber))
+                {
+                    BiddingNumbers.Add(matchedBiddingNumber);
+
+                    if (capture)
+                    {
+                        Terms.Remove(term);
+                    }
+
+                    MatchedTerms.Add(term);
+                }
+            }
+            return this;
+
         }
 
         public ApplicationSearchQueryParser CaptureGuids()
@@ -136,7 +160,9 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
             }
         }
 
-        public ApplicationSearchSemiStructuredQuery Query { get
+        public ApplicationSearchSemiStructuredQuery Query
+        {
+            get
             {
                 return new ApplicationSearchSemiStructuredQuery
                 {
@@ -145,12 +171,13 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
                     Dates = Dates,
                     NINOs = NINOs,
                     OriginalQuery = OriginalQuery,
-                    ReferenceNumbers = ReferenceNumbers
+                    ReferenceNumbers = ReferenceNumbers,
+                    BiddingNumbers = BiddingNumbers
                 };
             }
         }
 
-        
+
 
     }
 }

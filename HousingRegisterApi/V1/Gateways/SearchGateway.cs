@@ -59,13 +59,16 @@ namespace HousingRegisterApi.V1.Gateways
                 .SimpleQueryString(isq => isq
                                     .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
                                     .DefaultOperator(Operator.Or)
+                                    .Fields(f=>f.Fields(f=>f.Surname, f=>f.FirstName, f=>f.MiddleName, f=>f.ApplicationId))
                                 );
 
             var nestedDocQuery = new QueryContainerDescriptor<ApplicationOtherMembersSearchEntity>()
                 .SimpleQueryString(isq => isq
                                     .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
                                     .DefaultOperator(Operator.Or)
+                                    .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName))
                                 );
+
             //Add wildcards on detected entities
             foreach (var partialNino in structuedQuery.NINOs)
             {
@@ -75,13 +78,18 @@ namespace HousingRegisterApi.V1.Gateways
 
             foreach (var partialReference in structuedQuery.ReferenceNumbers)
             {
-                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.Reference, $"{partialReference}*");
+                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.Reference, $"{partialReference}{(partialReference.Length == 10 ? "" : "*")}");
             }
 
             foreach (var date in structuedQuery.Dates)
             {
                 topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.DateOfBirth, date);
                 nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Term(f => f.DateOfBirth, date);
+            }
+
+            foreach (var biddingNumber in structuedQuery.BiddingNumbers)
+            {
+                topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.BiddingNumber, biddingNumber);
             }
 
             SearchDescriptor<ApplicationSearchEntity> baseSearch = new SearchDescriptor<ApplicationSearchEntity>()
@@ -178,6 +186,7 @@ namespace HousingRegisterApi.V1.Gateways
                 .CaptureDates()
                 .CaptureReferenceNumbers(false)
                 .CaptureNINO(false)
+                .CaptureFullBiddingNumbers(false)
                 .RemoveMatched();
 
             return parser.Query;

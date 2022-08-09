@@ -21,6 +21,8 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
 
         public List<Guid> ApplicationIds { get; set; }
 
+        public List<int> BiddingNumbers { get; set; }
+
         public static ApplicationSearchSemiStructuredQuery Empty
         {
             get
@@ -32,7 +34,8 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
                     Dates = new List<DateTime>(),
                     NINOs = new List<string>(),
                     ReferenceNumbers = new List<string>(),
-                    Terms = new List<string>()
+                    Terms = new List<string>(),
+                    BiddingNumbers = new List<int>()
                 };
             }
         }
