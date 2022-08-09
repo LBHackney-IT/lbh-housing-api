@@ -31,6 +31,7 @@ namespace HousingRegisterApi.V1.Gateways
 #if DEBUG
             //When debugging locally, dont check for valid SSL to the search domain
             _connectionSettings.ServerCertificateValidationCallback((o, cert, chain, sslErrors) => true);
+            _connectionSettings.EnableDebugMode();
 #endif
             _client = new ElasticClient(_connectionSettings);
 
@@ -39,35 +40,74 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<ApplicationSearchPagedResult> SearchApplications(string queryPhrase, int pageNumber, int pageSize = 10)
         {
-            int offsetPageNumber = Math.Max(1, pageNumber);
+            var baseSearch = ConstructApplicationSearch(queryPhrase, pageNumber, pageSize);
 
-            var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => s
-                .Index(HousingRegisterReadAlias)
-                .Query(topLevelQuery => topLevelQuery
-                    .Bool(bq => bq
-                        .Should(sq => sq
-                            .Nested(nq => nq
-                                .Path(np => np.OtherMembers)
-                                .Query(inq => inq
-                                    .SimpleQueryString(isq => isq
-                                        .Query(queryPhrase)
-                                        .DefaultOperator(Operator.Or)
-                                    )
-                                )
-                            ),
-                            sq => sq
-                            .SimpleQueryString(isq => isq
-                                .Query(queryPhrase)
-                                .DefaultOperator(Operator.Or)
-                            )
-                        )
-                    )
-                )
-                .Take(pageSize)
-                .From(pageSize * (offsetPageNumber - 1))
-            ).ConfigureAwait(false);
+            var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
+
+            string queryJson = System.Text.Encoding.UTF8.GetString(simpleQueryStringSearch.ApiCall.RequestBodyInBytes);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
+        }
+
+        public static SearchDescriptor<ApplicationSearchEntity> ConstructApplicationSearch(string queryPhrase, int pageNumber, int pageSize)
+        {
+            var structuedQuery = ParseQuery(queryPhrase);
+
+            var offsetPageNumber = Math.Max(1, pageNumber);
+
+            var topLevelQuery = new QueryContainerDescriptor<ApplicationSearchEntity>()
+                .SimpleQueryString(isq => isq
+                                    .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
+                                    .DefaultOperator(Operator.Or)
+                                    .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName, f => f.ApplicationId))
+                                );
+
+            var nestedDocQuery = new QueryContainerDescriptor<ApplicationOtherMembersSearchEntity>()
+                .SimpleQueryString(isq => isq
+                                    .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
+                                    .DefaultOperator(Operator.Or)
+                                    .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName))
+                                );
+
+            //Add wildcards on detected entities
+            foreach (var partialNino in structuedQuery.NINOs)
+            {
+                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
+                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
+            }
+
+            foreach (var partialReference in structuedQuery.ReferenceNumbers)
+            {
+                topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.Reference, $"{partialReference}{(partialReference.Length == 10 ? "" : "*")}");
+            }
+
+            foreach (var date in structuedQuery.Dates)
+            {
+                topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.DateOfBirth, date);
+                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Term(f => f.DateOfBirth, date);
+            }
+
+            foreach (var biddingNumber in structuedQuery.BiddingNumbers)
+            {
+                topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.BiddingNumber, biddingNumber);
+            }
+
+            SearchDescriptor<ApplicationSearchEntity> baseSearch = new SearchDescriptor<ApplicationSearchEntity>()
+            .Index(HousingRegisterReadAlias)
+            .Query(tlq => tlq
+                .Bool(bq => bq
+                    .Should(sq => sq
+                        .Nested(nq => nq
+                            .Path(np => np.OtherMembers)
+                            .Query(inq => nestedDocQuery)
+                        ),
+                        sq => topLevelQuery
+                    )
+                 )
+            )
+            .Take(pageSize)
+            .From(pageSize * (offsetPageNumber - 1));
+            return baseSearch;
         }
 
         public async Task<Dictionary<string, long>> GetStatusBreakdown()
@@ -157,41 +197,20 @@ namespace HousingRegisterApi.V1.Gateways
 
         }
 
-        public static string ProcessFuzzyMatching(string inputQuery)
+
+
+        public static ApplicationSearchSemiStructuredQuery ParseQuery(string inputQuery)
         {
-            if (string.IsNullOrWhiteSpace(inputQuery)) return inputQuery;
+            if (string.IsNullOrWhiteSpace(inputQuery)) return ApplicationSearchSemiStructuredQuery.Empty;
 
-            string expertSymbols = "+|-\"*()~";
-            StringBuilder output = new StringBuilder();
+            ApplicationSearchQueryParser parser = new ApplicationSearchQueryParser(inputQuery)
+                .CaptureDates()
+                .CaptureReferenceNumbers(false)
+                .CaptureNINO(false)
+                .CaptureFullBiddingNumbers(false)
+                .RemoveMatched();
 
-            //If the user is an expert, and is already using the advanced search query capabilities, dont touch the query string
-            //Please see the simple query syntax here - https://www.elastic.co/guide/en/elasticsearch/reference/7.10/query-dsl-simple-query-string-query.html#simple-query-string-syntax
-
-            if (inputQuery.Intersect(expertSymbols).Any())
-            {
-                return inputQuery;
-            }
-
-            var terms = inputQuery.Split(" ");
-            var termFuzziness = 0;
-            var maxFuzinessPerTerm = 3;
-
-            foreach (var term in terms)
-            {
-                if (term.Any(char.IsDigit))
-                {
-                    //leave this term as-is - its a date, or a reference number
-                    output.Append(" " + term);
-                }
-                else
-                {
-                    termFuzziness = Math.Min(term.Length / 4, maxFuzinessPerTerm);
-
-                    output.Append($" {term}~{termFuzziness}");
-                }
-            }
-
-            return output.ToString().Trim();
+            return parser.Query;
         }
     }
 }
