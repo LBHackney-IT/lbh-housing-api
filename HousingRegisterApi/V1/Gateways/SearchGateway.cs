@@ -44,8 +44,6 @@ namespace HousingRegisterApi.V1.Gateways
 
             var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
 
-            string queryJson = System.Text.Encoding.UTF8.GetString(simpleQueryStringSearch.ApiCall.RequestBodyInBytes);
-
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
         }
 
