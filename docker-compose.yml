@@ -108,3 +108,7 @@ services:
 volumes:
   esdata-test:
     driver: local
+
+networks:
+  elastic:
+    driver: bridge
