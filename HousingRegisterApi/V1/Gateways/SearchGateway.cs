@@ -59,7 +59,7 @@ namespace HousingRegisterApi.V1.Gateways
                 .SimpleQueryString(isq => isq
                                     .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
                                     .DefaultOperator(Operator.Or)
-                                    .Fields(f=>f.Fields(f=>f.Surname, f=>f.FirstName, f=>f.MiddleName, f=>f.ApplicationId))
+                                    .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName, f => f.ApplicationId))
                                 );
 
             var nestedDocQuery = new QueryContainerDescriptor<ApplicationOtherMembersSearchEntity>()
