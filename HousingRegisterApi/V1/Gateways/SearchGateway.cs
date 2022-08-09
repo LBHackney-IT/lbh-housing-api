@@ -18,13 +18,21 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly ILogger<SearchGateway> _logger;
         private ElasticClient _client;
+        private ConnectionSettings _connectionSettings;
 
         const string HousingRegisterReadAlias = "housing-register-applications";
 
         public SearchGateway(ILogger<SearchGateway> logger, IConfiguration configuration)
         {
             _logger = logger;
-            _client = new ElasticClient(new Uri(configuration["SEARCHDOMAIN"]));
+            var searchDomainUri = new Uri(configuration["SEARCHDOMAIN"]);
+            _connectionSettings = new ConnectionSettings(searchDomainUri);
+
+#if DEBUG
+            //When debugging locally, dont check for valid SSL to the search domain
+            _connectionSettings.ServerCertificateValidationCallback((o, cert, chain, sslErrors) => true);
+#endif
+            _client = new ElasticClient(_connectionSettings);
 
             _client.ConnectionSettings.IdProperties.Add(typeof(ApplicationSearchEntity), "ApplicationId");
         }
@@ -57,7 +65,6 @@ namespace HousingRegisterApi.V1.Gateways
                 )
                 .Take(pageSize)
                 .From(pageSize * (offsetPageNumber - 1))
-                .TrackTotalHits()
             ).ConfigureAwait(false);
 
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
@@ -92,6 +99,7 @@ namespace HousingRegisterApi.V1.Gateways
         public async Task<ApplicationSearchPagedResult> FilterApplications(SearchQueryParameter filterParameters)
         {
             QueryContainer queryContainer = null;
+            int offsetPageNumber = Math.Max(1, filterParameters.Page);
 
             if (!string.IsNullOrWhiteSpace(filterParameters.Status))
             {
@@ -121,15 +129,32 @@ namespace HousingRegisterApi.V1.Gateways
             SearchRequest<ApplicationSearchEntity> request = new SearchRequest<ApplicationSearchEntity>(HousingRegisterReadAlias)
             {
                 Query = queryContainer,
-                From = filterParameters.Page * filterParameters.PageSize,
+                From = filterParameters.PageSize * (offsetPageNumber - 1),
                 Size = filterParameters.PageSize,
-                Sort = new List<ISort> { { new FieldSort { Field = new Field(filterParameters.OrderBy), Order = SortOrder.Descending } } },
-                TrackTotalHits = true
+                Sort = new List<ISort> { { new FieldSort { Field = new Field(GetKeywordFieldName(filterParameters.OrderBy)), Order = SortOrder.Descending } } }
             };
 
             var results = await _client.SearchAsync<ApplicationSearchEntity>(request).ConfigureAwait(false);
 
             return results.ToPagedResult(filterParameters.Page, filterParameters.PageSize);
+        }
+
+        private static string GetKeywordFieldName(string orderBy)
+        {
+
+            switch (orderBy?.ToLower()?.Trim())
+            {
+                case "firstname":
+                case "surname":
+                case "nationalinsurancenumber":
+                case "emailaddress":
+                case "phonenumber":
+                case "reference":
+                    return $"{orderBy}.keyword";
+                default:
+                    return orderBy ?? "surname.keyword";
+            }
+
         }
 
         public static string ProcessFuzzyMatching(string inputQuery)
