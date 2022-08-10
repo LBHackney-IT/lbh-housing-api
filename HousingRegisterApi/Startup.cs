@@ -126,7 +126,7 @@ namespace HousingRegisterApi
             });
 
             AWSXRayRecorder.InitializeInstance(Configuration);
-            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.Console);
 
             DotEnv.Fluent()
                 .WithTrimValues()
