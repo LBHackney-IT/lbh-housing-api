@@ -119,7 +119,8 @@ namespace HousingRegisterApi
                     c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddLogging(l => {
+            services.AddLogging(l =>
+            {
                 l.ClearProviders();
                 l.AddConsole();
             });
