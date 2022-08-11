@@ -246,9 +246,12 @@ namespace HousingRegisterApi.V1.Gateways
 
                 conditions.Add(assignCondition);
             }
-            if (searchParameters.HasAssessment.Value)
+            if (searchParameters.HasAssessment.HasValue)
             {
-                conditions.Add(new ScanCondition(nameof(Assessment), ScanOperator.IsNotNull));
+                if (searchParameters.HasAssessment.Value)
+                {
+                    conditions.Add(new ScanCondition(nameof(Assessment), ScanOperator.IsNotNull));
+                }
             }
 
             // query dynamodb

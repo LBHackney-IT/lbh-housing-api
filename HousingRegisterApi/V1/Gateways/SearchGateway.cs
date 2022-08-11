@@ -136,6 +136,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public async Task<ApplicationSearchPagedResult> FilterApplications(SearchQueryParameter filterParameters)
         {
+            _logger.LogInformation("Filtering using search");
             QueryContainer queryContainer = null;
             int offsetPageNumber = Math.Max(1, filterParameters.Page);
 
