@@ -21,7 +21,8 @@ provider:
     binaryMediaTypes:
       - 'text/csv'
   logs:
-    restApi: true
+    restApi:
+      fullExecutionData: true      
       
 package:
   artifact: ./bin/release/netcoreapp3.1/housing-register-api.zip
