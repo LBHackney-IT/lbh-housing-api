@@ -88,9 +88,9 @@ namespace HousingRegisterApi.V1.Domain.Report
             applicants.Add(application.MainApplicant);
             applicants.AddRange(application.OtherMembers);
             AHRCode = GetAHRCode(applicants.Where(a => a.MedicalNeed != null && a.MedicalNeed.AccessibileHousingRegister != null).ToList());
-            AutoBidPref_MobilityStandard = AHRCode == "COD" ? "Y" : "N";
-            AutoBidPref_WheelChairStandard = AHRCode == "AOB" ? "Y" : "N";
-            AutoBidPref_AdaptedStandard = AHRCode == "EEE" || AHRCode == "EPL" || AHRCode == "EPS" || AHRCode == "FLS" || AHRCode == "STL" ? "Y" : "N";
+            AutoBidPref_MobilityStandard = AHRCode == "B" ? "Y" : "N";
+            AutoBidPref_WheelChairStandard = AHRCode == "A" ? "Y" : "N";
+            AutoBidPref_AdaptedStandard = AHRCode == "E" || AHRCode == "C" || AHRCode == "E+" || AHRCode == "G" || AHRCode == "D" ? "Y" : "N";
             Errors = ErrorData;
         }
 
@@ -123,39 +123,39 @@ FFF - F any floor
 
             if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("a-b-wheelchair-standard"))
             {
-                AHRCodePriority = "AOB";
+                AHRCodePriority = "A"; //AOB
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("c-d-large-level-access"))
             {
-                AHRCodePriority = "COD";
+                AHRCodePriority = "B";//COD
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-step-free-level-access"))
             {
-                AHRCodePriority = "EEE";
+                AHRCodePriority = "E";//EEE
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-minimal-steps-up-to-4-steps"))
             {
-                AHRCodePriority = "EPL";
+                AHRCodePriority = "C";//EPL
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-ground-floor-and-level-access-shower"))
             {
-                AHRCodePriority = "EPS";
+                AHRCodePriority = "E+";//EPS
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("e-up-to-4-steps-and-level-access-shower"))
             {
-                AHRCodePriority = "EPL";
+                AHRCodePriority = "C";//EPL
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("stairlift"))
             {
-                AHRCodePriority = "STL";
+                AHRCodePriority = "D";//STL
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("f-general-needs-any-floor"))
             {
-                AHRCodePriority = "FFF";
+                AHRCodePriority = "F";//FFF
             }
             else if (applicants.Select(x => x.MedicalNeed.AccessibileHousingRegister).Contains("f-any-floor-with-level-access-shower"))
             {
-                AHRCodePriority = "FLS";
+                AHRCodePriority = "G";//FLS
             }
 
             return AHRCodePriority;
