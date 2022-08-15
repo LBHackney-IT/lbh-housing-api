@@ -44,6 +44,11 @@ namespace HousingRegisterApi.V1.Gateways
 
             var simpleQueryStringSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => baseSearch).ConfigureAwait(false);
 
+#if DEBUG
+            string searchJSON = System.Text.Encoding.UTF8.GetString(simpleQueryStringSearch.ApiCall.RequestBodyInBytes);
+            System.Diagnostics.Debug.WriteLine(searchJSON);
+#endif
+
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
         }
 
@@ -60,18 +65,18 @@ namespace HousingRegisterApi.V1.Gateways
                                     .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName, f => f.ApplicationId))
                                 );
 
-            var nestedDocQuery = new QueryContainerDescriptor<ApplicationOtherMembersSearchEntity>()
+            var nestedDocQuery = new QueryContainerDescriptor<ApplicationSearchEntity>()
                 .SimpleQueryString(isq => isq
                                     .Query(structuedQuery.GetSimpleQueryStringWithFuzziness())
                                     .DefaultOperator(Operator.Or)
-                                    .Fields(f => f.Fields(f => f.Surname, f => f.FirstName, f => f.MiddleName))
+                                    .Fields(f => f.Fields(f => f.OtherMembers.First().FirstName, f => f.OtherMembers.First().MiddleName, f => f.OtherMembers.First().Surname))
                                 );
 
             //Add wildcards on detected entities
             foreach (var partialNino in structuedQuery.NINOs)
             {
                 topLevelQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
-                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Wildcard(w => w.NationalInsuranceNumber, $"{partialNino}*");
+                nestedDocQuery |= Query<ApplicationSearchEntity>.Wildcard(w => w.OtherMembers.First().NationalInsuranceNumber, $"{partialNino}*");
             }
 
             foreach (var partialReference in structuedQuery.ReferenceNumbers)
@@ -82,7 +87,7 @@ namespace HousingRegisterApi.V1.Gateways
             foreach (var date in structuedQuery.Dates)
             {
                 topLevelQuery |= Query<ApplicationSearchEntity>.Term(f => f.DateOfBirth, date);
-                nestedDocQuery |= Query<ApplicationOtherMembersSearchEntity>.Term(f => f.DateOfBirth, date);
+                nestedDocQuery |= Query<ApplicationSearchEntity>.Term(f => f.OtherMembers.First().DateOfBirth, date);
             }
 
             foreach (var biddingNumber in structuedQuery.BiddingNumbers)
