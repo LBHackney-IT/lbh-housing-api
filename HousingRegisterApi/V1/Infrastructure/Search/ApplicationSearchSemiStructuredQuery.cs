@@ -71,7 +71,7 @@ namespace HousingRegisterApi.V1.Infrastructure.Search
                 }
                 else
                 {
-                    termFuzziness = Math.Min(term.Length / 4, maxFuzinessPerTerm);
+                    termFuzziness = Math.Max(1, Math.Min(term.Length / 4, maxFuzinessPerTerm));
 
                     output.Append($" {term}~{termFuzziness}");
                 }

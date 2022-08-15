@@ -20,6 +20,7 @@ provider:
         rateLimit: 100
     binaryMediaTypes:
       - 'text/csv'
+      
 package:
   artifact: ./bin/release/netcoreapp3.1/housing-register-api.zip
 
