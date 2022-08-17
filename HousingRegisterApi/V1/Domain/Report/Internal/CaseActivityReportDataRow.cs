@@ -61,7 +61,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             CalculatedBedroomNeed = application.CalculatedBedroomNeed.ToString();
             BedroomNeed = application.Assessment?.BedroomNeed.ToString();
             Band = application.Assessment?.Band;
-            BiddingNumber = application.Assessment?.BiddingNumber?.ToString();
+            BiddingNumber = application?.Assessment?.BiddingNumber?.ToString();
         }
 
         private static string FormatDate(DateTime? dateTime)
