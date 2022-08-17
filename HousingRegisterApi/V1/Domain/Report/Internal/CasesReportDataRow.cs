@@ -80,7 +80,7 @@ namespace HousingRegisterApi.V1.Domain.Report
             BedroomNeed = application.Assessment?.BedroomNeed.ToString();
             Band = application.Assessment?.Band;
 
-            BiddingNumber = application.Assessment?.BiddingNumber;
+            BiddingNumber = application.Assessment?.BiddingNumber.ToString();
             Tenure = application.MainApplicant.Questions.GetAnswer("current-accommodation");
             HouseholdCount = (1 + application.OtherMembers.Count()).ToString();
             LivingStatus = application.MainApplicant.Questions.GetAnswer("current-accommodation/living-situation");

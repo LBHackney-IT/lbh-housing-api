@@ -1,3 +1,4 @@
+using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Infrastructure;
 using System.Linq;
@@ -46,6 +47,34 @@ namespace HousingRegisterApi.V1.Factories
                 CalculatedBedroomNeed = entity.CalculatedBedroomNeed,
                 ImportedFromLegacyDatabase = entity.ImportedFromLegacyDatabase,
             };
+        }
+
+        public static Assessment ToDomain(this AssessmentRequest request)
+        {
+            long? biddingNumberNullable = null;
+            long biddingNumber = 0;
+
+            if (long.TryParse(request.BiddingNumber, out biddingNumber))
+            {
+                biddingNumberNullable = biddingNumber;
+            }
+            else
+            {
+                biddingNumberNullable = null;
+            }
+
+            Assessment domain = new Assessment
+            {
+                Band = request.Band,
+                BedroomNeed = request.BedroomNeed,
+                BiddingNumber = biddingNumberNullable,
+                GenerateBiddingNumber = request.GenerateBiddingNumber,
+                EffectiveDate = request.EffectiveDate,
+                InformationReceivedDate = request.InformationReceivedDate,
+                Reason = request.Reason
+            };
+
+            return domain;
         }
     }
 }

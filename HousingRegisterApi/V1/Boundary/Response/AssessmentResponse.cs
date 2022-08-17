@@ -1,8 +1,8 @@
 using System;
 
-namespace HousingRegisterApi.V1.Domain
+namespace HousingRegisterApi.V1.Boundary.Response
 {
-    public class Assessment
+    public class AssessmentResponse
     {
         public DateTime? EffectiveDate { get; set; }
 
@@ -14,7 +14,7 @@ namespace HousingRegisterApi.V1.Domain
 
         public string Reason { get; set; }
 
-        public long? BiddingNumber { get; set; }
+        public string BiddingNumber { get; set; }
 
         public bool GenerateBiddingNumber { get; set; }
     }

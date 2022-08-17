@@ -23,7 +23,7 @@ namespace HousingRegisterApi.V1.Factories
                 SubmittedAt = domain.SubmittedAt,
                 MainApplicant = domain.MainApplicant,
                 OtherMembers = domain.OtherMembers,
-                Assessment = domain.Assessment,
+                Assessment = domain.Assessment.ToResponse(),
                 CalculatedBedroomNeed = domain.CalculatedBedroomNeed,
                 ImportedFromLegacyDatabase = domain.ImportedFromLegacyDatabase,
             };
@@ -33,6 +33,24 @@ namespace HousingRegisterApi.V1.Factories
         {
             if (null == domainList) return new List<ApplicationResponse>();
             return domainList.Select(domain => domain.ToResponse()).ToList();
+        }
+
+        public static AssessmentResponse ToResponse(this Assessment assessment)
+        {
+            if (assessment == null) return null;
+
+            AssessmentResponse response = new AssessmentResponse
+            {
+                Band = assessment.Band,
+                BedroomNeed = assessment.BedroomNeed,
+                BiddingNumber = assessment?.BiddingNumber?.ToString(),
+                EffectiveDate = assessment.EffectiveDate,
+                GenerateBiddingNumber = assessment.GenerateBiddingNumber,
+                InformationReceivedDate = assessment.InformationReceivedDate,
+                Reason = assessment.Reason
+            };
+
+            return response;
         }
 
         public static ApplicationSearchResultResponse ToResponse(this ApplicationSearchEntity searchEntity)

@@ -17,31 +17,39 @@ namespace HousingRegisterApi.V1.UseCase
     public class UpdateApplicationUseCase : IUpdateApplicationUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        private readonly IBiddingNumberGenerator _biddingNumberGenerator;
         private readonly IActivityGateway _activityGateway;
 
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
-            IBiddingNumberGenerator biddingNumberGenerator,
             IActivityGateway applicationHistory)
         {
             _gateway = gateway;
-            _biddingNumberGenerator = biddingNumberGenerator;
             _activityGateway = applicationHistory;
         }
 
         public async Task<ApplicationResponse> Execute(Guid id, UpdateApplicationRequest request)
         {
             var origApplication = _gateway.GetApplicationById(id);
+            long? parsedBiddingNumber = null;
+            long biddingNumberValue = 0;
 
-            bool biddingNumberChanged = origApplication?.Assessment?.BiddingNumber != request?.Assessment?.BiddingNumber;
+            if (long.TryParse(request?.Assessment?.BiddingNumber, out biddingNumberValue))
+            {
+                parsedBiddingNumber = biddingNumberValue;
+            }
+            else
+            {
+                parsedBiddingNumber = null;
+            }
+
+            bool biddingNumberChanged = origApplication?.Assessment?.BiddingNumber != parsedBiddingNumber;
 
             //Check the bidding number if it has changed, or 
             if (request.Assessment != null
                 && request.Assessment.GenerateBiddingNumber || biddingNumberChanged)
             {
 
-                if (request.Assessment.GenerateBiddingNumber && string.IsNullOrWhiteSpace(request.Assessment.BiddingNumber))
+                if (request.Assessment.GenerateBiddingNumber && !parsedBiddingNumber.HasValue)
                 {
                     //There is no specified bidding number in the update, and auto-generate is set to true
                     var newBiddingNumber = await _gateway.IssueNextBiddingNumber().ConfigureAwait(false);
@@ -50,20 +58,14 @@ namespace HousingRegisterApi.V1.UseCase
                 }
                 else
                 {
-                    //Regardless of the generate flag, the bidding number has been manually entered.  This newly entered bidding number needs to be validated.
-                    long newBiddingNumber = 0;
-                    if (!long.TryParse(request?.Assessment?.BiddingNumber, out newBiddingNumber))
-                    {
-                        //The user has supplied a bidding number which is not a number
-                        throw new InvalidBiddingNumberException($"Supplied bidding number \"{request.Assessment.BiddingNumber}\" is invalid");
-                    }
-                    else if (newBiddingNumber > 0)
+
+                    if (parsedBiddingNumber.GetValueOrDefault(0) > 0)
                     {
                         //The user has supplied a bidding number
                         var lastIssuedBiddingNumber = await _gateway.GetLastIssuedBiddingNumber().ConfigureAwait(false);
                         if (lastIssuedBiddingNumber.HasValue)
                         {
-                            if (newBiddingNumber > lastIssuedBiddingNumber.Value)
+                            if (parsedBiddingNumber >= lastIssuedBiddingNumber)
                             {
                                 throw new InvalidBiddingNumberException($"Supplied bidding number \"{request.Assessment.BiddingNumber}\" is reserved for auto-generation.  Please use a bidding number below {lastIssuedBiddingNumber.Value}, or auto-generate the bidding number");
                             }
@@ -148,7 +150,7 @@ namespace HousingRegisterApi.V1.UseCase
                         "Assessment.InformationReceivedDate", application.Assessment?.InformationReceivedDate, request.Assessment.InformationReceivedDate));
                 }
 
-                if (!string.IsNullOrEmpty(request.Assessment?.BiddingNumber))
+                if (!string.IsNullOrWhiteSpace(request?.Assessment?.BiddingNumber))
                 {
                     activities.Add(new EntityActivity<ApplicationActivityType>(ApplicationActivityType.BiddingNumberChangedByUser,
                         "Assessment.BiddingNumber", application.Assessment?.BiddingNumber, request.Assessment.BiddingNumber));

@@ -18,7 +18,6 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class UpdateApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private Mock<IBiddingNumberGenerator> _biddingNumberGenerator;
         private Mock<IActivityGateway> _mockActivityGateway;
         private UpdateApplicationUseCase _classUnderTest;
         private Fixture _fixture;
@@ -27,9 +26,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _biddingNumberGenerator = new Mock<IBiddingNumberGenerator>();
             _mockActivityGateway = new Mock<IActivityGateway>();
-            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockActivityGateway.Object);
+            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object);
             _fixture = new Fixture();
         }
 
@@ -69,7 +67,16 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = await _classUnderTest.Execute(id, new UpdateApplicationRequest()
             {
                 Status = ApplicationStatus.New,
-                Assessment = application.Assessment
+                Assessment = new AssessmentRequest
+                {
+                    Band = application.Assessment.Band,
+                    BedroomNeed = application.Assessment.BedroomNeed,
+                    BiddingNumber = application?.Assessment?.BiddingNumber?.ToString(),
+                    EffectiveDate = application.Assessment.EffectiveDate,
+                    GenerateBiddingNumber = application.Assessment.GenerateBiddingNumber,
+                    InformationReceivedDate = application.Assessment.InformationReceivedDate,
+                    Reason = application.Assessment.Reason
+                }
             }).ConfigureAwait(false);
 
             // Assert
@@ -98,7 +105,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 {
                     return new Application
                     {
-                        Assessment = a.Assessment,
+                        Assessment = a.Assessment.ToDomain(),
                         AssignedTo = a.AssignedTo,
                         MainApplicant = a.MainApplicant,
                         OtherMembers = a.OtherMembers,
@@ -118,7 +125,16 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = await _classUnderTest.Execute(id, new UpdateApplicationRequest()
             {
                 Status = ApplicationStatus.New,
-                Assessment = assessment
+                Assessment = new AssessmentRequest
+                {
+                    Band = assessment.Band,
+                    BedroomNeed = assessment.BedroomNeed,
+                    BiddingNumber = assessment.BiddingNumber?.ToString(),
+                    EffectiveDate = assessment.EffectiveDate,
+                    GenerateBiddingNumber = assessment.GenerateBiddingNumber,
+                    InformationReceivedDate = assessment.InformationReceivedDate,
+                    Reason = assessment.Reason
+                }
             }).ConfigureAwait(false);
 
             // Assert
@@ -136,7 +152,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
             assessment.BiddingNumber = null;
             assessment.GenerateBiddingNumber = false;
-            assessment.BiddingNumber = "705";
+            assessment.BiddingNumber = 705;
 
             _mockGateway
                 .Setup(x => x.GetApplicationById(id))
@@ -148,7 +164,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 {
                     return new Application
                     {
-                        Assessment = a.Assessment,
+                        Assessment = a.Assessment.ToDomain(),
                         AssignedTo = a.AssignedTo,
                         MainApplicant = a.MainApplicant,
                         OtherMembers = a.OtherMembers,
@@ -168,57 +184,17 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             Assert.ThrowsAsync<InvalidBiddingNumberException>(async () => await _classUnderTest.Execute(id, new UpdateApplicationRequest()
             {
                 Status = ApplicationStatus.New,
-                Assessment = assessment
+                Assessment = new AssessmentRequest
+                {
+                    Band = assessment.Band,
+                    BedroomNeed = assessment.BedroomNeed,
+                    BiddingNumber = assessment.BiddingNumber?.ToString(),
+                    EffectiveDate = assessment.EffectiveDate,
+                    GenerateBiddingNumber = assessment.GenerateBiddingNumber,
+                    InformationReceivedDate = assessment.InformationReceivedDate,
+                    Reason = assessment.Reason
+                }
             }).ConfigureAwait(false), "Bidding number that is above the last generated number should not be valid!");
-
-        }
-
-        [Test]
-        public void ManuallyEnteredBiddingNumberThatIsNotANumberShouldThrow()
-        {
-            // Arrange
-            var id = Guid.NewGuid();
-            var application = _fixture.Create<Application>();
-            var updatedAssessment = application.Assessment;
-            application.Assessment = null;
-
-            updatedAssessment.BiddingNumber = null;
-            updatedAssessment.GenerateBiddingNumber = false;
-            updatedAssessment.BiddingNumber = "erg";
-
-            _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
-
-            _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns<Guid, UpdateApplicationRequest>((g, a) =>
-                {
-                    return new Application
-                    {
-                        Assessment = a.Assessment,
-                        AssignedTo = a.AssignedTo,
-                        MainApplicant = a.MainApplicant,
-                        OtherMembers = a.OtherMembers,
-                        Status = a.Status
-                    };
-                });
-
-            _mockGateway
-                .Setup(x => x.GetLastIssuedBiddingNumber())
-                .ReturnsAsync(700);
-
-            _mockGateway
-                .Setup(x => x.IssueNextBiddingNumber())
-                .ReturnsAsync(701);
-
-            //Act & Assert
-            Assert.ThrowsAsync<InvalidBiddingNumberException>(async () => await _classUnderTest.Execute(id, new UpdateApplicationRequest()
-            {
-                Status = ApplicationStatus.New,
-                Assessment = updatedAssessment
-            }).ConfigureAwait(false), "Invalid bidding number was validated!");
-
         }
     }
 }
