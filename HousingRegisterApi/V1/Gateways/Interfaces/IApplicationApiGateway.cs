@@ -39,6 +39,8 @@ namespace HousingRegisterApi.V1.Gateways
 
         Application ImportApplication(ImportApplicationRequest request);
 
-        Task<long?> GetNextBiddingNumber();
+        Task<long> IssueNextBiddingNumber();
+
+        Task<long?> GetLastIssuedBiddingNumber();
     }
 }

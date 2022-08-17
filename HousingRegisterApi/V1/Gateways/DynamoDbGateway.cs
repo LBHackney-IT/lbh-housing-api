@@ -530,19 +530,19 @@ namespace HousingRegisterApi.V1.Gateways
             return entity.ToDomain();
         }
 
-        public async Task<long?> GetNextBiddingNumber()
+        public async Task<long> IssueNextBiddingNumber()
         {
             string tableName = "HousingRegister";
-            long? nextBiddingNumber = null;
+            long nextBiddingNumber = 0;
 
             try
             {
                 var request = new UpdateItemRequest
                 {
-                    Key = new Dictionary<string, AttributeValue>() { { "Id", new AttributeValue { S = "HousingRegister#BiddingNumberAtomicCounter" } } },
+                    Key = new Dictionary<string, AttributeValue>() { { "id", new AttributeValue { S = "HousingRegister#BiddingNumberAtomicCounter" } } },
                     ExpressionAttributeNames = new Dictionary<string, string>()
     {
-        {"#B", "LastIssuedBiddingNumber"}
+        {"#B", "lastIssuedBiddingNumber"}
     },
                     ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
     {
@@ -555,7 +555,36 @@ namespace HousingRegisterApi.V1.Gateways
 
                 var response = await _dynamoDbClient.UpdateItemAsync(request).ConfigureAwait(false);
 
-                string newBiddingNumber = response.Attributes["LastIssuedBiddingNumber"].N;
+                string newBiddingNumber = response.Attributes["lastIssuedBiddingNumber"].N;
+
+                nextBiddingNumber = long.Parse(newBiddingNumber);
+            }
+            catch (AmazonDynamoDBException ex)
+            {
+                _logger.LogError(ex, "Error getting next bidding number transactionally");
+                throw;
+            }
+
+            return nextBiddingNumber;
+
+        }
+
+        public async Task<long?> GetLastIssuedBiddingNumber()
+        {
+            string tableName = "HousingRegister";
+            long? nextBiddingNumber = null;
+
+            try
+            {
+                var request = new GetItemRequest
+                {
+                    Key = new Dictionary<string, AttributeValue>() { { "id", new AttributeValue { S = "HousingRegister#BiddingNumberAtomicCounter" } } },
+                    TableName = tableName
+                };
+
+                var response = await _dynamoDbClient.GetItemAsync(request).ConfigureAwait(false);
+
+                string newBiddingNumber = response.Item["HousingRegister"].S;
 
                 nextBiddingNumber = long.Parse(newBiddingNumber);
             }
