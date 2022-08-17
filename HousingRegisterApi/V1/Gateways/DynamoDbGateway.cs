@@ -584,7 +584,7 @@ namespace HousingRegisterApi.V1.Gateways
 
                 var response = await _dynamoDbClient.GetItemAsync(request).ConfigureAwait(false);
 
-                string newBiddingNumber = response.Item["HousingRegister"].S;
+                string newBiddingNumber = response.Item["lastIssuedBiddingNumber"].S;
 
                 nextBiddingNumber = long.Parse(newBiddingNumber);
             }
