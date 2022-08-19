@@ -11,6 +11,8 @@ using System;
 using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.Boundary.Request;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Microsoft.Extensions.Logging;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
 {
@@ -18,20 +20,24 @@ namespace HousingRegisterApi.Tests.V1.Gateways
     public class DynamoDbGatewayTests
     {
         private readonly Fixture _fixture = new Fixture();
-        private Mock<IDynamoDBContext> _dynamoDb;
+        private Mock<IDynamoDBContext> _dynamoDbContext;
+        private Mock<IAmazonDynamoDB> _dynamoDb;
         private ISHA256Helper _hashHelper;
         private Mock<IVerifyCodeGenerator> _codeGenerator;
         private DynamoDbGateway _classUnderTest;
         private Mock<IBedroomCalculatorService> _bedroomCalculatorService;
+        private Mock<ILogger<DynamoDbGateway>> _logger;
 
         [SetUp]
         public void Setup()
         {
-            _dynamoDb = new Mock<IDynamoDBContext>();
+            _dynamoDbContext = new Mock<IDynamoDBContext>();
             _hashHelper = new SHA256Helper();
+            _dynamoDb = new Mock<IAmazonDynamoDB>();
             _codeGenerator = new Mock<IVerifyCodeGenerator>();
             _bedroomCalculatorService = new Mock<IBedroomCalculatorService>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object, _hashHelper, _codeGenerator.Object, _bedroomCalculatorService.Object);
+            _logger = new Mock<ILogger<DynamoDbGateway>>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDbContext.Object, _dynamoDb.Object, _hashHelper, _codeGenerator.Object, _bedroomCalculatorService.Object, _logger.Object);
         }
 
         [Test]
@@ -52,14 +58,14 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             var entity = _fixture.Create<Application>();
             var dbEntity = DatabaseEntityHelper.CreateDatabaseEntityFrom(entity);
 
-            _dynamoDb.Setup(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default))
+            _dynamoDbContext.Setup(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default))
                      .ReturnsAsync(dbEntity);
 
             // Act
             var response = _classUnderTest.GetApplicationById(entity.Id);
 
             // Assert
-            _dynamoDb.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default), Times.Once);
+            _dynamoDbContext.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default), Times.Once);
             entity.Should().BeEquivalentTo(response);
         }
 

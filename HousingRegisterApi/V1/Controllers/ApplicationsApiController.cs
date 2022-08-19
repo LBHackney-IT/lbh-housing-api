@@ -218,9 +218,9 @@ namespace HousingRegisterApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPatch]
         [Route("{id}")]
-        public IActionResult UpdateApplication([FromRoute][Required] Guid id, [FromBody] UpdateApplicationRequest applicationRequest)
+        public async Task<IActionResult> UpdateApplication([FromRoute][Required] Guid id, [FromBody] UpdateApplicationRequest applicationRequest)
         {
-            var result = _updateApplicationUseCase.Execute(id, applicationRequest);
+            var result = await _updateApplicationUseCase.Execute(id, applicationRequest).ConfigureAwait(false);
             if (result == null) return NotFound(id);
 
             return Ok(result);
