@@ -39,7 +39,9 @@ namespace HousingRegisterApi.V1.Controllers
                 }
                 else
                 {
-                    return Problem("An exception has occurred", null, 500, $"CorrelationId:{this.GetCorrelationId()}", ex.GetType().ToString());
+                    context.Response.StatusCode = 500;
+                    return new { message = $"An unexpected problem occurred. CorrelationId:{this.GetCorrelationId()}" };
+
                 }
             }
             else
