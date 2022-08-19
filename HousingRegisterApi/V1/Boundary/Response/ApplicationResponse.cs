@@ -32,7 +32,7 @@ namespace HousingRegisterApi.V1.Boundary.Response
 
         public IEnumerable<Applicant> OtherMembers { get; set; }
 
-        public AssessmentResponse Assessment { get; set; }
+        public Assessment Assessment { get; set; }
 
         public bool ImportedFromLegacyDatabase { get; set; }
     }

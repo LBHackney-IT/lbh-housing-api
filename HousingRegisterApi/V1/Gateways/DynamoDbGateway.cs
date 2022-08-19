@@ -439,7 +439,7 @@ namespace HousingRegisterApi.V1.Gateways
                 entity.OtherMembers = request.OtherMembers.ToList();
 
             if (request.Assessment != null)
-                entity.Assessment = request.Assessment.ToDomain();
+                entity.Assessment = request.Assessment;
 
             entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
 

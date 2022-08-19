@@ -49,7 +49,7 @@ namespace HousingRegisterApi.V1.Domain.Report
         {
             var bedroomNeed = application.Assessment?.BedroomNeed ?? application.CalculatedBedroomNeed!;
 
-            HousingRegisterRef = application.Assessment?.BiddingNumber?.ToString();
+            HousingRegisterRef = application.Assessment?.BiddingNumber ?? null;
             Title = application.MainApplicant?.Person?.Title ?? null;
             FirstName = application.MainApplicant?.Person?.FirstName ?? null;
             FamilyName = application.MainApplicant?.Person?.Surname ?? null;

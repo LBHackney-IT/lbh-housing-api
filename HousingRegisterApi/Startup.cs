@@ -196,6 +196,7 @@ namespace HousingRegisterApi
             services.AddScoped<IPaginationHelper, PaginationHelper>();
             services.AddScoped<IVerifyCodeGenerator, VerifyCodeGenerator>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IBiddingNumberGenerator, BiddingNumberGenerator>();
             services.AddScoped<IFtpHelper, FtpHelper>();
         }
 
