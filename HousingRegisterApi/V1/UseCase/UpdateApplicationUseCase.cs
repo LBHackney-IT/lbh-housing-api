@@ -4,59 +4,93 @@ using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
     public class UpdateApplicationUseCase : IUpdateApplicationUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        private readonly IBiddingNumberGenerator _biddingNumberGenerator;
         private readonly IActivityGateway _activityGateway;
+        private readonly ISearchGateway _search;
 
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
-            IBiddingNumberGenerator biddingNumberGenerator,
-            IActivityGateway applicationHistory)
+            IActivityGateway applicationHistory,
+            ISearchGateway search)
         {
             _gateway = gateway;
-            _biddingNumberGenerator = biddingNumberGenerator;
             _activityGateway = applicationHistory;
+            _search = search;
         }
 
-        public ApplicationResponse Execute(Guid id, UpdateApplicationRequest request)
+        public async Task<ApplicationResponse> Execute(Guid id, UpdateApplicationRequest request)
         {
-            if (request.Assessment != null
-                && (request.Assessment.GenerateBiddingNumber || !string.IsNullOrEmpty(request.Assessment.BiddingNumber)))
-            {
-                var searchParameters = new SearchQueryParameter()
-                {
-                    HasAssessment = true
-                };
+            var origApplication = _gateway.GetApplicationById(id);
 
-                var applications = _gateway.GetApplications(searchParameters);
-                if (request.Assessment.GenerateBiddingNumber)
+            bool biddingNumberChanged = origApplication?.Assessment?.BiddingNumber != request?.Assessment?.BiddingNumber;
+
+            //Check the bidding number if it has changed, or 
+            if (request.Assessment != null
+                && request.Assessment.GenerateBiddingNumber || biddingNumberChanged)
+            {
+
+                if (request.Assessment.GenerateBiddingNumber && string.IsNullOrWhiteSpace(request.Assessment.BiddingNumber))
                 {
-                    var biddingNumber = _biddingNumberGenerator.GetNextBiddingNumber(applications);
-                    request.Assessment.BiddingNumber = biddingNumber;
+                    //There is no specified bidding number in the update, and auto-generate is set to true
+                    var newBiddingNumber = await _gateway.IssueNextBiddingNumber().ConfigureAwait(false);
+
+                    request.Assessment.BiddingNumber = newBiddingNumber.ToString();
                 }
-                else if (!string.IsNullOrEmpty(request.Assessment.BiddingNumber)
-                    && _biddingNumberGenerator.IsExistingBiddingNumber(applications, id, request.Assessment.BiddingNumber))
+                else if (biddingNumberChanged)
                 {
-                    throw new DuplicateBiddingNumberException("Unable to update application with duplicate bidding number");
+                    //The bidding number has been manually changed.  This newly entered bidding number needs to be validated.
+                    long newBiddingNumber = 0;
+                    if (!long.TryParse(request?.Assessment?.BiddingNumber, out newBiddingNumber))
+                    {
+                        //The user has supplied a bidding number which is not a number
+                        throw new InvalidBiddingNumberException($"Supplied bidding number \"{request.Assessment.BiddingNumber}\" is invalid");
+                    }
+                    else if (newBiddingNumber > 0)
+                    {
+                        //The user has manually supplied a bidding number -check its not in the auto generated range, and check for duplicates
+
+                        //First, check that its not in the auto-generate range
+                        var lastIssuedBiddingNumber = await _gateway.GetLastIssuedBiddingNumber().ConfigureAwait(false);
+
+                        if (lastIssuedBiddingNumber.HasValue)
+                        {
+                            if (newBiddingNumber > lastIssuedBiddingNumber.Value)
+                            {
+                                throw new InvalidBiddingNumberException($"Supplied bidding number \"{request.Assessment.BiddingNumber}\" is reserved for auto-generation.  Please use a bidding number below {lastIssuedBiddingNumber.Value}, or auto-generate the bidding number");
+                            }
+                        }
+
+                        //Then, check for duplicates
+                        var duplicateCases = await _search.GetByBiddingNumber(newBiddingNumber, 0, 10).ConfigureAwait(false);
+
+                        if (duplicateCases.TotalResults > 0)
+                        {
+                            string references = string.Join(",", duplicateCases.Results.Select(r => r.Reference));
+                            throw new DuplicateBiddingNumberException($"The bidding number {newBiddingNumber} is a duplicate - it is used on {duplicateCases.TotalResults} other case(s). References: {references}");
+                        }
+                    }
                 }
             }
 
             // get list of all update activities prior to updating the application
-            var origApplication = _gateway.GetApplicationById(id);
+
             var activities = GetApplicationActivities(origApplication, request);
 
             var application = _gateway.UpdateApplication(id, request);
+
             if (null != application)
             {
                 // audit the update

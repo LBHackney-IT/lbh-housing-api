@@ -1,3 +1,4 @@
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
@@ -7,6 +8,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.Services;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -19,19 +21,26 @@ namespace HousingRegisterApi.V1.Gateways
     public class DynamoDbGateway : IApplicationApiGateway
     {
         private readonly IDynamoDBContext _dynamoDbContext;
+        private readonly IAmazonDynamoDB _dynamoDbClient;
         private readonly ISHA256Helper _hashHelper;
         private readonly IVerifyCodeGenerator _codeGenerator;
         private readonly IBedroomCalculatorService _bedroomCalculatorService;
+        private readonly ILogger<DynamoDbGateway> _logger;
+
         public DynamoDbGateway(
             IDynamoDBContext dynamoDbContext,
+            IAmazonDynamoDB dynamoDbClient,
             ISHA256Helper hashHelper,
             IVerifyCodeGenerator codeGenerator,
-            IBedroomCalculatorService bedroomCalculatorService)
+            IBedroomCalculatorService bedroomCalculatorService,
+            ILogger<DynamoDbGateway> logger)
         {
             _dynamoDbContext = dynamoDbContext;
+            _dynamoDbClient = dynamoDbClient;
             _hashHelper = hashHelper;
             _codeGenerator = codeGenerator;
             _bedroomCalculatorService = bedroomCalculatorService;
+            _logger = logger;
         }
 
         public async Task<(IEnumerable<Application>, string)> GetApplicationsByStatusAsync(SearchQueryParameter searchParameters)
@@ -519,6 +528,73 @@ namespace HousingRegisterApi.V1.Gateways
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
             return entity.ToDomain();
+        }
+
+        public async Task<long> IssueNextBiddingNumber()
+        {
+            string tableName = "HousingRegister";
+            long nextBiddingNumber = 0;
+
+            try
+            {
+                var request = new UpdateItemRequest
+                {
+                    Key = new Dictionary<string, AttributeValue>() { { "id", new AttributeValue { S = "HousingRegister#BiddingNumberAtomicCounter" } } },
+                    ExpressionAttributeNames = new Dictionary<string, string>()
+    {
+        {"#B", "lastIssuedBiddingNumber"}
+    },
+                    ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+    {
+        {":incr",new AttributeValue {N = "1"}}
+    },
+                    UpdateExpression = "SET #B = #B + :incr",
+                    TableName = tableName,
+                    ReturnValues = ReturnValue.UPDATED_NEW
+                };
+
+                var response = await _dynamoDbClient.UpdateItemAsync(request).ConfigureAwait(false);
+
+                string newBiddingNumber = response.Attributes["lastIssuedBiddingNumber"].N;
+
+                nextBiddingNumber = long.Parse(newBiddingNumber);
+            }
+            catch (AmazonDynamoDBException ex)
+            {
+                _logger.LogError(ex, "Error getting next bidding number transactionally");
+                throw;
+            }
+
+            return nextBiddingNumber;
+
+        }
+
+        public async Task<long?> GetLastIssuedBiddingNumber()
+        {
+            string tableName = "HousingRegister";
+            long? nextBiddingNumber = null;
+
+            try
+            {
+                var request = new GetItemRequest
+                {
+                    Key = new Dictionary<string, AttributeValue>() { { "id", new AttributeValue { S = "HousingRegister#BiddingNumberAtomicCounter" } } },
+                    TableName = tableName
+                };
+
+                var response = await _dynamoDbClient.GetItemAsync(request).ConfigureAwait(false);
+
+                string newBiddingNumber = response.Item["lastIssuedBiddingNumber"].N;
+
+                nextBiddingNumber = long.Parse(newBiddingNumber);
+            }
+            catch (AmazonDynamoDBException ex)
+            {
+                _logger.LogError(ex, "Error getting next bidding number transactionally");
+            }
+
+            return nextBiddingNumber;
+
         }
     }
 }

@@ -212,12 +212,14 @@ namespace HousingRegisterApi
             if (env.IsDevelopment())
             {
                 app.UseSession();
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
             else
             {
                 app.UseHsts();
             }
+
+            app.UseExceptionHandler("/api/v1/exception/handle");
 
             app.UseCorrelation();
             app.UseXRay("housing-register-api");

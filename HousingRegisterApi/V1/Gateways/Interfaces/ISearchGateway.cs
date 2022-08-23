@@ -12,5 +12,7 @@ namespace HousingRegisterApi.V1.Gateways.Interfaces
         Task<ApplicationSearchPagedResult> FilterApplications(SearchQueryParameter filterParameters);
 
         Task<Dictionary<string, long>> GetStatusBreakdown();
+
+        Task<ApplicationSearchPagedResult> GetByBiddingNumber(long biddingNumber, int page, int pageSize);
     }
 }
