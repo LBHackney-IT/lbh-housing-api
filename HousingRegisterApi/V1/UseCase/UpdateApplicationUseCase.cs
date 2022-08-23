@@ -4,6 +4,7 @@ using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using System;
@@ -17,17 +18,17 @@ namespace HousingRegisterApi.V1.UseCase
     public class UpdateApplicationUseCase : IUpdateApplicationUseCase
     {
         private readonly IApplicationApiGateway _gateway;
-        private readonly IBiddingNumberGenerator _biddingNumberGenerator;
         private readonly IActivityGateway _activityGateway;
+        private readonly ISearchGateway _search;
 
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
-            IBiddingNumberGenerator biddingNumberGenerator,
-            IActivityGateway applicationHistory)
+            IActivityGateway applicationHistory,
+            ISearchGateway search)
         {
             _gateway = gateway;
-            _biddingNumberGenerator = biddingNumberGenerator;
             _activityGateway = applicationHistory;
+            _search = search;
         }
 
         public async Task<ApplicationResponse> Execute(Guid id, UpdateApplicationRequest request)
@@ -48,9 +49,9 @@ namespace HousingRegisterApi.V1.UseCase
 
                     request.Assessment.BiddingNumber = newBiddingNumber.ToString();
                 }
-                else
+                else if (biddingNumberChanged)
                 {
-                    //Regardless of the generate flag, the bidding number has been manually entered.  This newly entered bidding number needs to be validated.
+                    //The bidding number has been manually changed.  This newly entered bidding number needs to be validated.
                     long newBiddingNumber = 0;
                     if (!long.TryParse(request?.Assessment?.BiddingNumber, out newBiddingNumber))
                     {
@@ -59,14 +60,26 @@ namespace HousingRegisterApi.V1.UseCase
                     }
                     else if (newBiddingNumber > 0)
                     {
-                        //The user has supplied a bidding number
+                        //The user has manually supplied a bidding number -check its not in the auto generated range, and check for duplicates
+
+                        //First, check that its not in the auto-generate range
                         var lastIssuedBiddingNumber = await _gateway.GetLastIssuedBiddingNumber().ConfigureAwait(false);
+
                         if (lastIssuedBiddingNumber.HasValue)
                         {
                             if (newBiddingNumber > lastIssuedBiddingNumber.Value)
                             {
                                 throw new InvalidBiddingNumberException($"Supplied bidding number \"{request.Assessment.BiddingNumber}\" is reserved for auto-generation.  Please use a bidding number below {lastIssuedBiddingNumber.Value}, or auto-generate the bidding number");
                             }
+                        }
+
+                        //Then, check for duplicates
+                        var duplicateCases = await _search.GetByBiddingNumber(newBiddingNumber, 0, 10).ConfigureAwait(false);
+
+                        if (duplicateCases.TotalResults > 0)
+                        {
+                            string references = string.Join(",", duplicateCases.Results.Select(r => r.Reference));
+                            throw new DuplicateBiddingNumberException($"The bidding number {newBiddingNumber} is a duplicate - it is used on the following case references: {references}");
                         }
                     }
                 }
