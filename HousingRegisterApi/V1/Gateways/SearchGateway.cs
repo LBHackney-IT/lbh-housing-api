@@ -201,6 +201,24 @@ namespace HousingRegisterApi.V1.Gateways
 
         }
 
+        public async Task<ApplicationSearchPagedResult> GetByBiddingNumber(long biddingNumber, int page, int pageSize)
+        {
+            var biddingNumberSearch = await _client.SearchAsync<ApplicationSearchEntity>(s => s
+                .Index(HousingRegisterReadAlias)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(s => s.Field(f => f.BiddingNumber).Value((int) biddingNumber))
+                        )
+                    )
+                )
+                .Take(pageSize)
+                .From(pageSize * page)
+            ).ConfigureAwait(false);
+
+            return biddingNumberSearch.ToPagedResult(page, pageSize);
+        }
+
 
 
         public static ApplicationSearchSemiStructuredQuery ParseQuery(string inputQuery)

@@ -6,6 +6,7 @@ using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
@@ -18,8 +19,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class UpdateApplicationUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockGateway;
-        private Mock<IBiddingNumberGenerator> _biddingNumberGenerator;
         private Mock<IActivityGateway> _mockActivityGateway;
+        private Mock<ISearchGateway> _mockASearchGateway;
         private UpdateApplicationUseCase _classUnderTest;
         private Fixture _fixture;
 
@@ -27,9 +28,9 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
-            _biddingNumberGenerator = new Mock<IBiddingNumberGenerator>();
             _mockActivityGateway = new Mock<IActivityGateway>();
-            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _biddingNumberGenerator.Object, _mockActivityGateway.Object);
+            _mockASearchGateway = new Mock<ISearchGateway>();
+            _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object, _mockASearchGateway.Object);
             _fixture = new Fixture();
         }
 

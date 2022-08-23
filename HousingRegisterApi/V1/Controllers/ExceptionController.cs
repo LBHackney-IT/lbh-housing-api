@@ -35,12 +35,12 @@ namespace HousingRegisterApi.V1.Controllers
                 if (ex is HousingRegisterException)
                 {
                     context.Response.StatusCode = 400;
-                    return new { message = ex.Message };
+                    return new { message = ex.Message, type = ex.GetType().Name };
                 }
                 else
                 {
                     context.Response.StatusCode = 500;
-                    return new { message = $"An unexpected problem occurred. CorrelationId:{this.GetCorrelationId()}" };
+                    return new { message = $"An unexpected problem occurred. CorrelationId:{this.GetCorrelationId()}", type = ex.GetType().Name };
 
                 }
             }
