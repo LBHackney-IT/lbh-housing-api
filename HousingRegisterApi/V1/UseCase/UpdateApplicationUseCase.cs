@@ -79,7 +79,7 @@ namespace HousingRegisterApi.V1.UseCase
                         if (duplicateCases.TotalResults > 0)
                         {
                             string references = string.Join(",", duplicateCases.Results.Select(r => r.Reference));
-                            throw new DuplicateBiddingNumberException($"The bidding number {newBiddingNumber} is a duplicate - it is used on the following case references: {references}");
+                            throw new DuplicateBiddingNumberException($"The bidding number {newBiddingNumber} is a duplicate - it is used on {duplicateCases.TotalResults} other case(s). References: {references}");
                         }
                     }
                 }
