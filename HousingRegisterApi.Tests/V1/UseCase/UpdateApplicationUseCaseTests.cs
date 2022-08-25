@@ -40,6 +40,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
+            application.FixDates();
             _mockGateway
                 .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
                 .Returns(application);
@@ -58,7 +59,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
-
+            application.FixDates();
             _mockGateway
                 .Setup(x => x.GetApplicationById(id))
                 .Returns(application);
@@ -84,10 +85,13 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
             var assessment = application.Assessment;
+            application.FixDates();
             application.Assessment = null;
 
             assessment.BiddingNumber = null;
             assessment.GenerateBiddingNumber = true;
+
+
 
             _mockGateway
                 .Setup(x => x.GetApplicationById(id))
@@ -132,6 +136,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
+            application.FixDates();
             var assessment = application.Assessment;
             application.Assessment = null;
 
@@ -180,6 +185,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             // Arrange
             var id = Guid.NewGuid();
             var application = _fixture.Create<Application>();
+            application.FixDates();
             var updatedAssessment = application.Assessment;
             application.Assessment = null;
 
