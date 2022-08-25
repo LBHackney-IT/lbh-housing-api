@@ -124,58 +124,58 @@ namespace HousingRegisterApi.V1.UseCase
                         throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s D.O.B has an invalid timezone skew - {otherApplicant.Person.DateOfBirth}");
                     }
 
-                    if (otherApplicant?.MedicalNeed?.AssessmentDate.HasValue ?? false)
-                    {
-                        if (otherApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
-                        {
-                            //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                            throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s Medical Need assessment date has an invalid timezone skew - {otherApplicant.MedicalNeed.AssessmentDate.Value}");
-                        }
-                    }
+                    //if (otherApplicant?.MedicalNeed?.AssessmentDate.HasValue ?? false)
+                    //{
+                    //    if (otherApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
+                    //    {
+                    //        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+                    //        throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s Medical Need assessment date has an invalid timezone skew - {otherApplicant.MedicalNeed.AssessmentDate.Value}");
+                    //    }
+                    //}
 
-                    if ((otherApplicant?.MedicalNeed?.FormRecieved.Hour ?? 0) != 0)
-                    {
-                        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                        throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s Medical Need Form Received date has an invalid timezone skew - {otherApplicant.MedicalNeed.FormRecieved}");
-                    }
+                    //if ((otherApplicant?.MedicalNeed?.FormRecieved.Hour ?? 0) != 0)
+                    //{
+                    //    //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+                    //    throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s Medical Need Form Received date has an invalid timezone skew - {otherApplicant.MedicalNeed.FormRecieved}");
+                    //}
                 }
             }
 
-            if (request?.Assessment?.InformationReceivedDate.HasValue ?? false)
-            {
-                if (request.Assessment.InformationReceivedDate.Value.Hour != 0)
-                {
-                    //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                    throw new InvalidDateException($"The assessments information recieved date has an invalid timezone skew - {request.Assessment.InformationReceivedDate.Value}");
-                }
-            }
+            //if (request?.Assessment?.InformationReceivedDate.HasValue ?? false)
+            //{
+            //    if (request.Assessment.InformationReceivedDate.Value.Hour != 0)
+            //    {
+            //        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+            //        throw new InvalidDateException($"The assessments information recieved date has an invalid timezone skew - {request.Assessment.InformationReceivedDate.Value}");
+            //    }
+            //}
 
-            if (request?.Assessment?.EffectiveDate.HasValue ?? false)
-            {
-                if (request.Assessment.EffectiveDate.Value.Hour != 0)
-                {
-                    //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                    throw new InvalidDateException($"The assessments Effective date has an invalid timezone skew - {request.Assessment.EffectiveDate.Value}");
-                }
-            }
+            //if (request?.Assessment?.EffectiveDate.HasValue ?? false)
+            //{
+            //    if (request.Assessment.EffectiveDate.Value.Hour != 0)
+            //    {
+            //        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+            //        throw new InvalidDateException($"The assessments Effective date has an invalid timezone skew - {request.Assessment.EffectiveDate.Value}");
+            //    }
+            //}
 
-            if (request.MainApplicant?.MedicalNeed != null)
-            {
-                if (request.MainApplicant.MedicalNeed?.AssessmentDate.HasValue ?? false)
-                {
-                    if (request.MainApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
-                    {
-                        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                        throw new InvalidDateException($"The main applicants Medical Need assessment date has an invalid timezone skew - {request.MainApplicant.MedicalNeed.AssessmentDate.Value}");
-                    }
-                }
+            //if (request.MainApplicant?.MedicalNeed != null)
+            //{
+            //    if (request.MainApplicant.MedicalNeed?.AssessmentDate.HasValue ?? false)
+            //    {
+            //        if (request.MainApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
+            //        {
+            //            //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+            //            throw new InvalidDateException($"The main applicants Medical Need assessment date has an invalid timezone skew - {request.MainApplicant.MedicalNeed.AssessmentDate.Value}");
+            //        }
+            //    }
 
-                if ((request.MainApplicant?.MedicalNeed?.FormRecieved.Hour ?? 0) != 0)
-                {
-                    //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
-                    throw new InvalidDateException($"The main applicants Medical Need Form Received date has an invalid timezone skew - {request.MainApplicant.MedicalNeed.FormRecieved}");
-                }
-            }
+            //    if ((request.MainApplicant?.MedicalNeed?.FormRecieved.Hour ?? 0) != 0)
+            //    {
+            //        //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
+            //        throw new InvalidDateException($"The main applicants Medical Need Form Received date has an invalid timezone skew - {request.MainApplicant.MedicalNeed.FormRecieved}");
+            //    }
+            //}
         }
 
         /// <summary>
