@@ -108,7 +108,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         private static void ValidateDates(UpdateApplicationRequest request)
         {
-            if (request.MainApplicant.Person.DateOfBirth.Hour != 0)
+            if (request?.MainApplicant?.Person?.DateOfBirth.Hour != 0)
             {
                 //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
                 throw new InvalidDateException($"The main applicant D.O.B has an invalid timezone skew - {request.MainApplicant.Person.DateOfBirth}");
@@ -116,13 +116,13 @@ namespace HousingRegisterApi.V1.UseCase
 
             foreach (var otherApplicant in request.OtherMembers)
             {
-                if (otherApplicant.Person.DateOfBirth.Hour != 0)
+                if (otherApplicant?.Person.DateOfBirth.Hour != 0)
                 {
                     //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
                     throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s D.O.B has an invalid timezone skew - {otherApplicant.Person.DateOfBirth}");
                 }
 
-                if (otherApplicant.MedicalNeed.AssessmentDate.HasValue)
+                if (otherApplicant?.MedicalNeed?.AssessmentDate.HasValue ?? false)
                 {
                     if (otherApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
                     {
@@ -131,14 +131,14 @@ namespace HousingRegisterApi.V1.UseCase
                     }
                 }
 
-                if (otherApplicant.MedicalNeed.FormRecieved.Hour != 0)
+                if (otherApplicant?.MedicalNeed?.FormRecieved.Hour != 0)
                 {
                     //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
                     throw new InvalidDateException($"The houshold member {otherApplicant.Person?.FullName}'s Medical Need Form Received date has an invalid timezone skew - {otherApplicant.MedicalNeed.FormRecieved}");
                 }
             }
 
-            if (request.Assessment.InformationReceivedDate.HasValue)
+            if (request?.Assessment?.InformationReceivedDate.HasValue ?? false)
             {
                 if (request.Assessment.InformationReceivedDate.Value.Hour != 0)
                 {
@@ -147,7 +147,7 @@ namespace HousingRegisterApi.V1.UseCase
                 }
             }
 
-            if (request.Assessment.EffectiveDate.HasValue)
+            if (request?.Assessment?.EffectiveDate.HasValue ?? false)
             {
                 if (request.Assessment.EffectiveDate.Value.Hour != 0)
                 {
@@ -158,7 +158,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (request.MainApplicant?.MedicalNeed != null)
             {
-                if (request.MainApplicant.MedicalNeed.AssessmentDate.HasValue)
+                if (request.MainApplicant.MedicalNeed?.AssessmentDate.HasValue ?? false)
                 {
                     if (request.MainApplicant.MedicalNeed.AssessmentDate.Value.Hour != 0)
                     {
@@ -167,7 +167,7 @@ namespace HousingRegisterApi.V1.UseCase
                     }
                 }
 
-                if (request.MainApplicant.MedicalNeed.FormRecieved.Hour != 0)
+                if (request.MainApplicant?.MedicalNeed?.FormRecieved.Hour != 0)
                 {
                     //Date of birth has an hour component - this time has been skewed by timezone issues on front end - reject
                     throw new InvalidDateException($"The main applicants Medical Need Form Received date has an invalid timezone skew - {request.MainApplicant.MedicalNeed.FormRecieved}");
