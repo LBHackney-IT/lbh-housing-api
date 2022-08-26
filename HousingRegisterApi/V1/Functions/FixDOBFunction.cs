@@ -17,6 +17,12 @@ namespace HousingRegisterApi.V1.Functions
         {
             context.Logger.LogLine("Fixing DOBs");
             var useCase = ServiceProvider.GetService<IFixDOBUseCase>();
+
+            if (useCase == null)
+            {
+                throw new System.Exception("Use case not found!");
+            }
+
             await useCase.Execute().ConfigureAwait(false);
         }
 
@@ -24,7 +30,7 @@ namespace HousingRegisterApi.V1.Functions
         {
             services.ConfigureDynamoDB();
 
-            services.AddScoped<IFixDOBUseCase, FixDOBUseCase>();
+            services.AddTransient<IFixDOBUseCase, FixDOBUseCase>();
 
             base.ConfigureServices(services);
         }
