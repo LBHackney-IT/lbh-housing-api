@@ -108,6 +108,7 @@ namespace HousingRegisterApi.V1.UseCase
                     { ":oldDOB", new AttributeValue(s: currentDOB.ToString("o", CultureInfo.InvariantCulture))}
                 },
                 UpdateExpression = $"SET #oth[{otherMemberIndex}].#per.#dob = :newDOB, #oth[{otherMemberIndex}].#per.#olddob = :oldDOB",
+                ConditionExpression = $"#oth[{otherMemberIndex}].#per.#dob = :oldDOB",
                 Key = new Dictionary<string, AttributeValue> { { "id", new AttributeValue(s: application["id"]) } }
             }).ConfigureAwait(false);
         }
