@@ -52,7 +52,7 @@ namespace HousingRegisterApi.V1.UseCase
 
                     request.Assessment.BiddingNumber = newBiddingNumber.ToString();
                 }
-                else if (biddingNumberChanged)
+                else if (biddingNumberChanged & !string.IsNullOrWhiteSpace(request?.Assessment?.BiddingNumber))
                 {
                     //The bidding number has been manually changed.  This newly entered bidding number needs to be validated.
                     long newBiddingNumber = 0;
