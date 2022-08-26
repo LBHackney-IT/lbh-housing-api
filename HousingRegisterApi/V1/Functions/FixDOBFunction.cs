@@ -9,6 +9,10 @@ namespace HousingRegisterApi.V1.Functions
 {
     public class FixDOBFunction : BaseFunction
     {
+        public FixDOBFunction() : base()
+        {
+
+        }
         protected async Task Handle(ILambdaContext context)
         {
             context.Logger.LogLine("Fixing DOBs");
@@ -19,7 +23,6 @@ namespace HousingRegisterApi.V1.Functions
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureDynamoDB();
-            services.AddHttpClient();
 
             services.AddScoped<IFixDOBUseCase, FixDOBUseCase>();
 
