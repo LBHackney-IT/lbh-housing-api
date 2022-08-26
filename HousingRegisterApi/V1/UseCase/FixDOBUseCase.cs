@@ -24,6 +24,7 @@ namespace HousingRegisterApi.V1.UseCase
 
         public async Task Execute()
         {
+            _logger.LogInformation("Beginning data fix");
             Table productCatalogTable = Table.LoadTable(_dynamo, "HousingRegister");
 
             ScanFilter scanFilter = new ScanFilter();
