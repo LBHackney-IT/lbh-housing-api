@@ -52,6 +52,7 @@ namespace HousingRegisterApi.V1.UseCase
                         DateTimeOffset newDOB;
                         newDOB = currentDOB.AddHours(1);
                         await UpdateMainApplicantDob(application, currentDOB, newDOB).ConfigureAwait(false);
+                        _logger.LogInformation($"{application["id"]},-1,{currentDOB.ToString("o", CultureInfo.InvariantCulture)},{newDOB.ToString("o", CultureInfo.InvariantCulture)}");
                     }
 
                     int index = 0;
@@ -65,6 +66,7 @@ namespace HousingRegisterApi.V1.UseCase
                             DateTimeOffset newDOB;
                             newDOB = currentDOB.AddHours(1);
                             await UpdateOtherApplicantDob(application, index, currentDOB, newDOB).ConfigureAwait(false);
+                            _logger.LogInformation($"{application["id"]},{index},{currentDOB.ToString("o", CultureInfo.InvariantCulture)},{newDOB.ToString("o", CultureInfo.InvariantCulture)}");
                         }
                         index++;
                     }
@@ -89,7 +91,7 @@ namespace HousingRegisterApi.V1.UseCase
                 },
                 UpdateExpression = "SET #main.#per.#dob = :newDOB, #main.#per.#olddob = :oldDOB",
                 Key = new Dictionary<string, AttributeValue> { { "id", new AttributeValue(s: application["id"]) } }
-            }).ConfigureAwait(false);            
+            }).ConfigureAwait(false);
         }
 
         private async Task UpdateOtherApplicantDob(Document application, int otherMemberIndex, DateTimeOffset currentDOB, DateTimeOffset newDOB)
