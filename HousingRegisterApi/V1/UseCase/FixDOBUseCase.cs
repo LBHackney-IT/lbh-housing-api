@@ -156,7 +156,7 @@ namespace HousingRegisterApi.V1.UseCase
             }
             catch (ConditionalCheckFailedException ex)
             {
-                _logger.LogError(ex,"Error updating other member");
+                _logger.LogError(ex, "Error updating other member");
 
             }
         }
