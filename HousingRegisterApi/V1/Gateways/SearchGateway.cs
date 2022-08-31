@@ -52,7 +52,7 @@ namespace HousingRegisterApi.V1.Gateways
             return simpleQueryStringSearch.ToPagedResult(pageNumber, pageSize);
         }
 
-        public static SearchDescriptor<ApplicationSearchEntity> ConstructApplicationSearch(string queryPhrase, int pageNumber, int pageSize)
+        public SearchDescriptor<ApplicationSearchEntity> ConstructApplicationSearch(string queryPhrase, int pageNumber, int pageSize)
         {
             var structuedQuery = ParseQuery(queryPhrase);
 
@@ -221,7 +221,7 @@ namespace HousingRegisterApi.V1.Gateways
 
 
 
-        public static ApplicationSearchSemiStructuredQuery ParseQuery(string inputQuery)
+        public ApplicationSearchSemiStructuredQuery ParseQuery(string inputQuery)
         {
             if (string.IsNullOrWhiteSpace(inputQuery)) return ApplicationSearchSemiStructuredQuery.Empty;
 
@@ -231,6 +231,37 @@ namespace HousingRegisterApi.V1.Gateways
                 .CaptureNINO(false)
                 .CaptureFullBiddingNumbers(false)
                 .RemoveMatched();
+
+            _logger.LogInformation($"Logging query parser results for input term \"{inputQuery}\"");
+
+            foreach (var parsedDate in parser.Dates)
+            {
+                _logger.LogInformation($"Date found - {parsedDate}");
+            }
+
+            foreach (var appId in parser.ApplicationIds)
+            {
+                _logger.LogInformation($"Application ID found - {appId}");
+            }
+
+            foreach (var nino in parser.NINOs)
+            {
+                _logger.LogInformation($"NINO found - {nino}");
+            }
+
+            foreach (var reference in parser.ReferenceNumbers)
+            {
+                _logger.LogInformation($"Ref found - {reference}");
+            }
+
+            foreach (var biddingnumber in parser.BiddingNumbers)
+            {
+                _logger.LogInformation($"Bidding Number found - {biddingnumber}");
+            }
+
+            _logger.LogInformation($"Remaining terms: {string.Join(" ", parser.Terms)}");
+
+            _logger.LogInformation($"Query text: {parser.Query.GetSimpleQueryStringWithFuzziness()}");
 
             return parser.Query;
         }

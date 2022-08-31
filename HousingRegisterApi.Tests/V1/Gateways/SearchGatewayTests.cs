@@ -40,7 +40,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "Martin Hughes~2";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.AreEqual(query, outputQuery.GetSimpleQueryStringWithFuzziness(), $"Expert query was changed");
@@ -53,7 +53,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "Martin Hughes";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.AreEqual(outputQuery.GetSimpleQueryStringWithFuzziness(), "Martin~1 Hughes~1", "Expected fuzziness not applied");
@@ -66,7 +66,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "Martin Smithson";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.AreEqual(outputQuery.GetSimpleQueryStringWithFuzziness(), "Martin~1 Smithson~2", "Expected fuzziness not applied");
@@ -79,7 +79,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "JL998";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.That(outputQuery.NINOs.Count == 1);
@@ -93,7 +93,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "bbd";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.That(outputQuery.ReferenceNumbers.Count == 1);
@@ -107,7 +107,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "bd6";
 
             //Act
-            var outputQuery = SearchGateway.ParseQuery(query);
+            var outputQuery = _classUnderTest.ParseQuery(query);
 
             //Assert
             Assert.That(outputQuery.ReferenceNumbers.Count == 1);
@@ -123,7 +123,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             string query = "bd6";
 
             //Act
-            var outputQuery = SearchGateway.ConstructApplicationSearch(query, 0, 10);
+            var outputQuery = _classUnderTest.ConstructApplicationSearch(query, 0, 10);
 
             string outputQueryAsString = outputQuery.ToString();
 

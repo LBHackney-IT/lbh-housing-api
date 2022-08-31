@@ -79,6 +79,11 @@ functions:
     events:
       - sns:
           arn: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
+  FixDOBsFunction:
+    name: ${self:service}-${self:provider.stage}-fixdobs
+    handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FixDOBFunction::Handle
+    role: lambdaExecutionRole
+    timeout: 900
   HousingRegisterNovaletExportUpload:
     name: ${self:service}-${self:provider.stage}-novalet-export-upload
     handler: HousingRegisterApi::HousingRegisterApi.V1.Functions.FtpUploadNovaletExportFunction::Handle

@@ -17,6 +17,7 @@ using HousingRegisterApi.V1.UseCase.Interfaces;
 using HousingRegisterApi.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -24,12 +25,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Notify.Client;
 using Notify.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -143,6 +146,18 @@ namespace HousingRegisterApi
             services.AddHttpContextWrapper();
             services.AddHttpContextAccessor();
 
+            // Configure supported cultures and localization options
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[]
+                {
+                    new CultureInfo("en-GB"),
+                };
+                options.DefaultRequestCulture = new RequestCulture(culture: "en-GB", uiCulture: "en-GB");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
+
             RegisterGateways(services);
             RegisterUseCases(services);
             RegisterServices(services);
@@ -220,6 +235,9 @@ namespace HousingRegisterApi
             }
 
             app.UseExceptionHandler("/api/v1/exception/handle");
+
+            var locOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
 
             app.UseCorrelation();
             app.UseXRay("housing-register-api");

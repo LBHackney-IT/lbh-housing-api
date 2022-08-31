@@ -69,3 +69,4 @@ database/shared-local-instance.db
 /HousingRegisterApi/local.env
 /testEnvironments.json
 /docker-compose.dcproj
+/HousingRegisterApi/.serverless
