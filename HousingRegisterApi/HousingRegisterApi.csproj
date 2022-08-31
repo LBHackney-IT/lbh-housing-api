@@ -26,7 +26,6 @@
         <PackageReference Include="AWSXRayRecorder.Handlers.EntityFramework" Version="1.1.0" />
         <PackageReference Include="Hackney.Core.Http" Version="1.49.0" />
         <PackageReference Include="Hackney.Core.JWT" Version="1.49.0" />
-        <PackageReference Include="Hackney.Core.Logging" Version="1.49.0" />
         <PackageReference Include="dotenv.net" Version="3.1.0" />
         <PackageReference Include="GovukNotify" Version="4.0.1" />
         <PackageReference Include="Hackney.Core.Logging" Version="1.49.0" />
