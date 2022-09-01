@@ -121,13 +121,27 @@ namespace HousingRegisterApi.V1.Services
         /// <returns></returns>
         private static List<string> GetValues(object source)
         {
+            Dictionary<string, List<string>> filterProperties = new Dictionary<string, List<string>>
+            {
+                { "NovaletExportDataRow", new List<string> { "Errors", "ErrorData" } }
+            };
             Type sourceType = source.GetType();
             PropertyInfo[] properties = sourceType.GetProperties();
             List<string> values = new List<string>();
 
             foreach (var property in properties)
             {
-                values.Add(ConvertToString(property.GetValue(source)));
+                if (filterProperties.ContainsKey(sourceType.Name))
+                {
+                    if (!filterProperties[sourceType.Name].Contains(property.Name))
+                    {
+                        values.Add(ConvertToString(property.GetValue(source)));
+                    }
+                }
+                else
+                {
+                    values.Add(ConvertToString(property.GetValue(source)));
+                }
             }
 
             return values;
