@@ -34,6 +34,10 @@ To serve the application, run it using your IDE of choice, we use Visual Studio 
 **Note**
 When running locally the appropriate database connection details are still needed.
 
+### Pre-commit hooks
+
+Repository has pre-commit hooks configuration to prevent direct commits to main branches and for scanning secrets. Please ensure you have [pre-commit framework](https://pre-commit.com/) installed before starting development work.
+
 #### DynamoDb
 
 To use a local instance of DynamoDb, this can be [installed](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html) or run via [Docker](https://www.docker.com/products/docker-desktop).
