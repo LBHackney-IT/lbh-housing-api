@@ -70,3 +70,6 @@ database/shared-local-instance.db
 /testEnvironments.json
 /docker-compose.dcproj
 /HousingRegisterApi/.serverless
+
+# ggshield cache
+.cache_ggshield
