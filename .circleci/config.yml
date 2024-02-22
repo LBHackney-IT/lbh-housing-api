@@ -221,16 +221,17 @@ workflows:
           filters:
             branches:
               only: development
-      - permit-development-terraform-release:
-          type: approval
-          requires:
-            - terraform-init-and-plan-development
-          filters:
-            branches:
-              only: development
+      #Enable this to check the plan before applying changes. Also please remember to change the required dependency below
+      # - permit-development-terraform-release:
+      #     type: approval
+      #     requires:
+      #       - terraform-init-and-plan-development
+      #     filters:
+      #       branches:
+      #         only: development
       - terraform-apply-development:
           requires:
-            - permit-development-terraform-release
+            - terraform-init-and-plan-development
           filters:
             branches:
               only: development
@@ -262,16 +263,17 @@ workflows:
           filters:
             branches:
               only: master
-      - permit-staging-terraform-release:
-          type: approval
-          requires:
-            - terraform-init-and-plan-staging
-          filters:
-            branches:
-              only: master
+      #Enable this to check the plan before applying changes. Also please remember to change the required dependency below
+      #     - permit-staging-terraform-release:
+      # type: approval
+      # requires:
+      #   - terraform-init-and-plan-staging
+      # filters:
+      #   branches:
+      #     only: master
       - terraform-apply-staging:
           requires:
-            - permit-staging-terraform-release
+            - terraform-init-and-plan-staging
           filters:
             branches:
               only: master
