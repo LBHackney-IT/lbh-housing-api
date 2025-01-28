@@ -1,7 +1,7 @@
 service: housing-register-api
 provider:
   name: aws
-  runtime: dotnet6
+  runtime: dotnet8
   memorySize: 2048
   tracing:
     lambda: true
@@ -22,7 +22,7 @@ provider:
       - 'text/csv'
       
 package:
-  artifact: ./bin/release/net6.0/housing-register-api.zip
+  artifact: ./bin/release/net8.0/housing-register-api.zip
 
 functions:
   HousingRegisterApi:
