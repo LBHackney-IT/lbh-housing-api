@@ -13,7 +13,7 @@ data "aws_subnet_ids" "staging" {
 }
 
 module "elasticsearch_db_staging" {
-  source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
   vpc_id              = data.aws_vpc.staging_vpc.id
   environment_name    = var.environment_name
   port                = 443
