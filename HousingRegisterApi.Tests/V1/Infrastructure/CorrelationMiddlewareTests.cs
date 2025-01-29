@@ -24,7 +24,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             var httpContext = new DefaultHttpContext();
             var headerValue = "123";
 
-            httpContext.HttpContext.Request.Headers.Add(Constants.CorrelationId, headerValue);
+            httpContext.HttpContext.Request.Headers.Append(Constants.CorrelationId, headerValue);
 
             // Act
             await _sut.InvokeAsync(httpContext).ConfigureAwait(false);
