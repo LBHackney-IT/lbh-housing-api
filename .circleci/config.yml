@@ -208,28 +208,9 @@ workflows:
           context: api-nuget-token-context
       - assume-role-development:
           context: api-assume-role-housing-development-context
+          name: assume-role-development-for-code-deployment
           requires:
             - build-and-test
-          filters:
-            branches:
-              only: development
-      - terraform-init-and-plan-development:
-          requires:
-            - assume-role-development
-          filters:
-            branches:
-              only: development
-      #Enable this to check the plan before applying changes. Also please remember to change the required dependency below
-      # - permit-development-terraform-release:
-      #     type: approval
-      #     requires:
-      #       - terraform-init-and-plan-development
-      #     filters:
-      #       branches:
-      #         only: development
-      - terraform-apply-development:
-          requires:
-            - terraform-init-and-plan-development
           filters:
             branches:
               only: development
@@ -238,7 +219,39 @@ workflows:
             - api-nuget-token-context
             - "Serverless Framework"  
           requires:
-            - terraform-apply-development
+            - assume-role-development-for-code-deployment
+          filters:
+            branches:
+              only: development
+      - permit-development-terraform-workflow:
+            type: approval
+            filters:
+              branches:
+                only: development
+      - assume-role-development:
+          context: api-assume-role-housing-development-context
+          name: assume-role-development-for-terraform-deployment
+          requires:
+            - permit-development-terraform-workflow
+          filters:
+            branches:
+              only: development
+      - terraform-init-and-plan-development:
+          requires:
+            - assume-role-development-for-terraform-deployment
+          filters:
+            branches:
+              only: development
+      - permit-development-terraform-release:
+          type: approval
+          requires:
+            - terraform-init-and-plan-development
+          filters:
+            branches:
+              only: development
+      - terraform-apply-development:
+          requires:
+            - permit-development-terraform-release
           filters:
             branches:
               only: development
