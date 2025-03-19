@@ -206,7 +206,7 @@ workflows:
           context: api-nuget-token-context
       - build-and-test:
           context: api-nuget-token-context
-      - assume-role-development:
+      - assume-role-development-for-code-deployment:
           context: api-assume-role-housing-development-context
           requires:
             - build-and-test
@@ -218,7 +218,7 @@ workflows:
             - api-nuget-token-context
             - "Serverless Framework"  
           requires:
-            - assume-role-development
+            - assume-role-development-for-code-deployment
           filters:
             branches:
               only: development
@@ -227,7 +227,7 @@ workflows:
             filters:
               branches:
                 only: development
-      - assume-role-development:
+      - assume-role-development-for-terraform-deployment:
           context: api-assume-role-housing-development-context
           requires:
             - permit-development-terraform-workflow
@@ -236,7 +236,7 @@ workflows:
               only: development
       - terraform-init-and-plan-development:
           requires:
-            - assume-role-development
+            - assume-role-development-for-terraform-deployment
           filters:
             branches:
               only: development
