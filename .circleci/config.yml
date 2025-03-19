@@ -206,8 +206,9 @@ workflows:
           context: api-nuget-token-context
       - build-and-test:
           context: api-nuget-token-context
-      - assume-role-development-for-code-deployment:
+      - assume-role-development:
           context: api-assume-role-housing-development-context
+          name: assume-role-development-for-code-deployment
           requires:
             - build-and-test
           filters:
@@ -227,8 +228,9 @@ workflows:
             filters:
               branches:
                 only: development
-      - assume-role-development-for-terraform-deployment:
+      - assume-role-development:
           context: api-assume-role-housing-development-context
+          name: assume-role-development-for-terraform-deployment
           requires:
             - permit-development-terraform-workflow
           filters:
