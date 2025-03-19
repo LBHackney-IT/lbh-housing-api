@@ -213,32 +213,43 @@ workflows:
           filters:
             branches:
               only: development
+      - deploy-to-development:
+          context:
+            - api-nuget-token-context
+            - "Serverless Framework"  
+          requires:
+            - assume-role-development
+          filters:
+            branches:
+              only: development
+      - permit-development-terraform-workflow:
+            type: approval
+            filters:
+              branches:
+                only: development
+      - assume-role-development:
+          context: api-assume-role-housing-development-context
+          requires:
+            - permit-development-terraform-workflow
+          filters:
+            branches:
+              only: development
       - terraform-init-and-plan-development:
           requires:
             - assume-role-development
           filters:
             branches:
               only: development
-      #Enable this to check the plan before applying changes. Also please remember to change the required dependency below
-      # - permit-development-terraform-release:
-      #     type: approval
-      #     requires:
-      #       - terraform-init-and-plan-development
-      #     filters:
-      #       branches:
-      #         only: development
-      - terraform-apply-development:
+      - permit-development-terraform-release:
+          type: approval
           requires:
             - terraform-init-and-plan-development
           filters:
             branches:
               only: development
-      - deploy-to-development:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"  
+      - terraform-apply-development:
           requires:
-            - terraform-apply-development
+            - permit-development-terraform-release
           filters:
             branches:
               only: development
