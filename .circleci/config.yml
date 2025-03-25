@@ -208,9 +208,9 @@ workflows:
           context: api-nuget-token-context
       - assume-role-development:
           context: api-assume-role-housing-development-context
-          name: assume-role-development-for-code-deployment
           requires:
             - build-and-test
+            - check-code-formatting
           filters:
             branches:
               only: development
@@ -219,10 +219,61 @@ workflows:
             - api-nuget-token-context
             - "Serverless Framework"  
           requires:
-            - assume-role-development-for-code-deployment
+            - assume-role-development
           filters:
             branches:
-              only: development
+              only: development      
+
+  check-and-deploy-staging-and-production:
+    jobs:
+      - build-and-test:
+          context: api-nuget-token-context
+          filters:
+            branches:
+              only: master
+      - assume-role-staging:
+          context: api-assume-role-housing-staging-context
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: master
+      - deploy-to-staging:
+          context:
+            - api-nuget-token-context
+            - "Serverless Framework"         
+          requires:
+            - assume-role-staging
+          filters:
+            branches:
+              only: master
+      - assume-role-production:
+          context: api-assume-role-housing-production-context
+          requires:
+            - deploy-to-staging
+          filters:
+            branches:
+              only: master
+      - permit-production-release:
+          type: approval
+          requires:
+            - assume-role-production
+          filters:
+            branches:
+              only: master
+      - deploy-to-production:
+          context:
+            - api-nuget-token-context
+            - "Serverless Framework"  
+          requires:
+            - permit-production-release
+          filters:
+            branches:
+              only: master
+     
+
+  deploy-development-terraform:
+    jobs:
       - permit-development-terraform-workflow:
             type: approval
             filters:
@@ -230,7 +281,6 @@ workflows:
                 only: development
       - assume-role-development:
           context: api-assume-role-housing-development-context
-          name: assume-role-development-for-terraform-deployment
           requires:
             - permit-development-terraform-workflow
           filters:
@@ -238,7 +288,7 @@ workflows:
               only: development
       - terraform-init-and-plan-development:
           requires:
-            - assume-role-development-for-terraform-deployment
+            - assume-role-development
           filters:
             branches:
               only: development
@@ -255,63 +305,16 @@ workflows:
           filters:
             branches:
               only: development
-
-  check-and-deploy-staging-and-production:
+  
+  deploy-staging-and-production-terraform:
     jobs:
-      - build-and-test:
-          context: api-nuget-token-context
-          filters:
-            branches:
-              only: master
-      - assume-role-staging:
-          context: api-assume-role-housing-staging-context
-          name: assume-role-staging-for-code-deployment
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only: master
-      - deploy-to-staging:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"         
-          requires:
-            - assume-role-staging-for-code-deployment
-          filters:
-            branches:
-              only: master
-      - assume-role-production:
-          context: api-assume-role-housing-production-context
-          name: assume-role-production-for-code-deployment
-          requires:
-            - deploy-to-staging
-          filters:
-            branches:
-              only: master
-      - permit-production-release:
-          type: approval
-          requires:
-            - assume-role-production-for-code-deployment
-          filters:
-            branches:
-              only: master
-      - deploy-to-production:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"  
-          requires:
-            - permit-production-release
-          filters:
-            branches:
-              only: master
       - permit-staging-and-production-terraform-workflow:
-            type: approval
-            filters:
-              branches:
-                only: master
+          type: approval
+          filters:
+            branches:
+              only: master
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
-          name: assume-role-staging-for-terraform-deployment
           requires:
             - permit-staging-and-production-terraform-workflow
           filters:
@@ -319,7 +322,7 @@ workflows:
               only: master
       - terraform-init-and-plan-staging:
           requires:
-            - assume-role-staging-for-terraform-deployment
+            - assume-role-staging
           filters:
             branches:
               only: master
@@ -345,7 +348,6 @@ workflows:
             - terraform-apply-staging
       - assume-role-production:
           context: api-assume-role-housing-production-context
-          name: assume-role-production-for-terraform-deployment
           requires:
             - permit-production-terraform-workflow
           filters:
@@ -353,7 +355,7 @@ workflows:
               only: master
       - terraform-init-and-plan-production:
           requires:
-            - assume-role-production-for-terraform-deployment
+            - assume-role-production
           filters:
             branches:
               only: master  
@@ -370,3 +372,4 @@ workflows:
           filters:
             branches:
               only: master
+              
