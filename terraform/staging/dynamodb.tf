@@ -1,7 +1,7 @@
 locals {
   defaultCapacity = 50
   minCapacity = 2
-  maxCapacity = 50
+  maxCapacity = 55
   indexNames = toset([
     "table/HousingRegister/index/HousingRegisterAll",
     "table/HousingRegister/index/HousingRegisterStatus",
