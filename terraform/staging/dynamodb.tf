@@ -54,7 +54,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     tags = {
         Name              = "housing-register-api-${var.environment_name}"
-        Environment       = var.environment_name
+        Environment       = "stg"
+        Confidentiality   = "Internal"
         terraform-managed = true
         project_name      = var.project_name
     }
