@@ -58,6 +58,8 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         Confidentiality   = "Internal"
         terraform-managed = true
         project_name      = var.project_name
+        Application       = "Housing Register"
+        TeamEmail         = "developementteam@hackney.gov.uk" 
     }
 
     global_secondary_index {
