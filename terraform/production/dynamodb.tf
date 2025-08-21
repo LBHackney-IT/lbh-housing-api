@@ -1,7 +1,7 @@
 locals {
   defaultCapacity = 10
   minCapacity = 2
-  maxCapacity = 100
+  maxCapacity = 50
   indexNames = toset([
     "table/HousingRegister/index/HousingRegisterAll",
     "table/HousingRegister/index/HousingRegisterStatus",
@@ -110,7 +110,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 }
 
 resource "aws_appautoscaling_target" "housingregisterapi_dynamodb_table_read_target" {
-  max_capacity       = local.maxCapacity
+  max_capacity       = 100 #To enable report generation with increased record count
   min_capacity       = 10  #Temporary set run applicant feed
   resource_id        = "table/HousingRegister"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
