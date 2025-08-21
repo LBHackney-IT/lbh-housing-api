@@ -60,6 +60,7 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         project_name      = var.project_name
         Application       = "Housing Register"
         TeamEmail         = "developementteam@hackney.gov.uk" 
+        BackupPolicy      = "Prod"
     }
 
     global_secondary_index {
