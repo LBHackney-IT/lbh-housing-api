@@ -1,7 +1,7 @@
 locals {
   defaultCapacity = 10
   minCapacity = 2
-  maxCapacity = 50
+  maxCapacity = 100
   indexNames = toset([
     "table/HousingRegister/index/HousingRegisterAll",
     "table/HousingRegister/index/HousingRegisterStatus",
@@ -54,9 +54,13 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
 
     tags = {
         Name              = "housing-register-api-${var.environment_name}"
-        Environment       = var.environment_name
+        Environment       = "prod"
+        Confidentiality   = "Internal"
         terraform-managed = true
         project_name      = var.project_name
+        Application       = "Housing Register"
+        TeamEmail         = "developementteam@hackney.gov.uk" 
+        BackupPolicy      = "Prod"
     }
 
     global_secondary_index {
