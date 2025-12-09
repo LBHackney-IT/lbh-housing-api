@@ -32,7 +32,8 @@ module "elasticsearch_db_production" {
 }
 
 resource "aws_ssm_parameter" "search_elasticsearch_domain" {
-  name  = "/${lower(var.project_name)}/${var.environment_name}/elasticsearch-domain"
-  type  = "String"
-  value = "https://${module.elasticsearch_db_production.es_endpoint_url}"
+  name      = "/${lower(var.project_name)}/${var.environment_name}/elasticsearch-domain"
+  type      = "String"
+  value     = "https://${module.elasticsearch_db_production.es_endpoint_url}"
+  overwrite = true
 }

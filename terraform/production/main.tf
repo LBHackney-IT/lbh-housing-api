@@ -65,7 +65,7 @@ resource "aws_s3_bucket" "housingregister_bucket" {
 
   tags = {
     Name = "housingregister-exports-${var.environment_name}-bucket"
-    Environment = var.environment_name
+    Environment = "prod"
   }
 }
 
