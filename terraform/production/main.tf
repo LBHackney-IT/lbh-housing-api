@@ -30,7 +30,7 @@ locals {
 
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-housing-production"
+    bucket  = "terraform-state-disaster-recovery"
     encrypt = true
     region  = "eu-west-2"
     key     = "services/housing-register-api/state"
@@ -75,7 +75,8 @@ resource "aws_sns_topic" "novaletexport_topic" {
 }
 
 resource "aws_ssm_parameter" "novalet_sns_arn" {
-  name  = "/sns-topic/production/novaletexport-sns-topic/arn"
-  type  = "String"
-  value = aws_sns_topic.novaletexport_topic.arn
+  name      = "/sns-topic/production/novaletexport-sns-topic/arn"
+  type      = "String"
+  value     = aws_sns_topic.novaletexport_topic.arn
+  overwrite = true
 }
