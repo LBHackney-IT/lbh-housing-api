@@ -45,9 +45,10 @@ resource "aws_sns_topic" "housingregister_topic" {
 }
 
 resource "aws_ssm_parameter" "housingregister_sns_arn" {
-  name  = "/sns-topic/production/housingregister/arn"
-  type  = "String"
-  value = aws_sns_topic.housingregister_topic.arn
+  name      = "/sns-topic/production/housingregister/arn"
+  type      = "String"
+  value     = aws_sns_topic.housingregister_topic.arn
+  overwrite = true
 }
 
 module "housingregister_api_cloudwatch_dashboard" {
@@ -55,11 +56,11 @@ module "housingregister_api_cloudwatch_dashboard" {
   environment_name    = var.environment_name
   api_name            = "housing-register-api"
   sns_topic_name      = aws_sns_topic.housingregister_topic.name
-  # dynamodb_table_name = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
+  dynamodb_table_name = "persons" # Dummy value
 }
 
 resource "aws_s3_bucket" "housingregister_bucket" {
-  bucket = "housingregister-exports-${var.environment_name}-bucket"
+  bucket = "housingregister-exports-${var.environment_name}-bucket-dr"
   acl    = "private"
 
   tags = {
