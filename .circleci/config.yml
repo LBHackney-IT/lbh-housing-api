@@ -52,11 +52,10 @@ commands:
             terraform init
           name: get and init
       - run:
-          name: plan
+          name: plan destroy
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform import aws_dynamodb_table.housingregisterapi_dynamodb_table HousingRegister
-            terraform plan -out=plan.out
+            terraform plan -destroy -out=plan.out
       - persist_to_workspace:
           root: *workspace_root
           paths:
@@ -101,10 +100,10 @@ commands:
             chmod +x ./build.sh
             ./build.sh
       - run:
-          name: Deploy lambda
+          name: Remove lambda
           command: |
             cd ./HousingRegisterApi/
-            sls deploy --stage <<parameters.stage>> --conceal
+            sls remove --stage <<parameters.stage>>
 
 jobs:
   check-code-formatting:
