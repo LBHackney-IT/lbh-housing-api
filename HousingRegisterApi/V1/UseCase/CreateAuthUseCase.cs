@@ -11,15 +11,18 @@ namespace HousingRegisterApi.V1.UseCase
 {
     public class CreateAuthUseCase : ICreateAuthUseCase
     {
+        private readonly ILogger _logger;
         private readonly IApplicationApiGateway _applicationGateway;
         private readonly INotifyGateway _notifyGateway;
         private readonly IActivityGateway _activityGateway;
 
         public CreateAuthUseCase(
+            ILogger<CalculateBedroomsUseCase> logger,
             IApplicationApiGateway applicationGateway,
             INotifyGateway notifyGateway,
             IActivityGateway activityGateway)
         {
+            _logger = logger;
             _applicationGateway = applicationGateway;
             _notifyGateway = notifyGateway;
             _activityGateway = activityGateway;
@@ -34,6 +37,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             if (incompleteApplication == null)
             {
+                _logger.LogInformation($"Creating new application for email: {request.Email}");
                 var blankApplication = _applicationGateway.CreateNewApplication(new CreateApplicationRequest()
                 {
                     MainApplicant = new Applicant()
@@ -53,6 +57,7 @@ namespace HousingRegisterApi.V1.UseCase
                 var activity = new EntityActivity<ApplicationActivityType>(ApplicationActivityType.Created,
                         "", null, blankApplication);
 
+                _logger.LogInformation($"Adding activity for application ID: {applicationId}");
                 activity.AddChange("", null, blankApplication);
 
                 _activityGateway.LogActivity(blankApplication, activity);
@@ -60,12 +65,14 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             // this generates a new verification code and assigns it to the application entity
+            _logger.LogInformation($"Creating verification code for application ID: {applicationId}");
             var application = _applicationGateway.CreateVerifyCode(applicationId.Value, request);
             if (application == null)
             {
                 return null;
             }
 
+            _logger.LogInformation($"Sending verification code for application ID: {applicationId}");
             var notifyResponse = _notifyGateway.SendVerifyCode(application.MainApplicant, application.VerifyCode);
             return new CreateAuthResponse()
             {

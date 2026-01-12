@@ -466,16 +466,19 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application CreateVerifyCode(Guid id, CreateAuthRequest request)
         {
+            _logger.LogInformation($"Looking up application ID: {id}");
             var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
             if (entity == null
                 || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
             {
+                _logger.LogInformation($"Application not found or email address does not match: {request.Email}");
                 return null;
             }
 
             entity.VerifyCode = _codeGenerator.GenerateCode();
             entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(30);
 
+            _logger.LogInformation($"Saving application ID: {id} with verify code that expires at {entity.VerifyExpiresAt}");
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
             return entity.ToDomain();
