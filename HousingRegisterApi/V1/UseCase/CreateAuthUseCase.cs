@@ -62,7 +62,8 @@ namespace HousingRegisterApi.V1.UseCase
                 activity.AddChange("", null, blankApplication);
 
                 _activityGateway.LogActivity(blankApplication, activity);
-
+            } else {
+                _logger.LogInformation($"Using existing incomplete application ID: {applicationId} for email: {request.Email}");
             }
 
             // this generates a new verification code and assigns it to the application entity
