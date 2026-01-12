@@ -120,12 +120,7 @@ namespace HousingRegisterApi
                     c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddLogging(l =>
-            {
-                l.ClearProviders();
-                l.AddConsole();
-            });
-
+            services.ConfigureLambdaLogging(Configuration);
             AWSXRayRecorder.InitializeInstance(Configuration);
             AWSXRayRecorder.RegisterLogger(LoggingOptions.Console);
 
