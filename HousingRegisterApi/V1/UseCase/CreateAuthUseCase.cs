@@ -73,7 +73,7 @@ namespace HousingRegisterApi.V1.UseCase
             var application = _applicationGateway.CreateVerifyCode(applicationId.Value, request);
             if (application == null)
             {
-                return null;
+                throw new Exception($"Failed to create verification code for application ID: {applicationId}");
             }
 
             _logger.LogInformation($"Sending verification code for application ID: {applicationId}");
