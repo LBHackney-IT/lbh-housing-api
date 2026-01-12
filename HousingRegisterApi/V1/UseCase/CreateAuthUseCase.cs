@@ -19,7 +19,7 @@ namespace HousingRegisterApi.V1.UseCase
         private readonly IActivityGateway _activityGateway;
 
         public CreateAuthUseCase(
-            ILogger<CalculateBedroomsUseCase> logger,
+            ILogger<CreateAuthUseCase> logger,
             IApplicationApiGateway applicationGateway,
             INotifyGateway notifyGateway,
             IActivityGateway activityGateway)
