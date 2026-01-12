@@ -5,6 +5,7 @@ using dotenv.net;
 using Hackney.Core.Http;
 using Hackney.Core.JWT;
 using Hackney.Core.Logging;
+using Hackney.Core.Middleware.Logging;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Controllers;
 using HousingRegisterApi.V1.Factories;
@@ -121,6 +122,7 @@ namespace HousingRegisterApi
             });
 
             services.ConfigureLambdaLogging(Configuration);
+            services.AddLogCallAspect();
             AWSXRayRecorder.InitializeInstance(Configuration);
             AWSXRayRecorder.RegisterLogger(LoggingOptions.Console);
 
@@ -233,6 +235,7 @@ namespace HousingRegisterApi
             app.UseRequestLocalization(locOptions.Value);
 
             app.UseCorrelation();
+            app.UseLogCall();
             app.UseXRay("housing-register-api");
 
             //Get All ApiVersions,

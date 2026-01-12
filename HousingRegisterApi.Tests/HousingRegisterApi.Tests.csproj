@@ -40,6 +40,7 @@
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.1.29" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Hackney.Core.Testing.Shared" Version="1.54.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.27" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>

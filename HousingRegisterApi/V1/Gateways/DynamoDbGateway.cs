@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Hackney.Core.Logging;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -464,6 +465,7 @@ namespace HousingRegisterApi.V1.Gateways
             return entity.ToDomain();
         }
 
+        [LogCall]
         public Application CreateVerifyCode(Guid id, CreateAuthRequest request)
         {
             _logger.LogInformation($"Looking up application ID: {id}");

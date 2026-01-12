@@ -11,6 +11,7 @@ using System;
 
 namespace HousingRegisterApi.Tests.V1.UseCase
 {
+    [Collection("LogCall collection")]
     public class CreateAuthUseCaseTests
     {
         private Mock<IApplicationApiGateway> _mockApplicationGateway;

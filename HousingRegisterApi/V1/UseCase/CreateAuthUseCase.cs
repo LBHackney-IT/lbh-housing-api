@@ -7,6 +7,7 @@ using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.Extensions.Logging;
+using Hackney.Core.Logging;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -29,6 +30,7 @@ namespace HousingRegisterApi.V1.UseCase
             _activityGateway = activityGateway;
         }
 
+        [LogCall]
         public CreateAuthResponse Execute(CreateAuthRequest request)
         {
             // check if an uncompleted application exists

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HousingRegisterApi.Tests.V1.Gateways
 {
+    [Collection("LogCall collection")]
     [TestFixture]
     public class DynamoDbGatewayTests
     {
