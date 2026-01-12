@@ -100,7 +100,7 @@ commands:
             chmod +x ./build.sh
             ./build.sh
       - run:
-          name: Remove lambda
+          name: Deploy lambda
           command: |
             cd ./HousingRegisterApi/
             sls deploy --stage <<parameters.stage>> --conceal
