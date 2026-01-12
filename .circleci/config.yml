@@ -55,6 +55,7 @@ commands:
           name: plan
           command: |
             cd ./terraform/<<parameters.environment>>/
+            terraform import 'aws_dynamodb_table.housingregisterapi_dynamodb_table' 'HousingRegister'
             terraform plan -out=plan.out
       - persist_to_workspace:
           root: *workspace_root
