@@ -6,6 +6,7 @@ using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace HousingRegisterApi.V1.UseCase
 {
