@@ -52,10 +52,10 @@ commands:
             terraform init
           name: get and init
       - run:
-          name: plan
+          name: plan destroy
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform plan -out=plan.out
+            terraform plan -destroy -out=plan.out
       - persist_to_workspace:
           root: *workspace_root
           paths:
@@ -103,7 +103,7 @@ commands:
           name: Deploy lambda
           command: |
             cd ./HousingRegisterApi/
-            sls deploy --stage <<parameters.stage>> --conceal
+            sls remove --stage <<parameters.stage>>
 
 jobs:
   check-code-formatting:
