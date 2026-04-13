@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
-  aws-cli: circleci/aws-cli@4.0.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0  
 
 executors:
   docker-python:
@@ -102,12 +102,11 @@ commands:
             apt-get install -y curl ca-certificates
             curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
             apt-get install -y nodejs
-      - aws-cli/install      
-      # - run:
-      #     name: Install AWS CLI
-      #     command: |
-      #       apt-get update
-      #       apt-get install -y awscli
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt-get update
+            apt-get install -y awscli
       - run:
           name: Fetch SSM parameters from central account for serverless deployment
           command: |
@@ -196,7 +195,8 @@ jobs:
   build-and-test:
     executor: docker-python
     steps:
-      - checkout
+      - checkout:
+          method: full
       - setup_remote_docker
       - run:
           name: build
@@ -204,6 +204,21 @@ jobs:
       - run:
           name: Run tests
           command: docker-compose run housing-register-api-test
+      - run:
+          name: Report
+          command: |
+            mkdir -p coverage test_results
+            CID=$(docker ps -aqf "name=housing-register-api-test" | head -n1)
+            if [ -z "${CID}" ]; then
+              echo "No test container found matching name=housing-register-api-test"
+              exit 1
+            fi
+            docker cp "${CID}:/app/coverage/." ./coverage/
+            docker cp "${CID}:/app/test_results/." ./test_results/
+            find coverage -name '*.opencover.xml' -exec sed -i "s|/app/|$(pwd)/|g" {} +
+      - store_test_results:
+          path: test_results          
+      - sonarcloud/scan          
   assume-role-development:
     executor: docker-python
     steps:
@@ -283,7 +298,9 @@ workflows:
       - check-code-formatting:
           context: api-nuget-token-context
       - build-and-test:
-          context: api-nuget-token-context
+          context: 
+            - api-nuget-token-context
+            - SonarCloud
       - assume-role-development:
           context: api-assume-role-housing-development-context
           requires:
@@ -306,7 +323,9 @@ workflows:
   check-and-deploy-staging-and-production:
     jobs:
       - build-and-test:
-          context: api-nuget-token-context
+          context: 
+            - api-nuget-token-context
+            - SonarCloud
           filters:
             branches:
               only: master

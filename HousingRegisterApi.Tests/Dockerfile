@@ -22,6 +22,12 @@ RUN dotnet restore ./HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj
 # Copy everything else and build
 COPY . .
 
-RUN dotnet build -c debug -o out HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj
+RUN dotnet build -c debug HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj
 
-CMD dotnet test
+CMD dotnet test HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj -c Debug --no-build \
+    --logger "console;verbosity=minimal" \
+    --logger "junit-xml;LogFilePath=/app/test_results/junit.xml" \
+    /p:CollectCoverage=true \
+    /p:CoverletOutput=/app/coverage/ \
+    /p:CoverletOutputFormat=opencover \
+    /p:CoverletOutputFile=coverage.opencover.xml
