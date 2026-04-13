@@ -26,7 +26,7 @@ RUN dotnet build -c debug HousingRegisterApi.Tests/HousingRegisterApi.Tests.cspr
 
 CMD dotnet test HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj -c Debug \
     --logger "console;verbosity=minimal" \
-    --logger "junit-xml;LogFilePath=/app/test_results/junit.xml" \
+    --logger "junit;LogFilePath=/app/test_results/junit.xml" \
     /p:CollectCoverage=true \
     /p:CoverletOutput=/app/coverage/ \
     /p:CoverletOutputFormat=opencover \
