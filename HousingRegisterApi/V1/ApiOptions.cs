@@ -16,7 +16,7 @@ namespace HousingRegisterApi.V1
         public static ApiOptions FromEnv()
         {
             var evidenceApiUrl = Environment.GetEnvironmentVariable("EVIDENCE_API_URL");
-            var activityApiUrl = Environment.GetEnvironmentVariable("ACTIVITYHISTORY_API_URL");
+            var activityApiUrl = Environment.GetEnvironmentVariable("ACTIVITY_HISTORY_API_URL");
 
             return new ApiOptions()
             {

@@ -25,7 +25,7 @@ namespace HousingRegisterApi.V1.Gateways
         public SearchGateway(ILogger<SearchGateway> logger, IConfiguration configuration)
         {
             _logger = logger;
-            var searchDomainUri = new Uri(configuration["SEARCHDOMAIN"]);
+            var searchDomainUri = new Uri(configuration["SEARCH_DOMAIN"]);
             _connectionSettings = new ConnectionSettings(searchDomainUri);
 
 #if DEBUG
