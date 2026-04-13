@@ -6,7 +6,7 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT='true'
 ENV DynamoDb_LocalMode='true'
 
 ARG LBHPACKAGESTOKEN
-ENV LBHPACKAGESTOKEN=$LBHPACKAGESTOKEN 
+ENV LBHPACKAGESTOKEN=$LBHPACKAGESTOKEN
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ COPY . .
 
 RUN dotnet build -c debug HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj
 
-CMD dotnet test HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj -c Debug --no-build \
+CMD dotnet test HousingRegisterApi.Tests/HousingRegisterApi.Tests.csproj -c Debug \
     --logger "console;verbosity=minimal" \
     --logger "junit-xml;LogFilePath=/app/test_results/junit.xml" \
     /p:CollectCoverage=true \
