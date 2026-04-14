@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
-  sonarcloud: sonarsource/sonarcloud@2.0.0  
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 
 executors:
   docker-python:
@@ -114,7 +114,7 @@ commands:
             export EVIDENCE_API=$(aws ssm get-parameter \
               --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/mtfh-housing-<<parameters.stage>>/mtfh-housing/evidence-api-url \
               --query Parameter.Value \
-              --output text)            
+              --output text)
             export ACTIVITY_HISTORY_API=$(aws ssm get-parameter \
               --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/mtfh-housing-<<parameters.stage>>/mtfh-housing/activity-history-api-url \
               --query Parameter.Value \
@@ -147,7 +147,8 @@ commands:
               --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/novalet-ftp-folder \
               --query Parameter.Value \
               --output text)
-              
+
+
             echo "export EVIDENCE_API=${EVIDENCE_API}" >> $BASH_ENV
             echo "export ACTIVITY_HISTORY_API=${ACTIVITY_HISTORY_API}" >> $BASH_ENV
             echo "export SEARCH_DOMAIN=${SEARCH_DOMAIN}" >> $BASH_ENV
@@ -156,8 +157,7 @@ commands:
             echo "export NOVALET_FTP_USERNAME=${NOVALET_FTP_USERNAME}" >> $BASH_ENV
             echo "export NOVALET_FTP_ADDRESS=${NOVALET_FTP_ADDRESS}" >> $BASH_ENV
             echo "export NOVALET_FTP_PORT=${NOVALET_FTP_PORT}" >> $BASH_ENV
-            echo "export NOVALET_FTP_FOLDER=${NOVALET_FTP_FOLDER}" >> $BASH_ENV 
-            echo "export NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}" >> $BASH_ENV      
+            echo "export NOVALET_FTP_FOLDER=${NOVALET_FTP_FOLDER}" >> $BASH_ENV
 
       - run:
           name: Build and deploy lambda
@@ -178,7 +178,6 @@ commands:
               --param="novaletFtpAddress=${NOVALET_FTP_ADDRESS}" \
               --param="novaletFtpPort=${NOVALET_FTP_PORT}" \
               --param="novaletFtpFolder=${NOVALET_FTP_FOLDER}" \
-              --param="gtmId=${NEXT_PUBLIC_GTM_ID}" \
               --conceal
 
 jobs:
@@ -217,8 +216,8 @@ jobs:
             docker cp "${CID}:/app/test_results/." ./test_results/
             find coverage -name '*.opencover.xml' -exec sed -i "s|/app/|$(pwd)/|g" {} +
       - store_test_results:
-          path: test_results          
-      - sonarcloud/scan          
+          path: test_results
+      - sonarcloud/scan
   assume-role-development:
     executor: docker-python
     steps:
@@ -298,7 +297,7 @@ workflows:
       - check-code-formatting:
           context: api-nuget-token-context
       - build-and-test:
-          context: 
+          context:
             - api-nuget-token-context
             - SonarCloud
       - assume-role-development:
@@ -313,17 +312,17 @@ workflows:
           context:
             - api-nuget-token-context
             - Serverless Framework
-            - central-parameter-store-context            
+            - central-parameter-store-context
           requires:
             - assume-role-development
           filters:
             branches:
-              only: build/use-central-params      
+              only: build/use-central-params
 
   check-and-deploy-staging-and-production:
     jobs:
       - build-and-test:
-          context: 
+          context:
             - api-nuget-token-context
             - SonarCloud
           filters:
@@ -339,8 +338,8 @@ workflows:
       - deploy-to-staging:
           context:
             - api-nuget-token-context
-            - Serverless Framework        
-            - central-parameter-store-context            
+            - Serverless Framework
+            - central-parameter-store-context
           requires:
             - assume-role-staging
           filters:
@@ -371,13 +370,13 @@ workflows:
           context:
             - api-nuget-token-context
             - Serverless Framework
-            - central-parameter-store-context            
+            - central-parameter-store-context
           requires:
             - permit-production-release
           filters:
             branches:
               only: master
-     
+
 
   deploy-development-terraform:
     jobs:
@@ -412,7 +411,7 @@ workflows:
           filters:
             branches:
               only: development
-  
+
   deploy-staging-and-production-terraform:
     jobs:
       - permit-staging-and-production-terraform-workflow:
@@ -465,7 +464,7 @@ workflows:
             - assume-role-production
           filters:
             branches:
-              only: master  
+              only: master
       - permit-production-terraform-release:
           type: approval
           requires:
@@ -479,4 +478,3 @@ workflows:
           filters:
             branches:
               only: master
-              
