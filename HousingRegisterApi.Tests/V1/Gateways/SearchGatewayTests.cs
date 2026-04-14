@@ -23,7 +23,7 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             //Arrange
             var inMemorySettings = new Dictionary<string, string>
             {
-                {"SEARCHDOMAIN", "http://localhost:9200"}
+                {"SEARCH_DOMAIN", "http://localhost:9200"}
             };
 
             _configuration = new ConfigurationBuilder()
