@@ -5,6 +5,7 @@ namespace HousingRegisterApi.V1.Boundary.Request
 {
     public class CreateApplicationRequest
     {
+        public string Id { get; set; }
         public string Status { get; set; }
         public bool SensitiveData { get; set; }
         public Applicant MainApplicant { get; set; }
