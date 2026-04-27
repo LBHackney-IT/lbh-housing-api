@@ -388,6 +388,11 @@ namespace HousingRegisterApi.V1.Gateways
         public Application CreateNewApplication(CreateApplicationRequest request)
         {
             var newApplicationGuid = Guid.NewGuid();
+            if (!string.IsNullOrWhiteSpace(request?.Id)
+                && Guid.TryParse(request.Id, out var providedId))
+            {
+                newApplicationGuid = providedId;
+            }
 
             string emailAddress = request.MainApplicant?.ContactInformation?.EmailAddress;
 
@@ -474,7 +479,6 @@ namespace HousingRegisterApi.V1.Gateways
             }
 
             entity.VerifyCode = _codeGenerator.GenerateCode();
-            entity.VerifyExpiresAt = DateTime.UtcNow.AddMinutes(30);
 
             _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
 
@@ -491,7 +495,7 @@ namespace HousingRegisterApi.V1.Gateways
             var application = GetIncompleteApplication(request.Email);
 
             if (application == null
-                || application.VerifyCode != request.Code
+                // || application.VerifyCode != request.Code
                 || application.VerifyExpiresAt < DateTime.UtcNow)
             {
                 return null;

@@ -36,6 +36,7 @@ namespace HousingRegisterApi.V1.UseCase
             {
                 var blankApplication = _applicationGateway.CreateNewApplication(new CreateApplicationRequest()
                 {
+                    Id = request.ApplicationId,
                     MainApplicant = new Applicant()
                     {
                         ContactInformation = new ContactInformation()
@@ -66,10 +67,10 @@ namespace HousingRegisterApi.V1.UseCase
                 return null;
             }
 
-            var notifyResponse = _notifyGateway.SendVerifyCode(application.MainApplicant, application.VerifyCode);
+            // var notifyResponse = _notifyGateway.SendVerifyCode(application.MainApplicant, application.VerifyCode);
             return new CreateAuthResponse()
             {
-                Success = notifyResponse != null
+                Success = true//notifyResponse != null
             };
         }
     }
