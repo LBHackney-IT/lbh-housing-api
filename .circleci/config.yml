@@ -324,7 +324,7 @@ workflows:
             - check-code-formatting
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
       - deploy-to-development:
           context:
             - api-nuget-token-context
@@ -334,7 +334,7 @@ workflows:
             - assume-role-development
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
 
   check-and-deploy-staging-and-production:
     jobs:
@@ -400,33 +400,33 @@ workflows:
           type: approval
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
       - assume-role-development:
           context: api-assume-role-housing-development-context
           requires:
             - permit-development-terraform-workflow
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
       - terraform-init-and-plan-development:
           requires:
             - assume-role-development
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
       - permit-development-terraform-release:
           type: approval
           requires:
             - terraform-init-and-plan-development
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
       - terraform-apply-development:
           requires:
             - permit-development-terraform-release
           filters:
             branches:
-              only: bugfix/clean-circle
+              only: development
 
   deploy-staging-and-production-terraform:
     jobs:
