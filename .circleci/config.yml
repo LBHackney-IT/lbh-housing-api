@@ -47,11 +47,11 @@ commands:
       - *attach_workspace
       - checkout
       - run:
+          name: get and init
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform get -update=true
             terraform init
-          name: get and init
       - run:
           name: plan
           command: |
@@ -70,7 +70,6 @@ commands:
         type: string
     steps:
       - *attach_workspace
-      # - checkout
       - run:
           name: apply
           command: |
@@ -82,15 +81,10 @@ commands:
     parameters:
       stage:
         type: enum
-        enum: ['development', 'staging', 'production']
+        enum: ["development", "staging", "production"]
       aws-central-parameter-account:
         type: enum
-        enum:
-          [
-            'AWS_ACCOUNT_DEVELOPMENT',
-            'AWS_ACCOUNT_STAGING',
-            'AWS_ACCOUNT_PRODUCTION',
-          ]
+        enum: ["AWS_ACCOUNT_DEVELOPMENT", "AWS_ACCOUNT_STAGING", "AWS_ACCOUNT_PRODUCTION"]
     steps:
       - *attach_workspace
       - checkout
@@ -107,18 +101,6 @@ commands:
           name: Restore npm cache
           keys:
             - npm-serverless-v4
-      # - run:
-      #     name: Install Node
-      #     command: |
-      #       apt-get update
-      #       apt-get install -y curl ca-certificates
-      #       curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
-      #       apt-get install -y nodejs
-      # - run:
-      #     name: Install AWS CLI
-      #     command: |
-      #       apt-get update
-      #       apt-get install -y awscli
       - run:
           name: Install Node and AWS CLI
           command: |
@@ -167,7 +149,6 @@ commands:
               --query Parameter.Value \
               --output text)
 
-
             echo "export EVIDENCE_API=${EVIDENCE_API}" >> $BASH_ENV
             echo "export ACTIVITY_HISTORY_API=${ACTIVITY_HISTORY_API}" >> $BASH_ENV
             echo "export SEARCH_DOMAIN=${SEARCH_DOMAIN}" >> $BASH_ENV
@@ -177,7 +158,6 @@ commands:
             echo "export NOVALET_FTP_ADDRESS=${NOVALET_FTP_ADDRESS}" >> $BASH_ENV
             echo "export NOVALET_FTP_PORT=${NOVALET_FTP_PORT}" >> $BASH_ENV
             echo "export NOVALET_FTP_FOLDER=${NOVALET_FTP_FOLDER}" >> $BASH_ENV
-
 
       - run:
           name: Build and deploy lambda
@@ -223,6 +203,7 @@ jobs:
       - run:
           name: Run formatter check
           command: dotnet format --verify-no-changes
+
   build-and-test:
     executor: docker-python
     steps:
@@ -251,6 +232,7 @@ jobs:
       - store_test_results:
           path: test_results
       - sonarcloud/scan
+
   assume-role-development:
     executor: docker-python
     steps:
@@ -309,20 +291,22 @@ jobs:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'development'
-          aws-central-parameter-account: 'AWS_ACCOUNT_DEVELOPMENT'
+          stage: "development"
+          aws-central-parameter-account: "AWS_ACCOUNT_DEVELOPMENT"
+
   deploy-to-staging:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'staging'
-          aws-central-parameter-account: 'AWS_ACCOUNT_STAGING'
+          stage: "staging"
+          aws-central-parameter-account: "AWS_ACCOUNT_STAGING"
+
   deploy-to-production:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'production'
-          aws-central-parameter-account: 'AWS_ACCOUNT_PRODUCTION'
+          stage: "production"
+          aws-central-parameter-account: "AWS_ACCOUNT_PRODUCTION"
 
 workflows:
   check-and-deploy-development:
@@ -410,40 +394,39 @@ workflows:
             branches:
               only: master
 
-
   deploy-development-terraform:
     jobs:
       - permit-development-terraform-workflow:
-            type: approval
-            filters:
-              branches:
-                only: development
+          type: approval
+          filters:
+            branches:
+              only: bugfix/clean-circle
       - assume-role-development:
           context: api-assume-role-housing-development-context
           requires:
             - permit-development-terraform-workflow
           filters:
             branches:
-              only: development
+              only: bugfix/clean-circle
       - terraform-init-and-plan-development:
           requires:
             - assume-role-development
           filters:
             branches:
-              only: development
+              only: bugfix/clean-circle
       - permit-development-terraform-release:
           type: approval
           requires:
             - terraform-init-and-plan-development
           filters:
             branches:
-              only: development
+              only: bugfix/clean-circle
       - terraform-apply-development:
           requires:
             - permit-development-terraform-release
           filters:
             branches:
-              only: development
+              only: bugfix/clean-circle
 
   deploy-staging-and-production-terraform:
     jobs:
@@ -480,11 +463,11 @@ workflows:
               only: master
       - permit-production-terraform-workflow:
           type: approval
+          requires:
+            - terraform-apply-staging
           filters:
             branches:
               only: master
-          requires:
-            - terraform-apply-staging
       - assume-role-production:
           context: api-assume-role-housing-production-context
           requires:
@@ -501,13 +484,13 @@ workflows:
       - permit-production-terraform-release:
           type: approval
           requires:
-            -  terraform-init-and-plan-production
+            - terraform-init-and-plan-production
           filters:
             branches:
               only: master
       - terraform-apply-production:
           requires:
-            -  permit-production-terraform-release
+            - permit-production-terraform-release
           filters:
             branches:
               only: master
