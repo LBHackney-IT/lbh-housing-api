@@ -340,7 +340,7 @@ workflows:
             - check-code-formatting
           filters:
             branches:
-              only: build/clean-up-circle
+              only: build/clean-circle
       - deploy-to-development:
           context:
             - api-nuget-token-context
@@ -350,7 +350,7 @@ workflows:
             - assume-role-development
           filters:
             branches:
-              only: build/clean-up-circle
+              only: build/clean-circle
 
   check-and-deploy-staging-and-production:
     jobs:
