@@ -10,7 +10,7 @@ executors:
       - image: circleci/python:3.7
   docker-terraform:
     docker:
-      - image: "hashicorp/terraform:light"
+      - image: "hashicorp/terraform:1.14"
   docker-dotnet:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -70,7 +70,7 @@ commands:
         type: string
     steps:
       - *attach_workspace
-      - checkout
+      # - checkout
       - run:
           name: apply
           command: |
@@ -94,19 +94,38 @@ commands:
     steps:
       - *attach_workspace
       - checkout
-      # - setup_remote_docker
+      - restore_cache:
+          name: Restore NuGet cache
+          keys:
+            - nuget-v1-{{ checksum "HousingRegisterApi/HousingRegisterApi.csproj" }}
+            - nuget-v1-
+      - restore_cache:
+          name: Restore dotnet global tools cache
+          keys:
+            - dotnet-lambda-tools-4.0.0
+      - restore_cache:
+          name: Restore npm cache
+          keys:
+            - npm-serverless-v4
+      # - run:
+      #     name: Install Node
+      #     command: |
+      #       apt-get update
+      #       apt-get install -y curl ca-certificates
+      #       curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+      #       apt-get install -y nodejs
+      # - run:
+      #     name: Install AWS CLI
+      #     command: |
+      #       apt-get update
+      #       apt-get install -y awscli
       - run:
-          name: Install Node
+          name: Install Node and AWS CLI
           command: |
             apt-get update
-            apt-get install -y curl ca-certificates
+            apt-get install -y curl ca-certificates awscli
             curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
             apt-get install -y nodejs
-      - run:
-          name: Install AWS CLI
-          command: |
-            apt-get update
-            apt-get install -y awscli
       - run:
           name: Fetch SSM parameters from central account for serverless deployment
           command: |
@@ -159,6 +178,7 @@ commands:
             echo "export NOVALET_FTP_PORT=${NOVALET_FTP_PORT}" >> $BASH_ENV
             echo "export NOVALET_FTP_FOLDER=${NOVALET_FTP_FOLDER}" >> $BASH_ENV
 
+
       - run:
           name: Build and deploy lambda
           command: |
@@ -179,15 +199,30 @@ commands:
               --param="novaletFtpPort=${NOVALET_FTP_PORT}" \
               --param="novaletFtpFolder=${NOVALET_FTP_FOLDER}" \
               --conceal
+      - save_cache:
+          name: Save NuGet cache
+          key: nuget-v1-{{ checksum "HousingRegisterApi/HousingRegisterApi.csproj" }}
+          paths:
+            - ~/.nuget/packages
+      - save_cache:
+          name: Save dotnet global tools cache
+          key: dotnet-lambda-tools-4.0.0
+          paths:
+            - ~/.dotnet/tools
+      - save_cache:
+          name: Save npm cache
+          key: npm-serverless-v4
+          paths:
+            - ~/.npm
 
 jobs:
   check-code-formatting:
     executor: docker-dotnet
     steps:
       - checkout
-      - run:
-          name: Install dotnet format
-          command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
+      # - run:
+      #     name: Install dotnet format
+      #     command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
       - run:
           name: Run formatter check
           command: ./dotnet-format-local/dotnet-format --check
@@ -196,7 +231,8 @@ jobs:
     steps:
       - checkout:
           method: full
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: build
           command: docker-compose build housing-register-api-test
@@ -307,7 +343,7 @@ workflows:
             - check-code-formatting
           filters:
             branches:
-              only: build/use-central-params
+              only: build/clean-up-circle
       - deploy-to-development:
           context:
             - api-nuget-token-context
@@ -317,7 +353,7 @@ workflows:
             - assume-role-development
           filters:
             branches:
-              only: build/use-central-params
+              only: build/clean-up-circle
 
   check-and-deploy-staging-and-production:
     jobs:
