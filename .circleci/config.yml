@@ -10,7 +10,7 @@ executors:
       - image: circleci/python:3.7
   docker-terraform:
     docker:
-      - image: "hashicorp/terraform:light"
+      - image: "hashicorp/terraform:1.14"
   docker-dotnet:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -47,11 +47,11 @@ commands:
       - *attach_workspace
       - checkout
       - run:
+          name: get and init
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform get -update=true
             terraform init
-          name: get and init
       - run:
           name: plan
           command: |
@@ -70,7 +70,6 @@ commands:
         type: string
     steps:
       - *attach_workspace
-      - checkout
       - run:
           name: apply
           command: |
@@ -82,31 +81,33 @@ commands:
     parameters:
       stage:
         type: enum
-        enum: ['development', 'staging', 'production']
+        enum: ["development", "staging", "production"]
       aws-central-parameter-account:
         type: enum
-        enum:
-          [
-            'AWS_ACCOUNT_DEVELOPMENT',
-            'AWS_ACCOUNT_STAGING',
-            'AWS_ACCOUNT_PRODUCTION',
-          ]
+        enum: ["AWS_ACCOUNT_DEVELOPMENT", "AWS_ACCOUNT_STAGING", "AWS_ACCOUNT_PRODUCTION"]
     steps:
       - *attach_workspace
       - checkout
-      # - setup_remote_docker
+      - restore_cache:
+          name: Restore NuGet cache
+          keys:
+            - nuget-v1-{{ checksum "HousingRegisterApi/HousingRegisterApi.csproj" }}
+            - nuget-v1-
+      - restore_cache:
+          name: Restore dotnet global tools cache
+          keys:
+            - dotnet-lambda-tools-4.0.0
+      - restore_cache:
+          name: Restore npm cache
+          keys:
+            - npm-serverless-v4
       - run:
-          name: Install Node
+          name: Install Node and AWS CLI
           command: |
             apt-get update
-            apt-get install -y curl ca-certificates
+            apt-get install -y curl ca-certificates awscli
             curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
             apt-get install -y nodejs
-      - run:
-          name: Install AWS CLI
-          command: |
-            apt-get update
-            apt-get install -y awscli
       - run:
           name: Fetch SSM parameters from central account for serverless deployment
           command: |
@@ -148,7 +149,6 @@ commands:
               --query Parameter.Value \
               --output text)
 
-
             echo "export EVIDENCE_API=${EVIDENCE_API}" >> $BASH_ENV
             echo "export ACTIVITY_HISTORY_API=${ACTIVITY_HISTORY_API}" >> $BASH_ENV
             echo "export SEARCH_DOMAIN=${SEARCH_DOMAIN}" >> $BASH_ENV
@@ -179,6 +179,21 @@ commands:
               --param="novaletFtpPort=${NOVALET_FTP_PORT}" \
               --param="novaletFtpFolder=${NOVALET_FTP_FOLDER}" \
               --conceal
+      - save_cache:
+          name: Save NuGet cache
+          key: nuget-v1-{{ checksum "HousingRegisterApi/HousingRegisterApi.csproj" }}
+          paths:
+            - ~/.nuget/packages
+      - save_cache:
+          name: Save dotnet global tools cache
+          key: dotnet-lambda-tools-4.0.0
+          paths:
+            - ~/.dotnet/tools
+      - save_cache:
+          name: Save npm cache
+          key: npm-serverless-v4
+          paths:
+            - ~/.npm
 
 jobs:
   check-code-formatting:
@@ -186,17 +201,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dotnet format
-          command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
-      - run:
           name: Run formatter check
-          command: ./dotnet-format-local/dotnet-format --check
+          command: dotnet format --verify-no-changes
+
   build-and-test:
     executor: docker-python
     steps:
       - checkout:
           method: full
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: build
           command: docker-compose build housing-register-api-test
@@ -218,6 +232,7 @@ jobs:
       - store_test_results:
           path: test_results
       - sonarcloud/scan
+
   assume-role-development:
     executor: docker-python
     steps:
@@ -276,20 +291,22 @@ jobs:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'development'
-          aws-central-parameter-account: 'AWS_ACCOUNT_DEVELOPMENT'
+          stage: "development"
+          aws-central-parameter-account: "AWS_ACCOUNT_DEVELOPMENT"
+
   deploy-to-staging:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'staging'
-          aws-central-parameter-account: 'AWS_ACCOUNT_STAGING'
+          stage: "staging"
+          aws-central-parameter-account: "AWS_ACCOUNT_STAGING"
+
   deploy-to-production:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: 'production'
-          aws-central-parameter-account: 'AWS_ACCOUNT_PRODUCTION'
+          stage: "production"
+          aws-central-parameter-account: "AWS_ACCOUNT_PRODUCTION"
 
 workflows:
   check-and-deploy-development:
@@ -307,7 +324,7 @@ workflows:
             - check-code-formatting
           filters:
             branches:
-              only: build/use-central-params
+              only: development
       - deploy-to-development:
           context:
             - api-nuget-token-context
@@ -317,7 +334,7 @@ workflows:
             - assume-role-development
           filters:
             branches:
-              only: build/use-central-params
+              only: development
 
   check-and-deploy-staging-and-production:
     jobs:
@@ -377,14 +394,13 @@ workflows:
             branches:
               only: master
 
-
   deploy-development-terraform:
     jobs:
       - permit-development-terraform-workflow:
-            type: approval
-            filters:
-              branches:
-                only: development
+          type: approval
+          filters:
+            branches:
+              only: development
       - assume-role-development:
           context: api-assume-role-housing-development-context
           requires:
@@ -412,9 +428,9 @@ workflows:
             branches:
               only: development
 
-  deploy-staging-and-production-terraform:
+  deploy-staging-terraform:
     jobs:
-      - permit-staging-and-production-terraform-workflow:
+      - permit-staging-terraform-workflow:
           type: approval
           filters:
             branches:
@@ -422,7 +438,7 @@ workflows:
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
           requires:
-            - permit-staging-and-production-terraform-workflow
+            - permit-staging-terraform-workflow
           filters:
             branches:
               only: master
@@ -445,13 +461,14 @@ workflows:
           filters:
             branches:
               only: master
+
+  deploy-production-terraform:
+    jobs:
       - permit-production-terraform-workflow:
           type: approval
           filters:
             branches:
               only: master
-          requires:
-            - terraform-apply-staging
       - assume-role-production:
           context: api-assume-role-housing-production-context
           requires:
@@ -468,13 +485,13 @@ workflows:
       - permit-production-terraform-release:
           type: approval
           requires:
-            -  terraform-init-and-plan-production
+            - terraform-init-and-plan-production
           filters:
             branches:
               only: master
       - terraform-apply-production:
           requires:
-            -  permit-production-terraform-release
+            - permit-production-terraform-release
           filters:
             branches:
               only: master
