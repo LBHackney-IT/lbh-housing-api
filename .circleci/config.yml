@@ -428,9 +428,9 @@ workflows:
             branches:
               only: development
 
-  deploy-staging-and-production-terraform:
+  deploy-staging-terraform:
     jobs:
-      - permit-staging-and-production-terraform-workflow:
+      - permit-staging-terraform-workflow:
           type: approval
           filters:
             branches:
@@ -438,7 +438,7 @@ workflows:
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
           requires:
-            - permit-staging-and-production-terraform-workflow
+            - permit-staging-terraform-workflow
           filters:
             branches:
               only: master
@@ -461,10 +461,11 @@ workflows:
           filters:
             branches:
               only: master
+
+  deploy-production-terraform:
+    jobs:
       - permit-production-terraform-workflow:
           type: approval
-          requires:
-            - terraform-apply-staging
           filters:
             branches:
               only: master
