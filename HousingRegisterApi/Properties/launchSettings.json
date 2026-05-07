@@ -18,7 +18,7 @@
         "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "DynamoDb_LocalMode": "true",
         "Localstack_SnsServiceUrl": "http://localhost:4566",
-        "SEARCHDOMAIN": "https://localhost:9200/"
+        "SEARCH_DOMAIN": "https://localhost:9200/"
       },
       "applicationUrl": "http://localhost:5000"
     },

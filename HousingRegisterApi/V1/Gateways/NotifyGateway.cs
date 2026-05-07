@@ -35,7 +35,7 @@ namespace HousingRegisterApi.V1.Gateways
                 {"band", currentBand},
             };
 
-            var templateId = Environment.GetEnvironmentVariable("NOTIFY_TEMPLATE_BEDROOMCHANGE");
+            var templateId = Environment.GetEnvironmentVariable("NOTIFY_TEMPLATE_BEDROOM_CHANGE");
             _client.SendEmail(email, templateId, personalisation, null, null);
             return new NotificationResponse();
         }

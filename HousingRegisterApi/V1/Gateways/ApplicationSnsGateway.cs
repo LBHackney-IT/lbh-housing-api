@@ -52,7 +52,7 @@ namespace HousingRegisterApi.V1.Gateways
             var request = new PublishRequest
             {
                 Message = message,
-                TopicArn = Environment.GetEnvironmentVariable("HOUSINGREGISTER_SNS_ARN"),
+                TopicArn = Environment.GetEnvironmentVariable("HOUSING_REGISTER_SNS_ARN"),
                 MessageGroupId = "SomeGroupId"
             };
 

@@ -128,7 +128,7 @@ namespace HousingRegisterApi.Tests
                 Attributes = snsAttrs,
             }).Result;
 
-            Environment.SetEnvironmentVariable("HOUSINGREGISTER_SNS_ARN", response.TopicArn);
+            Environment.SetEnvironmentVariable("HOUSING_REGISTER_SNS_ARN", response.TopicArn);
             SnsVerifer = new SnsEventVerifier<ApplicationSns>(AmazonSQS, SimpleNotificationService, response.TopicArn);
         }
 

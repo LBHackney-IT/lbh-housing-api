@@ -1,5 +1,7 @@
 # Hackney: Housing register API
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=LBHackney-IT_lbh-housing-api&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=LBHackney-IT_lbh-housing-api)
+
 An API to submit and review applications to the housing register. Using the Base API as boilerplate code.
 
 ## What does it do?
