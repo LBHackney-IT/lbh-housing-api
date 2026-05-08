@@ -8,16 +8,16 @@
 # 7) ENSURE THIS FILE IS PLACED WITHIN A 'terraform' FOLDER LOCATED AT THE ROOT PROJECT DIRECTORY
 
 terraform {
-    required_providers {
-        aws = {
-            source  = "hashicorp/aws"
-            version = "~> 3.0"
-        }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
     }
+  }
 }
 
 provider "aws" {
-    region = "eu-west-2"
+  region = "eu-west-2"
 }
 
 data "aws_caller_identity" "current" {}
@@ -25,7 +25,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-    parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
+  parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
 }
 
 terraform {
@@ -63,15 +63,15 @@ resource "aws_s3_bucket" "housingregister_bucket" {
   acl    = "private"
 
   tags = {
-    Name = "housingregister-exports-${var.environment_name}-bucket"
+    Name        = "housingregister-exports-${var.environment_name}-bucket"
     Environment = var.environment_name
   }
 }
 
 resource "aws_sns_topic" "novaletexport_topic" {
-  name                        = "novaletexport-sns-topic"
-  fifo_topic                  = false
-  kms_master_key_id           = "alias/aws/sns"
+  name              = "novaletexport-sns-topic"
+  fifo_topic        = false
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_ssm_parameter" "novalet_sns_arn" {
