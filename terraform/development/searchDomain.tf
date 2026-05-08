@@ -13,7 +13,7 @@ data "aws_subnet_ids" "development" {
 }
 
 module "elasticsearch_db_development" {
-  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch?ref=feature/dyanmic-zone-awareness"
+  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
   vpc_id              = data.aws_vpc.development_vpc.id
   environment_name    = var.environment_name
   port                = 443
