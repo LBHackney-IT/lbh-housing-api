@@ -27,7 +27,7 @@ module "elasticsearch_db_staging" {
   ebs_enabled         = "true"
   ebs_volume_size     = "10"
   region              = data.aws_region.current.name
-  account_id          = data.aws_caller_identity.current.account_id  
+  account_id          = data.aws_caller_identity.current.account_id
   create_service_role = "false"
 }
 
