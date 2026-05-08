@@ -51,7 +51,7 @@ resource "aws_ssm_parameter" "housingregister_sns_arn" {
 }
 
 module "housingregister_api_cloudwatch_dashboard" {
-  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git/tree/feature/dyanmic-zone-awareness/modules/cloudwatch/dashboards/api-dashboard"
+  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard?ref=feature/dyanmic-zone-awareness"
   environment_name    = var.environment_name
   api_name            = "housing-register-api"
   sns_topic_name      = aws_sns_topic.housingregister_topic.name
