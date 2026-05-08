@@ -51,12 +51,11 @@ resource "aws_ssm_parameter" "housingregister_sns_arn" {
 }
 
 module "housingregister_api_cloudwatch_dashboard" {
-  source                  = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
-  environment_name        = var.environment_name
-  api_name                = "housing-register-api"
-  sns_topic_name          = aws_sns_topic.housingregister_topic.name
-  dynamodb_table_name     = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
-  no_sns_widget_dashboard = true
+  source              = "git::git@github.com:LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
+  environment_name    = var.environment_name
+  api_name            = "housing-register-api"
+  sns_topic_name      = aws_sns_topic.housingregister_topic.name
+  dynamodb_table_name = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
 }
 
 resource "aws_s3_bucket" "housingregister_bucket" {
