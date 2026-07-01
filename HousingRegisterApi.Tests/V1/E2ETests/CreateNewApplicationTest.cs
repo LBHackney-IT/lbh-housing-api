@@ -25,6 +25,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             _applicationFixture = new ApplicationFixture();
         }
 
+        // StaffAuthValidator reads AUTHORISED_*_GROUP from the environment. The dummy
+        // StaffToken below includes groups: ["e2e-testing"], so this must match for
+        // create-application E2E tests to pass (production values come from SSM).
         [OneTimeSetUp]
         public void SetUpStaffGroups()
         {
