@@ -7,7 +7,7 @@ namespace HousingRegisterApi.V1.Infrastructure
     {
         private const int MaxEmailLength = 254;
 
-        private static readonly char[] DisallowedCharacters =
+        private static readonly char[] _disallowedCharacters =
         {
             '\'', '"', ';', '<', '>', '(', ')', '\\', '\r', '\n', '\0', ' '
         };
@@ -26,7 +26,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                 return false;
             }
 
-            if (trimmed.IndexOfAny(DisallowedCharacters) >= 0)
+            if (trimmed.IndexOfAny(_disallowedCharacters) >= 0)
             {
                 return false;
             }
