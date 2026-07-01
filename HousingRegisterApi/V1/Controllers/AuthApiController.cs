@@ -1,5 +1,6 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,8 +39,15 @@ namespace HousingRegisterApi.V1.Controllers
         [Route("generate")]
         public IActionResult GenerateCode([FromBody] CreateAuthRequest request)
         {
-            var result = _createAuthUseCase.Execute(request);
-            return Ok(result);
+            try
+            {
+                var result = _createAuthUseCase.Execute(request);
+                return Ok(result);
+            }
+            catch (AuthGenerateBlockedException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
         /// <summary>
