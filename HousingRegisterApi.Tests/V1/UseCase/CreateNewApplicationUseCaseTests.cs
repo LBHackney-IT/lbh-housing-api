@@ -80,7 +80,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _mockTokenFactory
                 .Setup(x => x.Create(It.IsAny<IHeaderDictionary>(), It.IsAny<string>()))
-                .Returns((Token)null);
+                .Returns((Token) null);
 
             Action act = () => _classUnderTest.Execute(new CreateApplicationRequest());
 
