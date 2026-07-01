@@ -13,6 +13,12 @@ namespace HousingRegisterApi.V1
         public string EvidenceApiPostClaimsToken { get; set; }
         public Uri ActivityHistoryApiUrl { get; set; }
 
+        /// <summary>
+        /// Comma-separated auth email blocklist. Supports exact emails and domain
+        /// wildcards such as *@prbly.win.
+        /// </summary>
+        public string BlockedAuthEmails { get; set; }
+
         public static ApiOptions FromEnv()
         {
             var evidenceApiUrl = Environment.GetEnvironmentVariable("EVIDENCE_API_URL");
@@ -28,6 +34,7 @@ namespace HousingRegisterApi.V1
                 EvidenceApiGetClaimsToken = Environment.GetEnvironmentVariable("EVIDENCE_API_GET_EVIDENCE_REQUESTS_TOKEN"),
                 EvidenceApiPostClaimsToken = Environment.GetEnvironmentVariable("EVIDENCE_API_POST_EVIDENCE_REQUESTS_TOKEN"),
                 ActivityHistoryApiUrl = activityApiUrl != null ? new Uri(activityApiUrl) : null,
+                BlockedAuthEmails = Environment.GetEnvironmentVariable("BLOCKED_AUTH_EMAILS"),
             };
         }
     }
