@@ -102,63 +102,12 @@ commands:
           keys:
             - npm-serverless-v4
       - run:
-          name: Install Node and AWS CLI
+          name: Install Node
           command: |
             apt-get update
-            apt-get install -y curl ca-certificates awscli
+            apt-get install -y curl ca-certificates
             curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
             apt-get install -y nodejs
-      - run:
-          name: Fetch SSM parameters from central account for serverless deployment
-          command: |
-            CENTRAL_ACCOUNT=${<<parameters.aws-central-parameter-account>>}
-            export EVIDENCE_API=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/mtfh-housing-<<parameters.stage>>/mtfh-housing/evidence-api-url \
-              --query Parameter.Value \
-              --output text)
-            export ACTIVITY_HISTORY_API=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/mtfh-housing-<<parameters.stage>>/mtfh-housing/activity-history-api-url \
-              --query Parameter.Value \
-              --output text)
-            export SEARCH_DOMAIN=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/search-domain \
-              --query Parameter.Value \
-              --output text)
-            export NOTIFY_TEMPLATE_BEDROOM_CHANGE=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/notify-template-bedroom-change \
-              --query Parameter.Value \
-              --output text)
-            export EVIDENCE_API_REQUESTED_BY=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/evidence-api-requested-by-email \
-              --query Parameter.Value \
-              --output text)
-            export NOVALET_FTP_USERNAME=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/novalet-ftp-username \
-              --query Parameter.Value \
-              --output text)
-            export NOVALET_FTP_ADDRESS=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/novalet-ftp-address \
-              --query Parameter.Value \
-              --output text)
-            export NOVALET_FTP_PORT=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/novalet-ftp-port \
-              --query Parameter.Value \
-              --output text)
-            export NOVALET_FTP_FOLDER=$(aws ssm get-parameter \
-              --name arn:aws:ssm:eu-west-2:${CENTRAL_ACCOUNT}:parameter/housing-<<parameters.stage>>/housing-register-<<parameters.stage>>/housing-register/novalet-ftp-folder \
-              --query Parameter.Value \
-              --output text)
-
-            echo "export EVIDENCE_API=${EVIDENCE_API}" >> $BASH_ENV
-            echo "export ACTIVITY_HISTORY_API=${ACTIVITY_HISTORY_API}" >> $BASH_ENV
-            echo "export SEARCH_DOMAIN=${SEARCH_DOMAIN}" >> $BASH_ENV
-            echo "export NOTIFY_TEMPLATE_BEDROOM_CHANGE=${NOTIFY_TEMPLATE_BEDROOM_CHANGE}" >> $BASH_ENV
-            echo "export EVIDENCE_API_REQUESTED_BY=${EVIDENCE_API_REQUESTED_BY}" >> $BASH_ENV
-            echo "export NOVALET_FTP_USERNAME=${NOVALET_FTP_USERNAME}" >> $BASH_ENV
-            echo "export NOVALET_FTP_ADDRESS=${NOVALET_FTP_ADDRESS}" >> $BASH_ENV
-            echo "export NOVALET_FTP_PORT=${NOVALET_FTP_PORT}" >> $BASH_ENV
-            echo "export NOVALET_FTP_FOLDER=${NOVALET_FTP_FOLDER}" >> $BASH_ENV
-
       - run:
           name: Build and deploy lambda
           command: |
@@ -169,15 +118,7 @@ commands:
 
             npx --yes serverless@4 deploy \
               --stage <<parameters.stage>> \
-              --param="evidenceApi=${EVIDENCE_API}" \
-              --param="activityHistoryApi=${ACTIVITY_HISTORY_API}" \
-              --param="searchDomain=${SEARCH_DOMAIN}" \
-              --param="notifyTemplateBedroomChange=${NOTIFY_TEMPLATE_BEDROOM_CHANGE}" \
-              --param="evidenceApiRequestedBy=${EVIDENCE_API_REQUESTED_BY}" \
-              --param="novaletFtpUsername=${NOVALET_FTP_USERNAME}" \
-              --param="novaletFtpAddress=${NOVALET_FTP_ADDRESS}" \
-              --param="novaletFtpPort=${NOVALET_FTP_PORT}" \
-              --param="novaletFtpFolder=${NOVALET_FTP_FOLDER}" \
+              --param="centralAccount=${<<parameters.aws-central-parameter-account>>}" \
               --conceal
       - save_cache:
           name: Save NuGet cache

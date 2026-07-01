@@ -1,5 +1,6 @@
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.UseCase;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -30,9 +31,11 @@ namespace HousingRegisterApi.V1.Controllers
         /// Generate a verify code for an existing application
         /// </summary>
         /// <response code="200">Success</response>
+        /// <response code="400">Invalid email address</response>
         /// <response code="404">Application not found</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
@@ -44,6 +47,10 @@ namespace HousingRegisterApi.V1.Controllers
                 var result = _createAuthUseCase.Execute(request);
                 return Ok(result);
             }
+            catch (InvalidAuthEmailException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (AuthGenerateBlockedException ex)
             {
                 return NotFound(new { message = ex.Message });
@@ -54,19 +61,28 @@ namespace HousingRegisterApi.V1.Controllers
         /// Verfies and email and verification code belong to an application
         /// </summary>
         /// <response code="200">Success</response>
+        /// <response code="400">Invalid email address</response>
         /// <response code="404">Application not found</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Route("verify")]
         public IActionResult VerifyCode([FromBody] VerifyAuthRequest request)
         {
-            var result = _verifyAuthUseCase.Execute(request);
-            if (result == null) return NotFound();
+            try
+            {
+                var result = _verifyAuthUseCase.Execute(request);
+                if (result == null) return NotFound();
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidAuthEmailException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

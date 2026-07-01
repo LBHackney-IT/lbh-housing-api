@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
@@ -31,14 +32,21 @@ namespace HousingRegisterApi.V1.UseCase
 
         public CreateAuthResponse Execute(CreateAuthRequest request)
         {
-            if (BlockedAuthEmailMatcher.IsBlocked(request.Email, _apiOptions.BlockedAuthEmails))
+            if (!AuthEmailValidator.IsValid(request?.Email))
+            {
+                throw new InvalidAuthEmailException();
+            }
+
+            var email = request.Email.Trim();
+
+            if (BlockedAuthEmailMatcher.IsBlocked(email, _apiOptions.BlockedAuthEmails))
             {
                 throw new AuthGenerateBlockedException();
             }
 
             // check if an uncompleted application exists
             // if so, use that, or create a blank one
-            var incompleteApplication = _applicationGateway.GetIncompleteApplication(request.Email);
+            var incompleteApplication = _applicationGateway.GetIncompleteApplication(email);
             var applicationId = incompleteApplication?.Id;
 
             if (incompleteApplication == null)
@@ -49,7 +57,7 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         ContactInformation = new ContactInformation()
                         {
-                            EmailAddress = request.Email
+                            EmailAddress = email
                         }
                     },
                     OtherMembers = new List<Applicant>(),
@@ -69,7 +77,10 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             // this generates a new verification code and assigns it to the application entity
-            var application = _applicationGateway.CreateVerifyCode(applicationId.Value, request);
+            var application = _applicationGateway.CreateVerifyCode(applicationId.Value, new CreateAuthRequest
+            {
+                Email = email
+            });
             if (application == null)
             {
                 return null;

@@ -1,6 +1,7 @@
 using System;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
@@ -21,7 +22,18 @@ namespace HousingRegisterApi.V1.UseCase
 
         public VerifyAuthResponse Execute(VerifyAuthRequest request)
         {
-            var application = _gateway.ConfirmVerifyCode(request);
+            if (!AuthEmailValidator.IsValid(request?.Email))
+            {
+                throw new InvalidAuthEmailException();
+            }
+
+            var verifyRequest = new VerifyAuthRequest
+            {
+                Email = request.Email.Trim(),
+                Code = request.Code
+            };
+
+            var application = _gateway.ConfirmVerifyCode(verifyRequest);
             if (application == null)
             {
                 return null;
