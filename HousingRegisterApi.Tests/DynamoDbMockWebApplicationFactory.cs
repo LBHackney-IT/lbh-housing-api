@@ -5,6 +5,7 @@ using Amazon.S3;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
+using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Domain.Sns;
 using HousingRegisterApi.V1.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -16,6 +17,7 @@ using Moq;
 using Notify.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HousingRegisterApi.Tests
 {
@@ -38,6 +40,8 @@ namespace HousingRegisterApi.Tests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            E2eHostConfiguration.Apply();
+
             builder.ConfigureAppConfiguration(b => b.AddEnvironmentVariables())
                 .UseStartup<Startup>();
 
@@ -71,6 +75,16 @@ namespace HousingRegisterApi.Tests
             // lets not send emails, but mock them
             builder.ConfigureTestServices(services =>
             {
+                E2eHostConfiguration.Apply();
+
+                var apiOptionsDescriptor = services
+                    .FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ApiOptions));
+                if (apiOptionsDescriptor != null)
+                {
+                    services.Remove(apiOptionsDescriptor);
+                }
+
+                services.AddSingleton(E2eHostConfiguration.CreateApiOptions());
                 services.AddTransient(x => new Mock<INotificationClient>().Object);
             });
         }

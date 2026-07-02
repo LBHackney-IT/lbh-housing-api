@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <Compile Include="V1\E2ETests\Fixtures\ApplicationFixture.cs" />
+    <Compile Include="V1\E2ETests\Fixtures\E2eStaffTokenHelper.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,23 +15,11 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests
     public class CreateNewApplicationTest : DynamoDbIntegrationTests<Startup>
     {
-        private const string StaffToken =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
-
         private readonly ApplicationFixture _applicationFixture;
 
         public CreateNewApplicationTest()
         {
             _applicationFixture = new ApplicationFixture();
-        }
-
-        // StaffAuthValidator reads AUTHORISED_*_GROUP from the environment. The dummy
-        // StaffToken below includes groups: ["e2e-testing"], so this must match for
-        // create-application E2E tests to pass (production values come from SSM).
-        [OneTimeSetUp]
-        public void SetUpStaffGroups()
-        {
-            Environment.SetEnvironmentVariable("AUTHORISED_OFFICER_GROUP", "e2e-testing");
         }
 
         private async Task<HttpResponseMessage> PostTestRequestAsync(string input, bool includeStaffToken = false)
@@ -48,7 +36,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             {
                 Content = data,
             };
-            message.Headers.Add("Authorization", StaffToken);
+            message.Headers.Add(
+                "Authorization",
+                E2eStaffTokenHelper.CreateStaffAuthorizationHeaderValue());
 
             return await Client.SendAsync(message).ConfigureAwait(false);
         }
