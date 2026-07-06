@@ -22,8 +22,6 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
     public class UpdateApplicationTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
-        private const string Token =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
 
         public UpdateApplicationTest()
         {
@@ -44,7 +42,9 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var uri = new Uri($"api/v1/applications/{id}", UriKind.Relative);
 
             var message = new HttpRequestMessage(HttpMethod.Patch, uri);
-            message.Headers.Add("Authorization", Token);
+            message.Headers.Add(
+                "Authorization",
+                E2eStaffTokenHelper.CreateStaffAuthorizationHeaderValue());
 
             message.Content = new StringContent(input, Encoding.UTF8, "application/json");
             message.Method = HttpMethod.Patch;
@@ -73,8 +73,8 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             message.Id.Should().NotBeEmpty();
             message.SourceDomain.Should().Be(UpdateApplicationConstants.SOURCEDOMAIN);
             message.SourceSystem.Should().Be(UpdateApplicationConstants.SOURCESYSTEM);
-            message.User.Email.Should().Be("e2e-testing@development.com");
-            message.User.Name.Should().Be("Tester");
+            message.User.Email.Should().Be(E2eStaffTokenHelper.StaffEmail);
+            message.User.Name.Should().Be(E2eStaffTokenHelper.StaffName);
             message.Version.Should().Be(UpdateApplicationConstants.V1VERSION);
         }
 

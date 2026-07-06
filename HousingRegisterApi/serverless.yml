@@ -39,15 +39,19 @@ functions:
       NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password, false}
       NOVALET_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/novaletexport-sns-topic/arn}
       HOUSING_REGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
-      EVIDENCE_API_URL: ${param:evidenceApi}
-      ACTIVITY_HISTORY_API_URL: ${param:activityHistoryApi}
-      SEARCH_DOMAIN: ${param:searchDomain}
-      NOTIFY_TEMPLATE_BEDROOM_CHANGE: ${param:notifyTemplateBedroomChange}
-      EVIDENCE_API_REQUESTED_BY: ${param:evidenceApiRequestedBy}
-      NOVALET_FTP_USERNAME: ${param:novaletFtpUsername}
-      NOVALET_FTP_ADDRESS: ${param:novaletFtpAddress}
-      NOVALET_FTP_PORT: ${param:novaletFtpPort}
+      EVIDENCE_API_URL: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/mtfh-housing-${self:provider.stage}/mtfh-housing/evidence-api-url}
+      ACTIVITY_HISTORY_API_URL: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/mtfh-housing-${self:provider.stage}/mtfh-housing/activity-history-api-url}
+      SEARCH_DOMAIN: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/search-domain}
+      NOTIFY_TEMPLATE_BEDROOM_CHANGE: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/notify-template-bedroom-change}
+      EVIDENCE_API_REQUESTED_BY: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/evidence-api-requested-by-email}
+      NOVALET_FTP_USERNAME: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-username}
+      NOVALET_FTP_ADDRESS: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-address}
+      NOVALET_FTP_PORT: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-port}
       BLOCKED_AUTH_EMAILS: ${ssm:/housing-register/${self:provider.stage}/blocked-auth-emails, ''}
+      AUTHORISED_ADMIN_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-admin-group}
+      AUTHORISED_MANAGER_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-manager-group}
+      AUTHORISED_OFFICER_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-officer-group}
+      AUTHORISED_READONLY_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-readonly-group}
     events:
       - http:
           path: /{proxy+}
@@ -61,7 +65,7 @@ functions:
     environment:
       NOTIFY_API_KEY: ${ssm:/housing-register/${self:provider.stage}/notify-api-key}
       HOUSING_REGISTER_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/housingregister/arn}
-      NOTIFY_TEMPLATE_BEDROOM_CHANGE: ${param:notifyTemplateBedroomChange}
+      NOTIFY_TEMPLATE_BEDROOM_CHANGE: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/notify-template-bedroom-change}
     events:
       - schedule: rate(1 hour)
   HousingRegisterNovaletExportGenerator:
@@ -92,10 +96,10 @@ functions:
     timeout: 300
     environment:
       NOVALET_FTP_PASSWORD: ${ssm:/housing-register/${self:provider.stage}/novalet/ftp-password}
-      NOVALET_FTP_USERNAME: ${param:novaletFtpUsername}
-      NOVALET_FTP_ADDRESS: ${param:novaletFtpAddress}
-      NOVALET_FTP_PORT: ${param:novaletFtpPort}
-      NOVALET_FTP_FOLDER: ${param:novaletFtpFolder}
+      NOVALET_FTP_USERNAME: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-username}
+      NOVALET_FTP_ADDRESS: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-address}
+      NOVALET_FTP_PORT: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-port}
+      NOVALET_FTP_FOLDER: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-folder}
     events:
       - schedule: cron(30 16 ? * MON-FRI *)
 resources:
