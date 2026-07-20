@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -21,11 +22,25 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             _applicationFixture = new ApplicationFixture();
         }
 
-        private async Task<HttpResponseMessage> PostTestRequestAsync(string input)
+        private async Task<HttpResponseMessage> PostTestRequestAsync(string input, bool includeStaffToken = false)
         {
             using var data = new StringContent(input, Encoding.UTF8, "application/json");
             var uri = new Uri($"api/v1/applications/", UriKind.Relative);
-            return await Client.PostAsync(uri, data).ConfigureAwait(false);
+
+            if (!includeStaffToken)
+            {
+                return await Client.PostAsync(uri, data).ConfigureAwait(false);
+            }
+
+            var message = new HttpRequestMessage(HttpMethod.Post, uri)
+            {
+                Content = data,
+            };
+            message.Headers.Add(
+                "Authorization",
+                E2eStaffTokenHelper.CreateStaffAuthorizationHeaderValue());
+
+            return await Client.SendAsync(message).ConfigureAwait(false);
         }
 
         [Test]
@@ -36,7 +51,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             var json = JsonConvert.SerializeObject(request);
 
             // Act
-            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+            var response = await PostTestRequestAsync(json, includeStaffToken: true).ConfigureAwait(false);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -50,6 +65,17 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
             apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+        }
+
+        [Test]
+        public async Task CreateNewApplicationReturnsForbiddenWithoutStaffToken()
+        {
+            var request = _applicationFixture.ConstructCreateApplicationRequest();
+            var json = JsonConvert.SerializeObject(request);
+
+            var response = await PostTestRequestAsync(json).ConfigureAwait(false);
+
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Test]

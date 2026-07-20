@@ -1,7 +1,9 @@
 using AutoFixture;
 using FluentAssertions;
+using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.UseCase;
@@ -16,8 +18,10 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         private Mock<IApplicationApiGateway> _mockApplicationGateway;
         private Mock<INotifyGateway> _mockNotifyGateway;
         private Mock<IActivityGateway> _mockActivityGateway;
+        private ApiOptions _apiOptions;
         private CreateAuthUseCase _classUnderTest;
         private Fixture _fixture;
+        private const string ValidEmail = "resident@hackney.gov.uk";
 
         [SetUp]
         public void SetUp()
@@ -25,7 +29,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockApplicationGateway = new Mock<IApplicationApiGateway>();
             _mockNotifyGateway = new Mock<INotifyGateway>();
             _mockActivityGateway = new Mock<IActivityGateway>();
-            _classUnderTest = new CreateAuthUseCase(_mockApplicationGateway.Object, _mockNotifyGateway.Object, _mockActivityGateway.Object);
+            _apiOptions = new ApiOptions();
+            _classUnderTest = new CreateAuthUseCase(
+                _mockApplicationGateway.Object,
+                _mockNotifyGateway.Object,
+                _mockActivityGateway.Object,
+                _apiOptions);
             _fixture = new Fixture();
         }
 
@@ -44,7 +53,10 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 .Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(new CreateAuthRequest());
+            var response = _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = ValidEmail
+            });
 
             // Assert
             _mockApplicationGateway.Verify(x => x.CreateVerifyCode(application.Id, It.IsAny<CreateAuthRequest>()));
@@ -70,11 +82,56 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 .Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(new CreateAuthRequest());
+            var response = _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = ValidEmail
+            });
 
             // Assert
             _mockApplicationGateway.Verify(x => x.CreateVerifyCode(It.IsAny<Guid>(), It.IsAny<CreateAuthRequest>()));
             response.Should().BeOfType<CreateAuthResponse>();
+        }
+
+        [Test]
+        public void CreateVerifyCodeThrowsWhenEmailIsInvalid()
+        {
+            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "' OR 1=1 --"
+            });
+
+            act.Should().Throw<InvalidAuthEmailException>();
+            _mockApplicationGateway.Verify(
+                x => x.GetIncompleteApplication(It.IsAny<string>()),
+                Times.Never);
+            _mockApplicationGateway.Verify(
+                x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()),
+                Times.Never);
+            _mockNotifyGateway.Verify(
+                x => x.SendVerifyCode(It.IsAny<Applicant>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Test]
+        public void CreateVerifyCodeThrowsWhenEmailIsBlocked()
+        {
+            _apiOptions.BlockedAuthEmails = "scanner@prbly.win,*@prbly.win";
+
+            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "scanner@prbly.win"
+            });
+
+            act.Should().Throw<AuthGenerateBlockedException>();
+            _mockApplicationGateway.Verify(
+                x => x.GetIncompleteApplication(It.IsAny<string>()),
+                Times.Never);
+            _mockApplicationGateway.Verify(
+                x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()),
+                Times.Never);
+            _mockNotifyGateway.Verify(
+                x => x.SendVerifyCode(It.IsAny<Applicant>(), It.IsAny<string>()),
+                Times.Never);
         }
     }
 }

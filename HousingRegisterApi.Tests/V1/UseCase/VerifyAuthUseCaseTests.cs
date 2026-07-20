@@ -2,6 +2,7 @@ using AutoFixture;
 using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
@@ -19,6 +20,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         private Mock<ITokenGenerator> _mockTokenGenerator;
         private VerifyAuthUseCase _classUnderTest;
         private Fixture _fixture;
+        private const string ValidEmail = "resident@hackney.gov.uk";
 
         [SetUp]
         public void SetUp()
@@ -40,11 +42,31 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 .Returns(application);
 
             // Act
-            var response = _classUnderTest.Execute(new VerifyAuthRequest());
+            var response = _classUnderTest.Execute(new VerifyAuthRequest
+            {
+                Email = ValidEmail,
+                Code = "123456"
+            });
 
             // Assert
-            _mockGateway.Verify(x => x.ConfirmVerifyCode(It.IsAny<VerifyAuthRequest>()));
+            _mockGateway.Verify(x => x.ConfirmVerifyCode(It.Is<VerifyAuthRequest>(r =>
+                r.Email == ValidEmail && r.Code == "123456")));
             response.Should().BeOfType<VerifyAuthResponse>();
+        }
+
+        [Test]
+        public void ConfirmVerifyCodeThrowsWhenEmailIsInvalid()
+        {
+            Action act = () => _classUnderTest.Execute(new VerifyAuthRequest
+            {
+                Email = "not-an-email",
+                Code = "123456"
+            });
+
+            act.Should().Throw<InvalidAuthEmailException>();
+            _mockGateway.Verify(
+                x => x.ConfirmVerifyCode(It.IsAny<VerifyAuthRequest>()),
+                Times.Never);
         }
     }
 }
