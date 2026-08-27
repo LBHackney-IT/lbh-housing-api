@@ -62,7 +62,7 @@ namespace HousingRegisterApi.V1.Gateways
             if (token != null && activity.HasChanges())
             {
                 var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
-                _snsGateway.Publish(applicationSnsMessage);
+                _snsGateway.Publish(applicationSnsMessage).GetAwaiter().GetResult();
             }
             else if (token == null)
             {
