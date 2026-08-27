@@ -1,11 +1,13 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using HousingRegisterApi.V1.Domain.Sns;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 //using System.Text.Json;
 //using System.Text.Json.Serialization;
 
@@ -14,11 +16,15 @@ namespace HousingRegisterApi.V1.Gateways
     public class ApplicationSnsGateway : ISnsGateway
     {
         private readonly IAmazonSimpleNotificationService _amazonSimpleNotificationService;
+        private readonly ILogger<ApplicationSnsGateway> _logger;
         //private readonly JsonSerializerOptions _jsonOptions;
 
-        public ApplicationSnsGateway(IAmazonSimpleNotificationService amazonSimpleNotificationService)
+        public ApplicationSnsGateway(
+            IAmazonSimpleNotificationService amazonSimpleNotificationService,
+            ILogger<ApplicationSnsGateway> logger)
         {
             _amazonSimpleNotificationService = amazonSimpleNotificationService;
+            _logger = logger;
             //_jsonOptions = CreateJsonOptions();
         }
 
@@ -56,7 +62,18 @@ namespace HousingRegisterApi.V1.Gateways
                 MessageGroupId = "SomeGroupId"
             };
 
-            _amazonSimpleNotificationService.PublishAsync(request);
+            try
+            {
+                var sw = Stopwatch.StartNew();
+                var response = _amazonSimpleNotificationService.PublishAsync(request).GetAwaiter().GetResult();
+                _logger.LogInformation("SNS ok {ApplicationId} {Id} {CorrelationId} {MessageId} {ElapsedMs}",
+                    applicationSns.EntityId, applicationSns.Id, applicationSns.CorrelationId, response.MessageId, sw.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SNS fail {ApplicationId} {Id} {CorrelationId}",
+                    applicationSns.EntityId, applicationSns.Id, applicationSns.CorrelationId);
+            }
         }
     }
 }
