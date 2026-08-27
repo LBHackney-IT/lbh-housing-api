@@ -96,7 +96,7 @@ namespace HousingRegisterApi.V1.UseCase
                         };
 
                         var applicationSnsMessage = _snsFactory.Update(application.Id, currentBedroomNeed, newBedroomNeed, token);
-                        _snsGateway.Publish(applicationSnsMessage);
+                        _snsGateway.Publish(applicationSnsMessage).GetAwaiter().GetResult();
                     }
 
                 }

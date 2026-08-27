@@ -5,6 +5,6 @@ namespace HousingRegisterApi.V1.Gateways
 {
     public interface ISnsGateway
     {
-        void Publish(ApplicationSns applicationSns);
+        Task Publish(ApplicationSns applicationSns);
     }
 }
