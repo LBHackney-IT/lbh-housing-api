@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 //using System.Text.Json;
 //using System.Text.Json.Serialization;
 
@@ -44,7 +45,7 @@ namespace HousingRegisterApi.V1.Gateways
             NamingStrategy = new CamelCaseNamingStrategy()
         };
 
-        public void Publish(ApplicationSns applicationSns)
+        public async Task Publish(ApplicationSns applicationSns)
         {
             var options = new JsonSerializerSettings
             {
@@ -65,7 +66,7 @@ namespace HousingRegisterApi.V1.Gateways
             try
             {
                 var sw = Stopwatch.StartNew();
-                var response = _amazonSimpleNotificationService.PublishAsync(request).GetAwaiter().GetResult();
+                var response = await _amazonSimpleNotificationService.PublishAsync(request).ConfigureAwait(false);
                 _logger.LogInformation("SNS ok {ApplicationId} {Id} {CorrelationId} {MessageId} {ElapsedMs}",
                     applicationSns.EntityId, applicationSns.Id, applicationSns.CorrelationId, response.MessageId, sw.ElapsedMilliseconds);
             }

@@ -2,6 +2,7 @@ using AutoFixture;
 using FluentAssertions;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Domain;
+using HousingRegisterApi.V1.Domain.Sns;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Services;
@@ -12,6 +13,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.UseCase
 {
@@ -33,6 +35,8 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _gatewayMock = new Mock<IApplicationApiGateway>();
             _notifyGatewayMock = new Mock<INotifyGateway>();
             _snsGatewayMock = new Mock<ISnsGateway>();
+            _snsGatewayMock.Setup(x => x.Publish(It.IsAny<ApplicationSns>()))
+                .Returns(Task.CompletedTask);
             _snsFactoryMock = new Mock<ISnsFactory>();
             _bedroomCalculatorServiceMock = new Mock<IBedroomCalculatorService>();
 
