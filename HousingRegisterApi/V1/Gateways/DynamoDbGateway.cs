@@ -355,18 +355,18 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application GetIncompleteApplication(string email)
         {
-            return GetApplicationsByEmail(email).FirstOrDefault();
+            var normalizedEmail = EmailNormalizer.Normalize(email);
+            if (normalizedEmail == null)
+            {
+                return null;
+            }
+
+            return GetApplicationsByEmail(normalizedEmail).FirstOrDefault();
         }
 
         public IEnumerable<Application> GetApplicationsByEmail(string email)
         {
-            var normalizedEmail = EmailNormalizer.Normalize(email);
-            if (normalizedEmail == null)
-            {
-                return Array.Empty<Application>();
-            }
-
-            string reference = _hashHelper.Generate(normalizedEmail).Substring(0, 10);
+            string reference = _hashHelper.Generate(email).Substring(0, 10);
 
             var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
 
