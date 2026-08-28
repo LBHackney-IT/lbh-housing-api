@@ -72,7 +72,72 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = _classUnderTest.Execute(new CreateApplicationRequest());
 
             _mockGateway.Verify(x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()));
+            _mockGateway.Verify(x => x.GetApplicationsByEmail(It.IsAny<string>()), Times.Never);
             response.Should().BeEquivalentTo(application.ToResponse());
+        }
+
+        [Test]
+        public void CreateNewApplicationLowercasesEmailAndCreatesWhenNoExistingApplication()
+        {
+            var application = _fixture.Create<Application>();
+            _mockTokenFactory
+                .Setup(x => x.Create(It.IsAny<IHeaderDictionary>(), It.IsAny<string>()))
+                .Returns(new Token { Groups = new[] { "officer-group" } });
+            _mockGateway
+                .Setup(x => x.GetApplicationsByEmail("resident@hackney.gov.uk"))
+                .Returns(Array.Empty<Application>());
+            _mockGateway
+                .Setup(x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()))
+                .Returns(application);
+
+            var request = new CreateApplicationRequest
+            {
+                MainApplicant = new Applicant
+                {
+                    ContactInformation = new ContactInformation
+                    {
+                        EmailAddress = "  Resident@Hackney.gov.uk "
+                    }
+                }
+            };
+
+            var response = _classUnderTest.Execute(request);
+
+            request.MainApplicant.ContactInformation.EmailAddress.Should().Be("resident@hackney.gov.uk");
+            _mockGateway.Verify(x => x.GetApplicationsByEmail("resident@hackney.gov.uk"), Times.Once);
+            _mockGateway.Verify(x => x.CreateNewApplication(request), Times.Once);
+            response.Should().BeEquivalentTo(application.ToResponse());
+        }
+
+        [Test]
+        public void CreateNewApplicationThrowsWhenEmailAlreadyExists()
+        {
+            var existing = _fixture.Create<Application>();
+            _mockTokenFactory
+                .Setup(x => x.Create(It.IsAny<IHeaderDictionary>(), It.IsAny<string>()))
+                .Returns(new Token { Groups = new[] { "officer-group" } });
+            _mockGateway
+                .Setup(x => x.GetApplicationsByEmail("resident@hackney.gov.uk"))
+                .Returns(new[] { existing });
+
+            var request = new CreateApplicationRequest
+            {
+                MainApplicant = new Applicant
+                {
+                    ContactInformation = new ContactInformation
+                    {
+                        EmailAddress = "Resident@Hackney.gov.uk"
+                    }
+                }
+            };
+
+            Action act = () => _classUnderTest.Execute(request);
+
+            act.Should().Throw<DuplicateApplicationEmailException>()
+                .Which.ApplicationIds.Should().Contain(existing.Id);
+            _mockGateway.Verify(
+                x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()),
+                Times.Never);
         }
 
         [Test]

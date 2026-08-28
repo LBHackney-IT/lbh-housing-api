@@ -93,6 +93,39 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         }
 
         [Test]
+        public void CreateVerifyCodeNormalizesEmailBeforeLookupAndCreate()
+        {
+            var application = _fixture.Create<Application>();
+
+            _mockApplicationGateway
+                .Setup(x => x.GetIncompleteApplication("resident@hackney.gov.uk"))
+                .Returns<Application>(null);
+
+            _mockApplicationGateway
+               .Setup(x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()))
+               .Returns(application);
+
+            _mockApplicationGateway
+                .Setup(x => x.CreateVerifyCode(It.IsAny<Guid>(), It.IsAny<CreateAuthRequest>()))
+                .Returns(application);
+
+            var response = _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "  Resident@Hackney.gov.uk "
+            });
+
+            _mockApplicationGateway.Verify(x => x.GetIncompleteApplication("resident@hackney.gov.uk"), Times.Once);
+            _mockApplicationGateway.Verify(
+                x => x.CreateNewApplication(It.Is<CreateApplicationRequest>(
+                    r => r.MainApplicant.ContactInformation.EmailAddress == "resident@hackney.gov.uk")),
+                Times.Once);
+            _mockApplicationGateway.Verify(
+                x => x.CreateVerifyCode(application.Id, It.Is<CreateAuthRequest>(r => r.Email == "resident@hackney.gov.uk")),
+                Times.Once);
+            response.Should().BeOfType<CreateAuthResponse>();
+        }
+
+        [Test]
         public void CreateVerifyCodeThrowsWhenEmailIsInvalid()
         {
             Action act = () => _classUnderTest.Execute(new CreateAuthRequest

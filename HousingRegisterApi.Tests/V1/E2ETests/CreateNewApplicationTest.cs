@@ -63,8 +63,24 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
             apiEntity.Status.Should().Be(request.Status);
             apiEntity.SensitiveData.Should().Be(request.SensitiveData);
             apiEntity.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, 5000);
-            apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant);
+            apiEntity.MainApplicant.Should().BeEquivalentTo(request.MainApplicant, options => options
+                .Excluding(x => x.ContactInformation.EmailAddress));
+            apiEntity.MainApplicant.ContactInformation.EmailAddress.Should().Be(
+                request.MainApplicant.ContactInformation.EmailAddress.Trim().ToLowerInvariant());
             apiEntity.OtherMembers.Should().BeEquivalentTo(request.OtherMembers);
+        }
+
+        [Test]
+        public async Task CreateNewApplicationReturnsConflictWhenEmailAlreadyExists()
+        {
+            var request = _applicationFixture.ConstructCreateApplicationRequest();
+            var json = JsonConvert.SerializeObject(request);
+
+            var firstResponse = await PostTestRequestAsync(json, includeStaffToken: true).ConfigureAwait(false);
+            firstResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+            var secondResponse = await PostTestRequestAsync(json, includeStaffToken: true).ConfigureAwait(false);
+            secondResponse.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
 
         [Test]

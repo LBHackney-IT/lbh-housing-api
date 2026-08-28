@@ -355,9 +355,19 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application GetIncompleteApplication(string email)
         {
-            string reference = _hashHelper.Generate(email).Substring(0, 10);
+            return GetApplicationsByEmail(email).FirstOrDefault();
+        }
 
-            var dbApplications = new List<ApplicationDbEntity>();
+        public IEnumerable<Application> GetApplicationsByEmail(string email)
+        {
+            var normalizedEmail = EmailNormalizer.Normalize(email);
+            if (normalizedEmail == null)
+            {
+                return Array.Empty<Application>();
+            }
+
+            string reference = _hashHelper.Generate(normalizedEmail).Substring(0, 10);
+
             var table = _dynamoDbContext.GetTargetTable<ApplicationDbEntity>();
 
             var queryConfig = new QueryOperationConfig
@@ -382,18 +392,18 @@ namespace HousingRegisterApi.V1.Gateways
             return _dynamoDbContext
                 .FromDocuments<ApplicationDbEntity>(resultsSet)
                 .Select(x => x.ToDomain())
-                .FirstOrDefault();
+                .ToList();
         }
 
         public Application CreateNewApplication(CreateApplicationRequest request)
         {
             var newApplicationGuid = Guid.NewGuid();
 
-            string emailAddress = request.MainApplicant?.ContactInformation?.EmailAddress;
+            string emailAddress = EmailNormalizer.Normalize(request.MainApplicant?.ContactInformation?.EmailAddress);
 
-            if (string.IsNullOrWhiteSpace(emailAddress))
+            if (request.MainApplicant?.ContactInformation != null)
             {
-                emailAddress = null;
+                request.MainApplicant.ContactInformation.EmailAddress = emailAddress;
             }
 
             var entity = new ApplicationDbEntity
