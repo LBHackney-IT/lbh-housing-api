@@ -37,7 +37,7 @@ namespace HousingRegisterApi.V1.UseCase
                 throw new InvalidAuthEmailException();
             }
 
-            var email = request.Email.Trim();
+            var email = EmailNormalizer.Normalize(request.Email);
 
             if (BlockedAuthEmailMatcher.IsBlocked(email, _apiOptions.BlockedAuthEmails))
             {

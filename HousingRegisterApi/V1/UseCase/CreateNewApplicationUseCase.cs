@@ -3,12 +3,14 @@ using Hackney.Core.JWT;
 using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
+using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Factories;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace HousingRegisterApi.V1.UseCase
 {
@@ -44,6 +46,21 @@ namespace HousingRegisterApi.V1.UseCase
                 _contextWrapper,
                 _tokenFactory,
                 _apiOptions);
+
+            if (request.MainApplicant?.ContactInformation != null)
+            {
+                var email = EmailNormalizer.Normalize(request.MainApplicant.ContactInformation.EmailAddress);
+                request.MainApplicant.ContactInformation.EmailAddress = email;
+
+                if (email != null)
+                {
+                    var existingApplications = _gateway.GetApplicationsByEmail(email).ToList();
+                    if (existingApplications.Any())
+                    {
+                        throw new DuplicateApplicationEmailException(existingApplications.Select(x => x.Id));
+                    }
+                }
+            }
 
             Application application = _gateway.CreateNewApplication(request);
 

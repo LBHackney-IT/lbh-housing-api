@@ -196,10 +196,12 @@ namespace HousingRegisterApi.V1.Controllers
         /// <response code="201">Returns the application created with its ID</response>
         /// <response code="400">Invalid fields in the post parameter.</response>
         /// <response code="403">Staff authorization required</response>
+        /// <response code="409">Application already exists for this email</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public IActionResult CreateNewApplication([FromBody] CreateApplicationRequest applicationRequest)
@@ -212,6 +214,10 @@ namespace HousingRegisterApi.V1.Controllers
             catch (UnauthorizedStaffException ex)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+            catch (DuplicateApplicationEmailException ex)
+            {
+                return Conflict(new { message = ex.Message, applicationIds = ex.ApplicationIds });
             }
         }
 
