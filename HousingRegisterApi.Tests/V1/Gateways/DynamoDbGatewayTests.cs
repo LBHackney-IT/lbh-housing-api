@@ -97,5 +97,17 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             // Assert
             Assert.AreEqual(application.Reference, _hashHelper.Generate(emailAddress).Substring(0, 10), "Reference is incorrect");
         }
+
+        [Test]
+        public void CreateNewEntityHashesLowercasedEmail()
+        {
+            var createRequest = _fixture.Create<CreateApplicationRequest>();
+            createRequest.MainApplicant.ContactInformation.EmailAddress = "  Test.Email@TestDomain.com ";
+
+            var application = _classUnderTest.CreateNewApplication(createRequest);
+
+            Assert.AreEqual("test.email@testdomain.com", application.MainApplicant.ContactInformation.EmailAddress);
+            Assert.AreEqual(application.Reference, _hashHelper.Generate("test.email@testdomain.com").Substring(0, 10), "Reference is incorrect");
+        }
     }
 }
