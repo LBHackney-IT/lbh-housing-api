@@ -347,12 +347,12 @@ namespace HousingRegisterApi.V1.Gateways
             return searchItems;
         }
 
-        private static readonly DynamoDBOperationConfig ConsistentReadConfig =
+        private static readonly DynamoDBOperationConfig _consistentReadConfig =
             new DynamoDBOperationConfig { ConsistentRead = true };
 
         public Application GetApplicationById(Guid id)
         {
-            var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, ConsistentReadConfig).GetAwaiter().GetResult();
+            var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).GetAwaiter().GetResult();
             return result?.ToDomain();
         }
 
@@ -430,7 +430,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application UpdateApplication(Guid id, UpdateApplicationRequest request)
         {
-            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, ConsistentReadConfig).GetAwaiter().GetResult();
+            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).GetAwaiter().GetResult();
             if (entity == null)
             {
                 return null;
