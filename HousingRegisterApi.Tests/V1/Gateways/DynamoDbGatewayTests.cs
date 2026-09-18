@@ -58,14 +58,14 @@ namespace HousingRegisterApi.Tests.V1.Gateways
             var entity = _fixture.Create<Application>();
             var dbEntity = DatabaseEntityHelper.CreateDatabaseEntityFrom(entity);
 
-            _dynamoDbContext.Setup(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default))
+            _dynamoDbContext.Setup(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, It.IsAny<DynamoDBOperationConfig>(), default))
                      .ReturnsAsync(dbEntity);
 
             // Act
             var response = _classUnderTest.GetApplicationById(entity.Id);
 
             // Assert
-            _dynamoDbContext.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, default), Times.Once);
+            _dynamoDbContext.Verify(x => x.LoadAsync<ApplicationDbEntity>(entity.Id, It.Is<DynamoDBOperationConfig>(c => c.ConsistentRead == true), default), Times.Once);
             entity.Should().BeEquivalentTo(response);
         }
 
