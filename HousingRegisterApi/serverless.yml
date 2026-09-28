@@ -47,7 +47,7 @@ functions:
       NOVALET_FTP_USERNAME: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-username}
       NOVALET_FTP_ADDRESS: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-address}
       NOVALET_FTP_PORT: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/novalet-ftp-port}
-      BLOCKED_AUTH_EMAILS: ${ssm:/housing-register/${self:provider.stage}/blocked-auth-emails, ''}
+      BLOCKED_AUTH_EMAILS: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/blocked-auth-emails}
       AUTHORISED_ADMIN_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-admin-group}
       AUTHORISED_MANAGER_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-manager-group}
       AUTHORISED_OFFICER_GROUP: ${ssm:arn:aws:ssm:eu-west-2:${param:centralAccount}:parameter/housing-${self:provider.stage}/housing-register-${self:provider.stage}/housing-register/authorised-officer-group}
