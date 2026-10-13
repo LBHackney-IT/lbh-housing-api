@@ -114,7 +114,8 @@ namespace HousingRegisterApi.V1.UseCase
                     foreach (var activity in activities)
                     {
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
-                    };
+                    }
+                    ;
                 }
             }
 
@@ -137,7 +138,8 @@ namespace HousingRegisterApi.V1.UseCase
                     foreach (var activity in activities)
                     {
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
-                    };
+                    }
+                    ;
                 }
             }
 

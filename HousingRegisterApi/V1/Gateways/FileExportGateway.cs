@@ -40,7 +40,8 @@ namespace HousingRegisterApi.V1.Gateways
             {
                 s3Object.ResponseStream.CopyTo(ms);
                 data = ms.ToArray();
-            };
+            }
+            ;
 
             var file = new ExportFile(fileName, s3Object.Headers.ContentType, data)
             {
@@ -97,7 +98,7 @@ namespace HousingRegisterApi.V1.Gateways
 
         private List<S3Object> GetNovaletS3Objects(string parentFolderName = "", int numberToReturn = 3)
         {
-            numberToReturn = Math.Max(numberToReturn, 3);//Limit the number of months to look back on to 3   
+            numberToReturn = Math.Max(numberToReturn, 3);//Limit the number of months to look back on to 3
             List<S3Object> s3Blobs = new List<S3Object>();
             List<Task> s3Tasks = new List<Task>();
 
