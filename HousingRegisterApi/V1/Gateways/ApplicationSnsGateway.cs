@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-//using System.Text.Json;
-//using System.Text.Json.Serialization;
 
 namespace HousingRegisterApi.V1.Gateways
 {
@@ -18,7 +16,6 @@ namespace HousingRegisterApi.V1.Gateways
     {
         private readonly IAmazonSimpleNotificationService _amazonSimpleNotificationService;
         private readonly ILogger<ApplicationSnsGateway> _logger;
-        //private readonly JsonSerializerOptions _jsonOptions;
 
         public ApplicationSnsGateway(
             IAmazonSimpleNotificationService amazonSimpleNotificationService,
@@ -26,19 +23,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _amazonSimpleNotificationService = amazonSimpleNotificationService;
             _logger = logger;
-            //_jsonOptions = CreateJsonOptions();
         }
-
-        //private static JsonSerializerOptions CreateJsonOptions()
-        //{
-        //    var options = new JsonSerializerOptions
-        //    {
-        //        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        //        WriteIndented = true
-        //    };
-        //    options.Converters.Add(new JsonStringEnumConverter());
-        //    return options;
-        //}
 
         DefaultContractResolver _contractResolver = new DefaultContractResolver
         {
@@ -50,7 +35,7 @@ namespace HousingRegisterApi.V1.Gateways
             var options = new JsonSerializerSettings
             {
                 ContractResolver = _contractResolver,
-                Converters = new List<JsonConverter> { new StringEnumConverter { CamelCaseText = true } },
+                Converters = new List<JsonConverter> { new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy() } },
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented
             };

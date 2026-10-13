@@ -15,7 +15,7 @@ namespace HousingRegisterApi.Tests.V1.E2ETests.Fixtures
         public const string StaffEmail = "e2e-testing@development.com";
         public const string StaffName = "Tester";
         public const string StaffGroup = "e2e-testing";
-        public const string TestJwtSecret = "e2e-test-only-jwt-secret";
+        public const string TestJwtSecret = "e2e-test-only-jwt-secret-32bytes";
 
         public static string CreateStaffAuthorizationHeaderValue(string group = StaffGroup)
         {

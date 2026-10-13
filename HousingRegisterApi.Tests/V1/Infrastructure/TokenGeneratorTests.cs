@@ -13,7 +13,7 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
         public void Init()
         {
             _classUnderTest = new TokenGenerator();
-            Environment.SetEnvironmentVariable("HACKNEY_JWT_SECRET", "HACKNEY_JWT_SECRET");
+            Environment.SetEnvironmentVariable("HACKNEY_JWT_SECRET", "HACKNEY_JWT_SECRET_FOR_TESTS_32B");
         }
 
         [Test]
