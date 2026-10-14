@@ -115,7 +115,6 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         exportDataSet.Add(new CaseActivityReportDataRow(activity, application));
                     }
-                    ;
                 }
             }
 
@@ -139,7 +138,6 @@ namespace HousingRegisterApi.V1.UseCase
                     {
                         exportDataSet.Add(new OfficerActivityReportDataRow(activity));
                     }
-                    ;
                 }
             }
 

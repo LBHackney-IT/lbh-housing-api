@@ -41,7 +41,6 @@ namespace HousingRegisterApi.V1.Gateways
                 s3Object.ResponseStream.CopyTo(ms);
                 data = ms.ToArray();
             }
-            ;
 
             var file = new ExportFile(fileName, s3Object.Headers.ContentType, data)
             {
