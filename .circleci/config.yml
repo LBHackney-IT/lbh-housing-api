@@ -7,13 +7,13 @@ orbs:
 executors:
   docker-python:
     docker:
-      - image: circleci/python:3.7
+      - image: cimg/python:3.14
   docker-terraform:
     docker:
       - image: "hashicorp/terraform:1.14"
   docker-dotnet:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:8.0
+      - image: mcr.microsoft.com/dotnet/sdk:10.0
 
 references:
   workspace_root: &workspace_root "~"
@@ -154,10 +154,10 @@ jobs:
           docker_layer_caching: true
       - run:
           name: build
-          command: docker-compose build housing-register-api-test
+          command: docker compose build housing-register-api-test
       - run:
           name: Run tests
-          command: docker-compose run housing-register-api-test
+          command: docker compose run housing-register-api-test
       - run:
           name: Report
           command: |
