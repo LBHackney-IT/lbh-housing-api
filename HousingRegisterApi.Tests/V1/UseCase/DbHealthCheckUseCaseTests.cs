@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using HousingRegisterApi.V1.UseCase;
 using Bogus;
 using FluentAssertions;
-using Microsoft.Extensions.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Moq;
 using NUnit.Framework;
 
@@ -12,7 +14,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
     public class DbHealthCheckUseCaseTests
     {
 
-        private Mock<IHealthCheckService> _mockHealthCheckService;
+        private Mock<HealthCheckService> _mockHealthCheckService;
         private DbHealthCheckUseCase _classUnderTest;
 
         private readonly Faker _faker = new Faker();
@@ -23,14 +25,22 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         {
             _description = _faker.Random.Words();
 
-            _mockHealthCheckService = new Mock<IHealthCheckService>();
-            CompositeHealthCheckResult compositeHealthCheckResult = new CompositeHealthCheckResult(CheckStatus.Healthy);
-            compositeHealthCheckResult.Add("test", CheckStatus.Healthy, _description);
-
+            _mockHealthCheckService = new Mock<HealthCheckService>();
+            var report = new HealthReport(
+                new Dictionary<string, HealthReportEntry>
+                {
+                    ["test"] = new HealthReportEntry(
+                        HealthStatus.Healthy,
+                        _description,
+                        TimeSpan.Zero,
+                        exception: null,
+                        data: null)
+                },
+                TimeSpan.Zero);
 
             _mockHealthCheckService.Setup(s =>
-                    s.CheckHealthAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(compositeHealthCheckResult);
+                    s.CheckHealthAsync(It.IsAny<Func<HealthCheckRegistration, bool>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(report);
 
             _classUnderTest = new DbHealthCheckUseCase(_mockHealthCheckService.Object);
         }
