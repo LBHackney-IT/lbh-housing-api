@@ -21,6 +21,13 @@ namespace HousingRegisterApi.V1
         /// </summary>
         public string BlockedAuthEmails { get; set; }
 
+        /// <summary>
+        /// Comma-separated domains allowed to request a verification code, such as
+        /// hackney.gov.uk or *@hackney.gov.uk. When unset, blank, or *, every domain
+        /// is allowed and <see cref="BlockedAuthEmails"/> still applies.
+        /// </summary>
+        public string AllowedAuthEmailDomains { get; set; }
+
         public string AuthorisedAdminGroup { get; set; }
 
         public string AuthorisedManagerGroup { get; set; }
@@ -55,6 +62,7 @@ namespace HousingRegisterApi.V1
                 EvidenceApiPostClaimsToken = Environment.GetEnvironmentVariable("EVIDENCE_API_POST_EVIDENCE_REQUESTS_TOKEN"),
                 ActivityHistoryApiUrl = activityApiUrl != null ? new Uri(activityApiUrl) : null,
                 BlockedAuthEmails = Environment.GetEnvironmentVariable("BLOCKED_AUTH_EMAILS"),
+                AllowedAuthEmailDomains = Environment.GetEnvironmentVariable("ALLOWED_AUTH_EMAIL_DOMAINS"),
                 AuthorisedAdminGroup = Environment.GetEnvironmentVariable("AUTHORISED_ADMIN_GROUP"),
                 AuthorisedManagerGroup = Environment.GetEnvironmentVariable("AUTHORISED_MANAGER_GROUP"),
                 AuthorisedOfficerGroup = Environment.GetEnvironmentVariable("AUTHORISED_OFFICER_GROUP"),

@@ -39,7 +39,8 @@ namespace HousingRegisterApi.V1.UseCase
 
             var email = EmailNormalizer.Normalize(request.Email);
 
-            if (BlockedAuthEmailMatcher.IsBlocked(email, _apiOptions.BlockedAuthEmails))
+            if (!AllowedAuthEmailMatcher.IsAllowed(email, _apiOptions.AllowedAuthEmailDomains)
+                || BlockedAuthEmailMatcher.IsBlocked(email, _apiOptions.BlockedAuthEmails))
             {
                 throw new AuthGenerateBlockedException();
             }

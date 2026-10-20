@@ -166,5 +166,67 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 x => x.SendVerifyCode(It.IsAny<Applicant>(), It.IsAny<string>()),
                 Times.Never);
         }
+
+        [Test]
+        public void CreateVerifyCodeThrowsWhenEmailDomainIsNotAllowed()
+        {
+            _apiOptions.AllowedAuthEmailDomains = "hackney.gov.uk";
+
+            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "resident@gmail.com"
+            });
+
+            act.Should().Throw<AuthGenerateBlockedException>();
+            _mockApplicationGateway.Verify(
+                x => x.GetIncompleteApplication(It.IsAny<string>()),
+                Times.Never);
+            _mockApplicationGateway.Verify(
+                x => x.CreateNewApplication(It.IsAny<CreateApplicationRequest>()),
+                Times.Never);
+            _mockNotifyGateway.Verify(
+                x => x.SendVerifyCode(It.IsAny<Applicant>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Test]
+        public void CreateVerifyCodeAllowsEmailOnConfiguredDomain()
+        {
+            var application = _fixture.Create<Application>();
+            _apiOptions.AllowedAuthEmailDomains = "hackney.gov.uk";
+
+            _mockApplicationGateway
+                .Setup(x => x.GetIncompleteApplication(ValidEmail))
+                .Returns(application);
+
+            _mockApplicationGateway
+                .Setup(x => x.CreateVerifyCode(application.Id, It.IsAny<CreateAuthRequest>()))
+                .Returns(application);
+
+            var response = _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = ValidEmail
+            });
+
+            _mockApplicationGateway.Verify(x => x.CreateVerifyCode(application.Id, It.IsAny<CreateAuthRequest>()));
+            response.Should().BeOfType<CreateAuthResponse>();
+        }
+
+        [Test]
+        public void CreateVerifyCodeThrowsWhenAllowedDomainAddressIsBlocked()
+        {
+            _apiOptions.AllowedAuthEmailDomains = "hackney.gov.uk";
+            _apiOptions.BlockedAuthEmails = "scanner@hackney.gov.uk";
+
+            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "scanner@hackney.gov.uk"
+            });
+
+            act.Should().Throw<AuthGenerateBlockedException>();
+            _mockApplicationGateway.Verify(
+                x => x.GetIncompleteApplication(It.IsAny<string>()),
+                Times.Never);
+        }
     }
 }
