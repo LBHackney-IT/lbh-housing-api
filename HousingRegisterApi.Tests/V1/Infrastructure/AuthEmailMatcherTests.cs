@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace HousingRegisterApi.Tests.V1.Infrastructure
 {
-    public class AllowedAuthEmailMatcherTests
+    public class AuthEmailMatcherTests
     {
         [TestCase("resident@hackney.gov.uk", null, true)]
         [TestCase("resident@hackney.gov.uk", "", true)]
@@ -25,7 +25,24 @@ namespace HousingRegisterApi.Tests.V1.Infrastructure
             string allowedDomainsConfig,
             bool expected)
         {
-            AllowedAuthEmailMatcher.IsAllowed(email, allowedDomainsConfig)
+            AuthEmailMatcher.IsAllowed(email, allowedDomainsConfig)
+                .Should()
+                .Be(expected);
+        }
+
+        [TestCase("scanner@prbly.win", "scanner@prbly.win", true)]
+        [TestCase("SCANNER@prbly.win", "scanner@prbly.win", true)]
+        [TestCase("scanner@prbly.win", "*@prbly.win", true)]
+        [TestCase("other@prbly.win", "*@prbly.win", true)]
+        [TestCase("resident@hackney.gov.uk", "scanner@prbly.win,*@prbly.win", false)]
+        [TestCase("resident@hackney.gov.uk", "", false)]
+        [TestCase("resident@hackney.gov.uk", null, false)]
+        public void IsBlockedMatchesConfiguredRules(
+            string email,
+            string blockedEmailsConfig,
+            bool expected)
+        {
+            AuthEmailMatcher.IsBlocked(email, blockedEmailsConfig)
                 .Should()
                 .Be(expected);
         }
