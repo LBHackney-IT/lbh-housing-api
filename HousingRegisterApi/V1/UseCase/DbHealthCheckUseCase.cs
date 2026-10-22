@@ -1,13 +1,15 @@
+using System;
+using System.Linq;
 using HousingRegisterApi.V1.Boundary;
-using Microsoft.Extensions.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace HousingRegisterApi.V1.UseCase
 {
     public class DbHealthCheckUseCase
     {
-        private readonly IHealthCheckService _healthCheckService;
+        private readonly HealthCheckService _healthCheckService;
 
-        public DbHealthCheckUseCase(IHealthCheckService healthCheckService)
+        public DbHealthCheckUseCase(HealthCheckService healthCheckService)
         {
             _healthCheckService = healthCheckService;
         }
@@ -16,8 +18,11 @@ namespace HousingRegisterApi.V1.UseCase
         {
             var result = _healthCheckService.CheckHealthAsync().Result;
 
-            var success = result.CheckStatus == CheckStatus.Healthy;
-            return new HealthCheckResponse(success, result.Description);
+            var success = result.Status == HealthStatus.Healthy;
+            var message = string.Join(
+                Environment.NewLine,
+                result.Entries.Select(entry => $"{entry.Key}: {entry.Value.Description}"));
+            return new HealthCheckResponse(success, message);
         }
     }
 

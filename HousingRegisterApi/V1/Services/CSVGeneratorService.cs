@@ -56,7 +56,7 @@ namespace HousingRegisterApi.V1.Services
                     {
                         sw.WriteLine(string.Join(",", dataRow));
                     }
-                };
+                }
 
                 output = ms.ToArray();
             }
