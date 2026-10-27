@@ -38,10 +38,6 @@ namespace HousingRegisterApi.V1.UseCase
 
             var origApplication = _gateway.GetApplicationById(id);
 
-            // A partial update that omits assessment (staff assignment, sensitive-data
-            // flag, household edits) is not a bidding-number change. Comparing a missing
-            // number with the stored one used to be true, and the || below then ran
-            // outside the null check and threw.
             bool biddingNumberChanged = request?.Assessment != null
                 && origApplication?.Assessment?.BiddingNumber != request.Assessment.BiddingNumber;
 
