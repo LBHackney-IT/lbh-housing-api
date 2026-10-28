@@ -227,5 +227,37 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             }).ConfigureAwait(false), "Invalid bidding number was validated!");
 
         }
+
+        [Test]
+        public async Task AssignmentOnlyUpdateSucceedsWhenStoredApplicationHasBiddingNumber()
+        {
+            // Staff assignment sends only AssignedTo. Omitting assessment must not be
+            // treated as clearing a bidding number that is already stored.
+            var id = Guid.NewGuid();
+            var application = _fixture.Create<Application>();
+            application.FixDates();
+            application.Assessment.BiddingNumber = "1234567";
+            application.Assessment.GenerateBiddingNumber = false;
+
+            _mockGateway
+                .Setup(x => x.GetApplicationById(id))
+                .Returns(application);
+
+            _mockGateway
+                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
+                .Returns(application);
+
+            var request = new UpdateApplicationRequest
+            {
+                AssignedTo = "officer@hackney.gov.uk"
+            };
+
+            var response = await _classUnderTest.Execute(id, request).ConfigureAwait(false);
+
+            response.Should().BeEquivalentTo(application.ToResponse());
+            _mockGateway.Verify(x => x.UpdateApplication(id, request));
+            _mockGateway.Verify(x => x.GetLastIssuedBiddingNumber(), Times.Never);
+            _mockGateway.Verify(x => x.IssueNextBiddingNumber(), Times.Never);
+        }
     }
 }
