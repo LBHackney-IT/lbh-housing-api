@@ -38,11 +38,11 @@ namespace HousingRegisterApi.V1.UseCase
 
             var origApplication = _gateway.GetApplicationById(id);
 
-            bool biddingNumberChanged = origApplication?.Assessment?.BiddingNumber != request?.Assessment?.BiddingNumber;
+            bool biddingNumberChanged = request?.Assessment != null
+                && origApplication?.Assessment?.BiddingNumber != request.Assessment.BiddingNumber;
 
-            //Check the bidding number if it has changed, or 
-            if (request.Assessment != null
-                && request.Assessment.GenerateBiddingNumber || biddingNumberChanged)
+            if (request?.Assessment != null
+                && (request.Assessment.GenerateBiddingNumber || biddingNumberChanged))
             {
 
                 if (request.Assessment.GenerateBiddingNumber && string.IsNullOrWhiteSpace(request.Assessment.BiddingNumber))
