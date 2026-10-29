@@ -14,18 +14,17 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
 
             var rules = ParseRules(allowedDomainsConfig);
-            if (rules.Any(rule => rule == "*"))
+            if (rules.Contains("*"))
             {
                 return true;
             }
 
             var domains = rules
-                .Select(TryParseDomain)
+                .Select(TryParseAllowedDomain)
                 .Where(domain => domain != null)
                 .ToList();
 
-            var emailDomain = GetDomain(email);
-            return emailDomain != null && domains.Contains(emailDomain);
+            return TryGetDomain(email, out var emailDomain) && domains.Contains(emailDomain);
         }
 
         public static bool IsBlocked(string email, string blockedEmailsConfig)
@@ -35,9 +34,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                 return false;
             }
 
-            var normalizedEmail = NormalizeEmail(email);
-            return ParseRules(blockedEmailsConfig)
-                .Any(rule => MatchesBlockedRule(normalizedEmail, rule));
+            return ParseRules(blockedEmailsConfig).Any(rule => MatchesBlockedDomain(email, rule));
         }
 
         private static IReadOnlyList<string> ParseRules(string config)
@@ -49,18 +46,27 @@ namespace HousingRegisterApi.V1.Infrastructure
                 .ToList();
         }
 
-        private static bool MatchesBlockedRule(string normalizedEmail, string rule)
+        // *@prbly.win matches that domain. *@prbly* matches a domain starting with
+        // "prbly". *@prbly.* matches a domain starting with "prbly.".
+        private static bool MatchesBlockedDomain(string email, string rule)
         {
-            if (rule.StartsWith("*@", StringComparison.Ordinal))
+            if (!rule.StartsWith("*@", StringComparison.Ordinal) || !TryGetDomain(email, out var domain))
             {
-                var domain = TryParseDomain(rule);
-                return domain != null && GetDomain(normalizedEmail) == domain;
+                return false;
             }
 
-            return normalizedEmail == rule;
+            var domainRule = rule[2..];
+            if (domainRule.Length > 1 && domainRule[^1] == '*' && domainRule.IndexOf('*') == domainRule.Length - 1)
+            {
+                var prefix = domainRule[..^1];
+                return domain.Length > prefix.Length
+                    && domain.StartsWith(prefix, StringComparison.Ordinal);
+            }
+
+            return !domainRule.Contains('*') && domain == domainRule;
         }
 
-        private static string TryParseDomain(string rule)
+        private static string TryParseAllowedDomain(string rule)
         {
             if (rule.StartsWith("*@", StringComparison.Ordinal))
             {
@@ -69,10 +75,6 @@ namespace HousingRegisterApi.V1.Infrastructure
             else if (rule.StartsWith('@'))
             {
                 rule = rule[1..];
-            }
-            else if (rule.Contains('@') || rule == "*")
-            {
-                return null;
             }
 
             if (rule.Length == 0 || rule.Contains('@') || rule.Contains('*'))
@@ -83,26 +85,23 @@ namespace HousingRegisterApi.V1.Infrastructure
             return rule;
         }
 
-        private static string GetDomain(string email)
+        private static bool TryGetDomain(string value, out string domain)
         {
-            if (string.IsNullOrWhiteSpace(email))
+            domain = null;
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return null;
+                return false;
             }
 
-            var normalizedEmail = NormalizeEmail(email);
-            var atIndex = normalizedEmail.LastIndexOf('@');
-            if (atIndex < 0 || atIndex == normalizedEmail.Length - 1)
+            var normalized = value.Trim().ToLowerInvariant();
+            var atIndex = normalized.LastIndexOf('@');
+            if (atIndex <= 0 || atIndex == normalized.Length - 1)
             {
-                return null;
+                return false;
             }
 
-            return normalizedEmail[(atIndex + 1)..];
-        }
-
-        private static string NormalizeEmail(string email)
-        {
-            return email.Trim().ToLowerInvariant();
+            domain = normalized[(atIndex + 1)..];
+            return true;
         }
     }
 }

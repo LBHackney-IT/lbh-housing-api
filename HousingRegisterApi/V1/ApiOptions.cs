@@ -16,8 +16,9 @@ namespace HousingRegisterApi.V1
         public Uri ActivityHistoryApiUrl { get; set; }
 
         /// <summary>
-        /// Comma-separated auth email blocklist. Supports exact emails and domain
-        /// wildcards such as *@prbly.win.
+        /// Comma-separated domain blocklist. The local part is ignored.
+        /// *@prbly.win matches that domain, *@prbly* matches a domain starting
+        /// with "prbly", and *@prbly.* matches a domain starting with "prbly.".
         /// </summary>
         public string BlockedAuthEmails { get; set; }
 

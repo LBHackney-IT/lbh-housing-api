@@ -148,7 +148,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         [Test]
         public void CreateVerifyCodeThrowsWhenEmailIsBlocked()
         {
-            _apiOptions.BlockedAuthEmails = "scanner@prbly.win,*@prbly.win";
+            _apiOptions.BlockedAuthEmails = "*@prbly.win,*@prbly*";
 
             Action act = () => _classUnderTest.Execute(new CreateAuthRequest
             {
@@ -212,21 +212,5 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             response.Should().BeOfType<CreateAuthResponse>();
         }
 
-        [Test]
-        public void CreateVerifyCodeThrowsWhenAllowedDomainAddressIsBlocked()
-        {
-            _apiOptions.AllowedAuthEmailDomains = "hackney.gov.uk";
-            _apiOptions.BlockedAuthEmails = "scanner@hackney.gov.uk";
-
-            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
-            {
-                Email = "scanner@hackney.gov.uk"
-            });
-
-            act.Should().Throw<AuthGenerateBlockedException>();
-            _mockApplicationGateway.Verify(
-                x => x.GetIncompleteApplication(It.IsAny<string>()),
-                Times.Never);
-        }
     }
 }
