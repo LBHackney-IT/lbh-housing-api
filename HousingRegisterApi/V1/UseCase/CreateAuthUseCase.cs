@@ -7,6 +7,7 @@ using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Infrastructure;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase.Interfaces;
 
 namespace HousingRegisterApi.V1.UseCase
@@ -16,18 +17,18 @@ namespace HousingRegisterApi.V1.UseCase
         private readonly IApplicationApiGateway _applicationGateway;
         private readonly INotifyGateway _notifyGateway;
         private readonly IActivityGateway _activityGateway;
-        private readonly ApiOptions _apiOptions;
+        private readonly IAuthEmailDomainService _authEmailDomainService;
 
         public CreateAuthUseCase(
             IApplicationApiGateway applicationGateway,
             INotifyGateway notifyGateway,
             IActivityGateway activityGateway,
-            ApiOptions apiOptions)
+            IAuthEmailDomainService authEmailDomainService)
         {
             _applicationGateway = applicationGateway;
             _notifyGateway = notifyGateway;
             _activityGateway = activityGateway;
-            _apiOptions = apiOptions;
+            _authEmailDomainService = authEmailDomainService;
         }
 
         public CreateAuthResponse Execute(CreateAuthRequest request)
@@ -39,8 +40,7 @@ namespace HousingRegisterApi.V1.UseCase
 
             var email = EmailNormalizer.Normalize(request.Email);
 
-            if (!AuthEmailMatcher.IsAllowed(email, _apiOptions.AllowedAuthEmailDomains)
-                || AuthEmailMatcher.IsBlocked(email, _apiOptions.BlockedAuthEmails))
+            if (!_authEmailDomainService.CanRequestVerificationCode(email))
             {
                 throw new AuthGenerateBlockedException();
             }
