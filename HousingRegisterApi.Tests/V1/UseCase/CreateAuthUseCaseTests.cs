@@ -1,11 +1,11 @@
 using AutoFixture;
 using FluentAssertions;
-using HousingRegisterApi.V1;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Response.Exceptions;
 using HousingRegisterApi.V1.Domain;
 using HousingRegisterApi.V1.Gateways;
+using HousingRegisterApi.V1.Services;
 using HousingRegisterApi.V1.UseCase;
 using Moq;
 using NUnit.Framework;
@@ -18,7 +18,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         private Mock<IApplicationApiGateway> _mockApplicationGateway;
         private Mock<INotifyGateway> _mockNotifyGateway;
         private Mock<IActivityGateway> _mockActivityGateway;
-        private ApiOptions _apiOptions;
+        private Mock<IAuthEmailDomainService> _mockAuthEmailDomainService;
         private CreateAuthUseCase _classUnderTest;
         private Fixture _fixture;
         private const string ValidEmail = "resident@hackney.gov.uk";
@@ -29,12 +29,15 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockApplicationGateway = new Mock<IApplicationApiGateway>();
             _mockNotifyGateway = new Mock<INotifyGateway>();
             _mockActivityGateway = new Mock<IActivityGateway>();
-            _apiOptions = new ApiOptions();
+            _mockAuthEmailDomainService = new Mock<IAuthEmailDomainService>();
+            _mockAuthEmailDomainService
+                .Setup(x => x.CanRequestVerificationCode(It.IsAny<string>()))
+                .Returns(true);
             _classUnderTest = new CreateAuthUseCase(
                 _mockApplicationGateway.Object,
                 _mockNotifyGateway.Object,
                 _mockActivityGateway.Object,
-                _apiOptions);
+                _mockAuthEmailDomainService.Object);
             _fixture = new Fixture();
         }
 
@@ -146,13 +149,15 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         }
 
         [Test]
-        public void CreateVerifyCodeThrowsWhenEmailIsBlocked()
+        public void CreateVerifyCodeThrowsWhenEmailDomainCannotRequestCode()
         {
-            _apiOptions.BlockedAuthEmails = "scanner@prbly.win,*@prbly.win";
+            _mockAuthEmailDomainService
+                .Setup(x => x.CanRequestVerificationCode("scanner@prbly.win"))
+                .Returns(false);
 
             Action act = () => _classUnderTest.Execute(new CreateAuthRequest
             {
-                Email = "scanner@prbly.win"
+                Email = " Scanner@prbly.win "
             });
 
             act.Should().Throw<AuthGenerateBlockedException>();
@@ -164,6 +169,20 @@ namespace HousingRegisterApi.Tests.V1.UseCase
                 Times.Never);
             _mockNotifyGateway.Verify(
                 x => x.SendVerifyCode(It.IsAny<Applicant>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Test]
+        public void CreateVerifyCodeDoesNotCheckDomainOfInvalidEmail()
+        {
+            Action act = () => _classUnderTest.Execute(new CreateAuthRequest
+            {
+                Email = "not-an-email"
+            });
+
+            act.Should().Throw<InvalidAuthEmailException>();
+            _mockAuthEmailDomainService.Verify(
+                x => x.CanRequestVerificationCode(It.IsAny<string>()),
                 Times.Never);
         }
     }

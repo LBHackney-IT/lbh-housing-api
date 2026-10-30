@@ -136,6 +136,7 @@ namespace HousingRegisterApi
 
             var options = ApiOptions.FromEnv();
             services.AddSingleton(x => options);
+            services.AddSingleton(options.ToAuthEmailDomainRules());
 
             services.ConfigureDynamoDB();
             services.ConfigureSns();
@@ -217,6 +218,7 @@ namespace HousingRegisterApi
         {
             services.AddScoped<IBedroomCalculatorService, BedroomCalculatorService>();
             services.AddScoped<ICsvService, CsvGeneratorService>();
+            services.AddScoped<IAuthEmailDomainService, AuthEmailDomainService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
