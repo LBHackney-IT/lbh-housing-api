@@ -9,7 +9,7 @@ namespace HousingRegisterApi.V1.Infrastructure
     [ExcludeFromCodeCoverage]
     public static class SnsInitilisationExtensions
     {
-        private static readonly TimeSpan ActivityPublishTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan _activityPublishTimeout = TimeSpan.FromSeconds(5);
 
         public static void ConfigureSns(this IServiceCollection services)
         {
@@ -25,7 +25,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                     {
                         ServiceURL = snsUrl,
                         AuthenticationRegion = "eu-west-2",
-                        Timeout = ActivityPublishTimeout,
+                        Timeout = _activityPublishTimeout,
                         MaxErrorRetry = 1,
                     };
 
@@ -39,7 +39,7 @@ namespace HousingRegisterApi.V1.Infrastructure
                     {
                         // Publishing is audit logging after the application is saved.
                         // The SDK default of 100s outlives API Gateway's 29s limit.
-                        Timeout = ActivityPublishTimeout,
+                        Timeout = _activityPublishTimeout,
                         MaxErrorRetry = 1,
                     }));
             }
