@@ -84,3 +84,25 @@ resource "aws_dynamodb_table" "housingregisterapi_dynamodb_table" {
         projection_type = "ALL"
     }
 }
+
+resource "aws_sns_topic" "housingregister_dynamodb_alerts" {
+  name = "housingregister-dynamodb-alerts"
+}
+
+resource "aws_cloudwatch_metric_alarm" "housingregister_dynamodb_read_spike" {
+  alarm_name          = "housing-register-dynamodb-read-spike-${var.environment_name}"
+  alarm_description   = "DynamoDB ConsumedReadCapacityUnits is unusually high — possible runaway scan or bulk operation."
+  namespace           = "AWS/DynamoDB"
+  metric_name         = "ConsumedReadCapacityUnits"
+  dimensions = {
+    TableName = aws_dynamodb_table.housingregisterapi_dynamodb_table.name
+  }
+  statistic           = "Sum"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 10000 # 10,000 RCUs / 5 min ≈ 33 RCU/s sustained
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.housingregister_dynamodb_alerts.arn]
+  ok_actions          = [aws_sns_topic.housingregister_dynamodb_alerts.arn]
+}
