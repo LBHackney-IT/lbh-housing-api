@@ -25,9 +25,13 @@ namespace HousingRegisterApi.V1.Gateways
 
         Application GetApplicationById(Guid id);
 
+        Task<Application> GetApplicationByIdAsync(Guid id);
+
         Application CreateNewApplication(CreateApplicationRequest request);
 
         Application UpdateApplication(Guid id, UpdateApplicationRequest request);
+
+        Task<Application> UpdateApplicationAsync(Guid id, UpdateApplicationRequest request);
 
         Application CompleteApplication(Guid id);
 

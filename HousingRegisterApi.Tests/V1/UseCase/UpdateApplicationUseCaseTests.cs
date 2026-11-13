@@ -28,7 +28,16 @@ namespace HousingRegisterApi.Tests.V1.UseCase
         public void SetUp()
         {
             _mockGateway = new Mock<IApplicationApiGateway>();
+            _mockGateway
+                .Setup(x => x.GetApplicationByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Application)null);
+            _mockGateway
+                .Setup(x => x.UpdateApplicationAsync(It.IsAny<Guid>(), It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync((Application)null);
             _mockActivityGateway = new Mock<IActivityGateway>();
+            _mockActivityGateway
+                .Setup(x => x.LogActivityAsync(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()))
+                .Returns(Task.CompletedTask);
             _mockASearchGateway = new Mock<ISearchGateway>();
             _classUnderTest = new UpdateApplicationUseCase(_mockGateway.Object, _mockActivityGateway.Object, _mockASearchGateway.Object);
             _fixture = new Fixture();
@@ -42,14 +51,14 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var application = _fixture.Create<Application>();
             application.FixDates();
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns(application);
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync(application);
 
             // Act
             var response = await _classUnderTest.Execute(id, new UpdateApplicationRequest()).ConfigureAwait(false);
 
             // Assert
-            _mockGateway.Verify(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()));
+            _mockGateway.Verify(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()));
             response.Should().BeEquivalentTo(application.ToResponse());
         }
 
@@ -61,12 +70,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var application = _fixture.Create<Application>();
             application.FixDates();
             _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
+                .Setup(x => x.GetApplicationByIdAsync(id))
+                .ReturnsAsync(application);
 
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns(application);
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync(application);
 
             var response = await _classUnderTest.Execute(id, new UpdateApplicationRequest()
             {
@@ -75,7 +84,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             }).ConfigureAwait(false);
 
             // Assert
-            _mockActivityGateway.Verify(x => x.LogActivity(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()));
+            _mockActivityGateway.Verify(x => x.LogActivityAsync(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()));
         }
 
         [Test]
@@ -94,12 +103,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
 
 
             _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
+                .Setup(x => x.GetApplicationByIdAsync(id))
+                .ReturnsAsync(application);
 
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns<Guid, UpdateApplicationRequest>((g, a) =>
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync((Guid g, UpdateApplicationRequest a) =>
                 {
                     return new Application
                     {
@@ -145,12 +154,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             assessment.BiddingNumber = "705";
 
             _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
+                .Setup(x => x.GetApplicationByIdAsync(id))
+                .ReturnsAsync(application);
 
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns<Guid, UpdateApplicationRequest>((g, a) =>
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync((Guid g, UpdateApplicationRequest a) =>
                 {
                     return new Application
                     {
@@ -194,12 +203,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             updatedAssessment.BiddingNumber = "erg";
 
             _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
+                .Setup(x => x.GetApplicationByIdAsync(id))
+                .ReturnsAsync(application);
 
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns<Guid, UpdateApplicationRequest>((g, a) =>
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync((Guid g, UpdateApplicationRequest a) =>
                 {
                     return new Application
                     {
@@ -240,12 +249,12 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             application.Assessment.GenerateBiddingNumber = false;
 
             _mockGateway
-                .Setup(x => x.GetApplicationById(id))
-                .Returns(application);
+                .Setup(x => x.GetApplicationByIdAsync(id))
+                .ReturnsAsync(application);
 
             _mockGateway
-                .Setup(x => x.UpdateApplication(id, It.IsAny<UpdateApplicationRequest>()))
-                .Returns(application);
+                .Setup(x => x.UpdateApplicationAsync(id, It.IsAny<UpdateApplicationRequest>()))
+                .ReturnsAsync(application);
 
             var request = new UpdateApplicationRequest
             {
@@ -255,7 +264,7 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             var response = await _classUnderTest.Execute(id, request).ConfigureAwait(false);
 
             response.Should().BeEquivalentTo(application.ToResponse());
-            _mockGateway.Verify(x => x.UpdateApplication(id, request));
+            _mockGateway.Verify(x => x.UpdateApplicationAsync(id, request));
             _mockGateway.Verify(x => x.GetLastIssuedBiddingNumber(), Times.Never);
             _mockGateway.Verify(x => x.IssueNextBiddingNumber(), Times.Never);
         }

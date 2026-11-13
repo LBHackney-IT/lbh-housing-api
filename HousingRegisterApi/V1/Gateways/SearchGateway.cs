@@ -26,7 +26,9 @@ namespace HousingRegisterApi.V1.Gateways
         {
             _logger = logger;
             var searchDomainUri = new Uri(configuration["SEARCH_DOMAIN"]);
-            _connectionSettings = new ConnectionSettings(searchDomainUri);
+            _connectionSettings = new ConnectionSettings(searchDomainUri)
+                // Default is 60s, which is longer than API Gateway will wait.
+                .RequestTimeout(TimeSpan.FromSeconds(8));
 
 #if DEBUG
             //When debugging locally, dont check for valid SSL to the search domain

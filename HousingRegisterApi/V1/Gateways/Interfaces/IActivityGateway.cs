@@ -16,6 +16,8 @@ namespace HousingRegisterApi.V1.Gateways
         /// <param name="activity"></param>
         void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity);
 
+        Task LogActivityAsync(Application application, EntityActivity<ApplicationActivityType> activity);
+
         /// <summary>
         ///  Gets the activity history for an application
         /// </summary>
