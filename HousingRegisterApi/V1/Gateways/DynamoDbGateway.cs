@@ -352,7 +352,12 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application GetApplicationById(Guid id)
         {
-            var result = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).GetAwaiter().GetResult();
+            return GetApplicationByIdAsync(id).GetAwaiter().GetResult();
+        }
+
+        public async Task<Application> GetApplicationByIdAsync(Guid id)
+        {
+            var result = await _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).ConfigureAwait(false);
             return result?.ToDomain();
         }
 
@@ -430,7 +435,12 @@ namespace HousingRegisterApi.V1.Gateways
 
         public Application UpdateApplication(Guid id, UpdateApplicationRequest request)
         {
-            var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).GetAwaiter().GetResult();
+            return UpdateApplicationAsync(id, request).GetAwaiter().GetResult();
+        }
+
+        public async Task<Application> UpdateApplicationAsync(Guid id, UpdateApplicationRequest request)
+        {
+            var entity = await _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id, _consistentReadConfig).ConfigureAwait(false);
             if (entity == null)
             {
                 return null;
@@ -456,7 +466,7 @@ namespace HousingRegisterApi.V1.Gateways
 
             entity.CalculatedBedroomNeed = _bedroomCalculatorService.Calculate(entity.ToDomain());
 
-            _dynamoDbContext.SaveAsync(entity).GetAwaiter().GetResult();
+            await _dynamoDbContext.SaveAsync(entity).ConfigureAwait(false);
 
             return entity.ToDomain();
         }

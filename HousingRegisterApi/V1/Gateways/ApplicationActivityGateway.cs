@@ -51,6 +51,11 @@ namespace HousingRegisterApi.V1.Gateways
 
         public void LogActivity(Application application, EntityActivity<ApplicationActivityType> activity)
         {
+            LogActivityAsync(application, activity).GetAwaiter().GetResult();
+        }
+
+        public async Task LogActivityAsync(Application application, EntityActivity<ApplicationActivityType> activity)
+        {
             // we only want to log activites after an application has been submitted
             if (activity == null || application == null)
             {
@@ -62,7 +67,7 @@ namespace HousingRegisterApi.V1.Gateways
             if (token != null && activity.HasChanges())
             {
                 var applicationSnsMessage = _snsFactory.Update(application.Id, activity.OldData, activity.NewData, token);
-                _snsGateway.Publish(applicationSnsMessage).GetAwaiter().GetResult();
+                await _snsGateway.Publish(applicationSnsMessage).ConfigureAwait(false);
             }
             else if (token == null)
             {

@@ -36,7 +36,7 @@ namespace HousingRegisterApi.V1.UseCase
             //Validate dates are whole dates
             ValidateDates(request);
 
-            var origApplication = _gateway.GetApplicationById(id);
+            var origApplication = await _gateway.GetApplicationByIdAsync(id).ConfigureAwait(false);
 
             bool biddingNumberChanged = request?.Assessment != null
                 && origApplication?.Assessment?.BiddingNumber != request.Assessment.BiddingNumber;
@@ -92,15 +92,14 @@ namespace HousingRegisterApi.V1.UseCase
 
             var activities = GetApplicationActivities(origApplication, request);
 
-            var application = _gateway.UpdateApplication(id, request);
+            var application = await _gateway.UpdateApplicationAsync(id, request).ConfigureAwait(false);
 
             if (null != application)
             {
-                // audit the update
-                activities.ForEach(activity =>
-                {
-                    _activityGateway.LogActivity(application, activity);
-                });
+                // One publish per changed field. Run them together so a slow
+                // audit event cannot stack up to the API Gateway limit.
+                await Task.WhenAll(activities.Select(activity =>
+                    _activityGateway.LogActivityAsync(application, activity))).ConfigureAwait(false);
             }
 
             return application.ToResponse();

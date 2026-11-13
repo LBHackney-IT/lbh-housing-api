@@ -9,6 +9,8 @@ namespace HousingRegisterApi.V1.Infrastructure
     [ExcludeFromCodeCoverage]
     public static class SnsInitilisationExtensions
     {
+        private static readonly TimeSpan _activityPublishTimeout = TimeSpan.FromSeconds(5);
+
         public static void ConfigureSns(this IServiceCollection services)
         {
             _ = bool.TryParse(Environment.GetEnvironmentVariable("DynamoDb_LocalMode"), out var localMode);
@@ -22,7 +24,9 @@ namespace HousingRegisterApi.V1.Infrastructure
                     var clientConfig = new AmazonSimpleNotificationServiceConfig
                     {
                         ServiceURL = snsUrl,
-                        AuthenticationRegion = "eu-west-2"
+                        AuthenticationRegion = "eu-west-2",
+                        Timeout = _activityPublishTimeout,
+                        MaxErrorRetry = 1,
                     };
 
                     return new AmazonSimpleNotificationServiceClient(clientConfig);
@@ -30,7 +34,14 @@ namespace HousingRegisterApi.V1.Infrastructure
             }
             else
             {
-                services.TryAddScoped<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();
+                services.TryAddScoped<IAmazonSimpleNotificationService>(_ =>
+                    new AmazonSimpleNotificationServiceClient(new AmazonSimpleNotificationServiceConfig
+                    {
+                        // Publishing is audit logging after the application is saved.
+                        // The SDK default of 100s outlives API Gateway's 29s limit.
+                        Timeout = _activityPublishTimeout,
+                        MaxErrorRetry = 1,
+                    }));
             }
         }
     }
