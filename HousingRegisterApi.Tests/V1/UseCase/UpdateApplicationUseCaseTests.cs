@@ -30,10 +30,10 @@ namespace HousingRegisterApi.Tests.V1.UseCase
             _mockGateway = new Mock<IApplicationApiGateway>();
             _mockGateway
                 .Setup(x => x.GetApplicationByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync((Application)null);
+                .ReturnsAsync((Application) null);
             _mockGateway
                 .Setup(x => x.UpdateApplicationAsync(It.IsAny<Guid>(), It.IsAny<UpdateApplicationRequest>()))
-                .ReturnsAsync((Application)null);
+                .ReturnsAsync((Application) null);
             _mockActivityGateway = new Mock<IActivityGateway>();
             _mockActivityGateway
                 .Setup(x => x.LogActivityAsync(It.IsAny<Application>(), It.IsAny<EntityActivity<ApplicationActivityType>>()))
