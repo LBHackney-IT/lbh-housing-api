@@ -138,7 +138,8 @@ namespace HousingRegisterApi
             services.AddSingleton(x => options);
             services.AddSingleton(options.ToAuthEmailDomainRules());
 
-            services.ConfigureDynamoDB();
+            // API Gateway returns 504 when this function is still running at 29s.
+            services.ConfigureDynamoDB(TimeSpan.FromSeconds(15));
             services.ConfigureSns();
             services.ConfigureS3();
             services.AddTokenFactory();
