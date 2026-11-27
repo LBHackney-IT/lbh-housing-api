@@ -1,3 +1,5 @@
+using Hackney.Core.Http;
+using Hackney.Core.JWT;
 using HousingRegisterApi.V1.Boundary.Request;
 using HousingRegisterApi.V1.Boundary.Response;
 using HousingRegisterApi.V1.Boundary.Response.Exceptions;
@@ -7,6 +9,7 @@ using HousingRegisterApi.V1.Gateways;
 using HousingRegisterApi.V1.Gateways.Interfaces;
 using HousingRegisterApi.V1.Infrastructure;
 using HousingRegisterApi.V1.UseCase.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +23,27 @@ namespace HousingRegisterApi.V1.UseCase
         private readonly IApplicationApiGateway _gateway;
         private readonly IActivityGateway _activityGateway;
         private readonly ISearchGateway _search;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IHttpContextWrapper _contextWrapper;
+        private readonly ITokenFactory _tokenFactory;
+        private readonly ApiOptions _apiOptions;
 
         public UpdateApplicationUseCase(
             IApplicationApiGateway gateway,
             IActivityGateway applicationHistory,
-            ISearchGateway search)
+            ISearchGateway search,
+            IHttpContextAccessor contextAccessor,
+            IHttpContextWrapper contextWrapper,
+            ITokenFactory tokenFactory,
+            ApiOptions apiOptions)
         {
             _gateway = gateway;
             _activityGateway = applicationHistory;
             _search = search;
+            _contextAccessor = contextAccessor;
+            _contextWrapper = contextWrapper;
+            _tokenFactory = tokenFactory;
+            _apiOptions = apiOptions;
         }
 
         public async Task<ApplicationResponse> Execute(Guid id, UpdateApplicationRequest request)
@@ -37,6 +52,20 @@ namespace HousingRegisterApi.V1.UseCase
             ValidateDates(request);
 
             var origApplication = _gateway.GetApplicationById(id);
+
+            // Residents reach this API without a staff token. They may only change the
+            // household details they entered. Status, assessment, assignment, sensitivity and
+            // medical needs are owned by staff and the system, so the request is merged onto the
+            // stored application rather than let a stale copy held in the resident's browser
+            // overwrite staff changes.
+            if (!IsStaffCaller())
+            {
+                ResidentUpdateRestrictions.Apply(request, origApplication);
+            }
+
+            // The main applicant's email is the key they sign in with, so it is fixed once the
+            // application exists. Applies to residents and staff alike. Modifies request in place.
+            ApplyEmailLock(request, origApplication);
 
             bool biddingNumberChanged = request?.Assessment != null
                 && origApplication?.Assessment?.BiddingNumber != request.Assessment.BiddingNumber;
@@ -104,6 +133,31 @@ namespace HousingRegisterApi.V1.UseCase
             }
 
             return application.ToResponse();
+        }
+
+        private bool IsStaffCaller()
+        {
+            return StaffAuthValidator.IsStaffWithWriteAccess(
+                _contextAccessor.HttpContext,
+                _contextWrapper,
+                _tokenFactory,
+                _apiOptions);
+        }
+
+        /// <summary>
+        /// Keeps the stored main applicant email. Only applies when an email is already stored;
+        /// a blank stored email is left alone so it can still be filled in.
+        /// </summary>
+        private static void ApplyEmailLock(UpdateApplicationRequest request, Application origApplication)
+        {
+            var storedEmail = origApplication?.MainApplicant?.ContactInformation?.EmailAddress;
+            if (request?.MainApplicant == null || string.IsNullOrWhiteSpace(storedEmail))
+            {
+                return;
+            }
+
+            request.MainApplicant.ContactInformation ??= new ContactInformation();
+            request.MainApplicant.ContactInformation.EmailAddress = storedEmail;
         }
 
         private static void ValidateDates(UpdateApplicationRequest request)

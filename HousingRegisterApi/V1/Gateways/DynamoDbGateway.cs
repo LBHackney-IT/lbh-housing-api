@@ -481,7 +481,7 @@ namespace HousingRegisterApi.V1.Gateways
         {
             var entity = _dynamoDbContext.LoadAsync<ApplicationDbEntity>(id).GetAwaiter().GetResult();
             if (entity == null
-                || entity.MainApplicant.ContactInformation.EmailAddress != request.Email)
+                || !EmailNormalizer.IsSameAddress(entity.MainApplicant.ContactInformation.EmailAddress, request.Email))
             {
                 return null;
             }
