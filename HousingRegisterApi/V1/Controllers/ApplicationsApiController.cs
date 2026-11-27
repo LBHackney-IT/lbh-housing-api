@@ -316,38 +316,62 @@ namespace HousingRegisterApi.V1.Controllers
         /// Create evidence requests for an application
         /// </summary>
         /// <response code="200">Success</response>
+        /// <response code="403">Resident authorization for this application required</response>
         /// <response code="404">No record found for the specified ID</response>
+        /// <response code="409">The application has not been submitted</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Route("{id}/evidence")]
         public async Task<IActionResult> CreateEvidenceRequestAsync([FromRoute][Required] Guid id, [FromBody] CreateEvidenceRequestBase request)
         {
-            var result = await _createEvidenceRequestUseCase.ExecuteAsync(id, request).ConfigureAwait(false);
-            if (result == null) return NotFound(id);
+            try
+            {
+                var result = await _createEvidenceRequestUseCase.ExecuteAsync(id, request).ConfigureAwait(false);
+                if (result == null) return NotFound(id);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (UnauthorizedResidentException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+            catch (EvidenceRequestNotAllowedException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
 
         /// <summary>
         /// Adds note to an applications activity history
         /// </summary>
         /// <response code="200">Success</response>
+        /// <response code="403">Staff authorization required</response>
         /// <response code="404">No record found for the specified ID</response>
         /// <response code="500">Internal server error</response>
         [ProducesResponseType(typeof(ApplicationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [Route("{id}/note")]
         public IActionResult AddApplicationNote([FromRoute][Required] Guid id, [FromBody] AddApplicationNoteRequest request)
         {
-            var result = _addApplicationNoteUseCase.Execute(id, request);
-            if (result == null) return NotFound(id);
+            try
+            {
+                var result = _addApplicationNoteUseCase.Execute(id, request);
+                if (result == null) return NotFound(id);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (UnauthorizedStaffException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
         }
 
         /// <summary>

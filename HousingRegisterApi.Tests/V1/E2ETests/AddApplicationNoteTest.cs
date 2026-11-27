@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HousingRegisterApi.Tests.V1.E2ETests
 {
-    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests    
+    //For guidance on writing integration tests see the wiki page https://github.com/LBHackney-IT/lbh-base-api/wiki/Writing-Integration-Tests
     public class AddApplicationNoteTest : DynamoDbIntegrationTests<Startup>
     {
         private readonly ApplicationFixture _applicationFixture;
@@ -27,7 +27,17 @@ namespace HousingRegisterApi.Tests.V1.E2ETests
         {
             using var data = new StringContent(request, Encoding.UTF8, "application/json");
             var uri = new Uri($"api/v1/applications/{id}/note", UriKind.Relative);
-            return await Client.PostAsync(uri, data).ConfigureAwait(false);
+
+            // Notes are staff-only, so the request must carry a staff token
+            var message = new HttpRequestMessage(HttpMethod.Post, uri)
+            {
+                Content = data,
+            };
+            message.Headers.Add(
+                "Authorization",
+                E2eStaffTokenHelper.CreateStaffAuthorizationHeaderValue());
+
+            return await Client.SendAsync(message).ConfigureAwait(false);
         }
 
         private async Task SetupTestData(Application entity)

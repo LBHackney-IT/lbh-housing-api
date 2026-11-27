@@ -6,5 +6,10 @@ namespace HousingRegisterApi.V1.Boundary.Response.Exceptions
             : base("Staff authorization is required to create an application.")
         {
         }
+
+        public UnauthorizedStaffException(string message)
+            : base(message)
+        {
+        }
     }
 }

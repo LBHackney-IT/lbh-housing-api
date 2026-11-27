@@ -17,22 +17,36 @@ namespace HousingRegisterApi.V1.Infrastructure
             ITokenFactory tokenFactory,
             ApiOptions apiOptions)
         {
-            if (!TryGetStaffToken(context, contextWrapper, tokenFactory, out var token))
+            if (!IsStaffWithWriteAccess(context, contextWrapper, tokenFactory, apiOptions))
             {
                 throw new UnauthorizedStaffException();
+            }
+        }
+
+        /// <summary>
+        /// True when the request carries a valid staff token in one of the groups that may
+        /// write applications (admin, manager or officer). Read-only staff, residents (who
+        /// reach this API without an Authorization header) and unparseable tokens are not.
+        /// </summary>
+        public static bool IsStaffWithWriteAccess(
+            HttpContext context,
+            IHttpContextWrapper contextWrapper,
+            ITokenFactory tokenFactory,
+            ApiOptions apiOptions)
+        {
+            if (!TryGetStaffToken(context, contextWrapper, tokenFactory, out var token))
+            {
+                return false;
             }
 
             var allowedGroups = apiOptions.GetStaffGroupsAllowedToCreateApplications().ToList();
             if (!allowedGroups.Any())
             {
-                throw new UnauthorizedStaffException();
+                return false;
             }
 
-            if (token.Groups == null ||
-                !token.Groups.Any(group => allowedGroups.Contains(group, StringComparer.OrdinalIgnoreCase)))
-            {
-                throw new UnauthorizedStaffException();
-            }
+            return token.Groups != null &&
+                token.Groups.Any(group => allowedGroups.Contains(group, StringComparer.OrdinalIgnoreCase));
         }
 
         private static bool TryGetStaffToken(
